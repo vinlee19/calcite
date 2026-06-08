@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 720" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="vArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+  </defs>
+
+  <rect width="980" height="720" fill="#ffffff"/>
+  <text x="490" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">VolcanoPlanner 搜索流程</text>
+  <text x="490" y="52" text-anchor="middle" font-size="12" fill="#595959">Cascades 风格的动态规划 + Memo 等价类管理 + 基于代价的最佳计划选取</text>
+
+  <!-- Flow column (left) -->
+  <!-- Start -->
+  <ellipse cx="240" cy="100" rx="90" ry="26" fill="#1F4E79"/>
+  <text x="240" y="105" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">setRoot(logicalRel)</text>
+
+  <line x1="240" y1="126" x2="240" y2="150" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#vArr)"/>
+
+  <!-- Init Memo -->
+  <rect x="130" y="150" width="220" height="60" rx="6" fill="#DEEBF7" stroke="#1F4E79"/>
+  <text x="240" y="175" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">注册到 Memo</text>
+  <text x="240" y="195" text-anchor="middle" font-size="11" fill="#595959">RelSet ← RelSubset(trait) ← RelNode</text>
+
+  <line x1="240" y1="210" x2="240" y2="234" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#vArr)"/>
+
+  <!-- changeTraits target -->
+  <rect x="130" y="234" width="220" height="56" rx="6" fill="#DEEBF7" stroke="#1F4E79"/>
+  <text x="240" y="258" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">changeTraits(root, target)</text>
+  <text x="240" y="276" text-anchor="middle" font-size="11" fill="#595959">target = ENUMERABLE / JDBC / ...</text>
+
+  <line x1="240" y1="290" x2="240" y2="314" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#vArr)"/>
+
+  <!-- RuleQueue loop -->
+  <rect x="130" y="314" width="220" height="60" rx="6" fill="#FBE5D6" stroke="#C65911"/>
+  <text x="240" y="339" text-anchor="middle" font-size="13" font-weight="700" fill="#833C0C">从 RuleQueue 取 RelOptRuleMatch</text>
+  <text x="240" y="357" text-anchor="middle" font-size="11" fill="#595959">按 importance 排序</text>
+
+  <line x1="240" y1="374" x2="240" y2="398" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#vArr)"/>
+
+  <!-- Decision: queue empty? -->
+  <polygon points="240,398 350,440 240,482 130,440" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5"/>
+  <text x="240" y="436" text-anchor="middle" font-size="12" font-weight="700" fill="#7F6000">Queue 是否为空？</text>
+  <text x="240" y="454" text-anchor="middle" font-size="10" fill="#595959">且找到最优计划？</text>
+
+  <!-- Yes branch -->
+  <line x1="240" y1="482" x2="240" y2="506" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#vArr)"/>
+  <text x="252" y="494" font-size="11" font-weight="700" fill="#385723">是</text>
+
+  <rect x="130" y="506" width="220" height="56" rx="6" fill="#E2EFDA" stroke="#548235"/>
+  <text x="240" y="528" text-anchor="middle" font-size="13" font-weight="700" fill="#385723">findBestExp() 返回</text>
+  <text x="240" y="548" text-anchor="middle" font-size="11" fill="#595959">沿 RelSubset.best 反向重建物理树</text>
+
+  <line x1="240" y1="562" x2="240" y2="586" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#vArr)"/>
+  <ellipse cx="240" cy="610" rx="90" ry="26" fill="#548235"/>
+  <text x="240" y="615" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">输出物理 RelNode</text>
+
+  <!-- No branch (right loop) -->
+  <line x1="350" y1="440" x2="400" y2="440" stroke="#1F4E79" stroke-width="1.5"/>
+  <line x1="400" y1="440" x2="400" y2="340" stroke="#1F4E79" stroke-width="1.5"/>
+  <line x1="400" y1="340" x2="600" y2="340" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#vArr)"/>
+  <text x="360" y="432" font-size="11" font-weight="700" fill="#C00000">否</text>
+
+  <!-- Right column: rule fire -->
+  <rect x="600" y="312" width="220" height="60" rx="6" fill="#FBE5D6" stroke="#C65911"/>
+  <text x="710" y="336" text-anchor="middle" font-size="13" font-weight="700" fill="#833C0C">rule.onMatch(call)</text>
+  <text x="710" y="356" text-anchor="middle" font-size="11" fill="#595959">生成等价 RelNode (新或转换)</text>
+
+  <line x1="710" y1="372" x2="710" y2="394" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#vArr)"/>
+
+  <rect x="600" y="394" width="220" height="60" rx="6" fill="#DEEBF7" stroke="#1F4E79"/>
+  <text x="710" y="418" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">register(newRel)</text>
+  <text x="710" y="438" text-anchor="middle" font-size="11" fill="#595959">归入同一 RelSet 的 RelSubset</text>
+
+  <line x1="710" y1="454" x2="710" y2="476" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#vArr)"/>
+
+  <rect x="600" y="476" width="220" height="60" rx="6" fill="#DEEBF7" stroke="#1F4E79"/>
+  <text x="710" y="500" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">propagateCost</text>
+  <text x="710" y="520" text-anchor="middle" font-size="11" fill="#595959">RelMetadataQuery 计算 cost，向上传播</text>
+
+  <line x1="710" y1="536" x2="710" y2="558" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#vArr)"/>
+
+  <rect x="600" y="558" width="220" height="50" rx="6" fill="#FFF2CC" stroke="#BF8F00"/>
+  <text x="710" y="580" text-anchor="middle" font-size="12" font-weight="700" fill="#7F6000">入队新匹配的 Rule</text>
+  <text x="710" y="598" text-anchor="middle" font-size="11" fill="#595959">触发新一轮探索</text>
+
+  <!-- back loop arrow -->
+  <line x1="600" y1="582" x2="500" y2="582" stroke="#1F4E79" stroke-width="1.5"/>
+  <line x1="500" y1="582" x2="500" y2="344" stroke="#1F4E79" stroke-width="1.5"/>
+  <line x1="500" y1="344" x2="350" y2="344" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#vArr)"/>
+  <text x="510" y="466" font-size="10" fill="#595959" transform="rotate(-90 510 466)">继续探索</text>
+
+  <!-- Side panel: glossary -->
+  <g>
+    <rect x="600" y="100" width="340" height="190" rx="8" fill="#F2F2F2" stroke="#595959" stroke-dasharray="3,3"/>
+    <text x="615" y="120" font-size="13" font-weight="700" fill="#262626">关键概念 (Memo 内部结构)</text>
+    <text x="615" y="143" font-size="11" fill="#1F4E79" font-weight="700">RelSet</text>
+    <text x="660" y="143" font-size="11" fill="#595959">一组语义等价的 RelNode 集合</text>
+    <text x="615" y="166" font-size="11" fill="#1F4E79" font-weight="700">RelSubset</text>
+    <text x="678" y="166" font-size="11" fill="#595959">RelSet 中具有相同 traits 的子集</text>
+    <text x="615" y="189" font-size="11" fill="#1F4E79" font-weight="700">RelOptCost</text>
+    <text x="688" y="189" font-size="11" fill="#595959">{rows, cpu, io}  支持 isLt() 比较</text>
+    <text x="615" y="212" font-size="11" fill="#1F4E79" font-weight="700">Trait Pull-up</text>
+    <text x="695" y="212" font-size="11" fill="#595959">子节点已具备的 trait 向上冒泡</text>
+    <text x="615" y="235" font-size="11" fill="#1F4E79" font-weight="700">Trait Enforcement</text>
+    <text x="725" y="235" font-size="11" fill="#595959">不足的 trait 由 Converter 强制</text>
+    <text x="615" y="262" font-size="11" font-style="italic" fill="#7F3F00">→ 源码：plan/volcano/VolcanoPlanner.java</text>
+    <text x="615" y="280" font-size="11" font-style="italic" fill="#7F3F00">→ 源码：plan/volcano/RelSubset.java</text>
+  </g>
+
+  <text x="490" y="700" text-anchor="middle" font-size="10" fill="#A6A6A6">图 5 — 左侧主流程，右侧为单次 rule fire 的展开；菱形为决策节点，绿色为终态</text>
+</svg>

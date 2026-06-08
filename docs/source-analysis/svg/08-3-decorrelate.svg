@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 700" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="stage" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7F3F00"/>
+    </marker>
+  </defs>
+
+  <rect width="980" height="700" fill="#ffffff"/>
+  <text x="490" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">子查询去关联：RexSubQuery → Correlate → Join</text>
+  <text x="490" y="52" text-anchor="middle" font-size="12" fill="#595959">把"行级标量子查询"提升为"关系级算子"，让优化器能下推、重排、转哈希连接</text>
+
+  <!-- SQL block -->
+  <rect x="60" y="70" width="860" height="56" rx="8" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5"/>
+  <text x="74" y="90" font-size="11" font-weight="700" fill="#7F6000">相关子查询示例</text>
+  <text x="74" y="110" font-size="11.5" font-family="'SF Mono',Menlo,monospace" fill="#262626">SELECT e.ename FROM emp e WHERE e.sal &gt; (SELECT avg(sal) FROM emp WHERE deptno = e.deptno)</text>
+
+  <!-- Stage A: expand=true path -->
+  <rect x="40" y="146" width="290" height="490" rx="8" fill="#ffffff" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="56" y="168" font-size="12.5" font-weight="700" fill="#1F4E79">A. 出现在表达式里</text>
+  <text x="56" y="185" font-size="9.5" fill="#595959">config.expand=false：保留为 RexSubQuery</text>
+
+  <rect x="62" y="198" width="246" height="48" rx="6" fill="#1F4E79"/>
+  <text x="185" y="219" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">LogicalFilter</text>
+  <text x="185" y="236" text-anchor="middle" font-size="9.5" fill="#DEEBF7">condition 含 RexSubQuery.scalar(...)</text>
+
+  <rect x="62" y="262" width="246" height="44" rx="6" fill="#FFFFFF" stroke="#1F4E79"/>
+  <text x="185" y="282" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1F4E79">LogicalTableScan(emp e)</text>
+  <text x="185" y="298" text-anchor="middle" font-size="9" fill="#595959">外层行</text>
+
+  <text x="62" y="332" font-size="10" fill="#595959">RexSubQuery 内嵌一棵 RelNode：</text>
+  <rect x="80" y="342" width="210" height="40" rx="6" fill="#5B9BD5"/>
+  <text x="185" y="367" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">Aggregate avg(sal)</text>
+  <rect x="80" y="392" width="210" height="40" rx="6" fill="#70AD47"/>
+  <text x="185" y="413" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">Filter deptno = $cor0</text>
+  <text x="185" y="427" text-anchor="middle" font-size="8.5" fill="#E2EFDA">引用外层 e.deptno = 相关变量</text>
+  <line x1="185" y1="382" x2="185" y2="392" stroke="#1F4E79" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+  <text x="56" y="462" font-size="10.5" font-weight="700" fill="#7F3F00">substituteSubQuery（config.expand=true 时）</text>
+  <text x="56" y="480" font-size="9.5" fill="#595959">把 RexSubQuery 重写为 Correlate：</text>
+  <rect x="62" y="492" width="246" height="46" rx="6" fill="#ED7D31" stroke="#7F3F00"/>
+  <text x="185" y="513" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">LogicalCorrelate</text>
+  <text x="185" y="529" text-anchor="middle" font-size="9" fill="#FFF2CC">correlation=[$cor0]  requiredColumns={..}</text>
+
+  <text x="56" y="560" font-size="9.5" fill="#595959">Correlate = 把外层每一行的 $cor0</text>
+  <text x="56" y="575" font-size="9.5" fill="#595959">喂给右侧子查询（嵌套循环语义）。</text>
+  <text x="56" y="595" font-size="9.5" fill="#888">仍是"相关"的，优化器难直接处理 ——</text>
+  <text x="56" y="610" font-size="9.5" fill="#888">这是去关联的起点而非终点。</text>
+
+  <!-- arrows -->
+  <line x1="185" y1="246" x2="185" y2="262" stroke="#1F4E79" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <line x1="185" y1="438" x2="185" y2="492" stroke="#7F3F00" stroke-width="1.6" marker-end="url(#stage)"/>
+
+  <!-- big arrow to stage B -->
+  <line x1="334" y1="390" x2="372" y2="390" stroke="#7F3F00" stroke-width="2" marker-end="url(#stage)"/>
+  <text x="353" y="380" text-anchor="middle" font-size="10" font-weight="700" fill="#7F3F00">RelDecorrelator</text>
+
+  <!-- Stage B: RelDecorrelator -->
+  <rect x="380" y="146" width="270" height="490" rx="8" fill="#FBE5D6" stroke="#C65911" stroke-width="1.5"/>
+  <text x="396" y="168" font-size="12.5" font-weight="700" fill="#833C0C">B. RelDecorrelator.decorrelateQuery</text>
+  <text x="396" y="185" font-size="9.5" fill="#833C0C">ReflectiveVisitor 自顶向下重写</text>
+
+  <g font-size="10">
+    <rect x="398" y="198" width="234" height="40" rx="5" fill="#ffffff" stroke="#C65911"/>
+    <text x="408" y="214" font-weight="700" fill="#833C0C">1. CorelMapBuilder.build</text>
+    <text x="408" y="230" fill="#595959" font-size="9">扫描 $cor*；无相关则原样返回</text>
+
+    <rect x="398" y="246" width="234" height="44" rx="5" fill="#ffffff" stroke="#C65911"/>
+    <text x="408" y="262" font-weight="700" fill="#833C0C">2. removeCorrelationViaRule</text>
+    <text x="408" y="278" fill="#595959" font-size="9">FilterCorrelateRule 等先做规则级</text>
+    <text x="408" y="288" fill="#595959" font-size="9">化简（HepPlanner，见第 10 篇）</text>
+
+    <rect x="398" y="298" width="234" height="44" rx="5" fill="#ffffff" stroke="#C65911"/>
+    <text x="408" y="314" font-weight="700" fill="#833C0C">3. CorrelateProjectExtractor</text>
+    <text x="408" y="330" fill="#595959" font-size="9">抽出相关计算到 Project；刷新</text>
+    <text x="408" y="340" fill="#595959" font-size="9">CorelMap（cm）</text>
+
+    <rect x="398" y="350" width="234" height="56" rx="5" fill="#ffffff" stroke="#C65911"/>
+    <text x="408" y="366" font-weight="700" fill="#833C0C">4. dispatcher.invoke(decorrelateRel)</text>
+    <text x="408" y="382" fill="#595959" font-size="9">每种 RelNode 一个 decorrelateRel</text>
+    <text x="408" y="394" fill="#595959" font-size="9">重载；反射分派，返回 Frame</text>
+    <text x="408" y="403" fill="#595959" font-size="9">(新树 + 旧→新列下标映射)</text>
+
+    <rect x="398" y="414" width="234" height="44" rx="5" fill="#ffffff" stroke="#C65911"/>
+    <text x="408" y="430" font-weight="700" fill="#833C0C">5. post 规则 FILTER_INTO_JOIN 等</text>
+    <text x="408" y="446" fill="#595959" font-size="9">把 Correlate 落地为普通 Join</text>
+  </g>
+
+  <text x="396" y="482" font-size="10" font-weight="700" fill="#833C0C">防腐三道关：</text>
+  <text x="396" y="500" font-size="9.5" fill="#595959">• 无相关 → 直接返回（hasCorrelation 短路）</text>
+  <text x="396" y="516" font-size="9.5" fill="#595959">• 行类型校验 equalsSansFieldNames</text>
+  <text x="396" y="532" font-size="9.5" fill="#595959">• Frame 列数对不齐则补 Project 或抛错</text>
+  <text x="396" y="556" font-size="9.5" fill="#888">坑：currentRel 可变、cm 需多次重建；</text>
+  <text x="396" y="571" font-size="9.5" fill="#888">能去关联的范围有限，去不掉就保留</text>
+  <text x="396" y="586" font-size="9.5" fill="#888">Correlate 交给优化器（性能可能差）。</text>
+
+  <!-- big arrow to stage C -->
+  <line x1="654" y1="390" x2="692" y2="390" stroke="#7F3F00" stroke-width="2" marker-end="url(#stage)"/>
+
+  <!-- Stage C: result -->
+  <rect x="700" y="146" width="250" height="490" rx="8" fill="#ffffff" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="716" y="168" font-size="12.5" font-weight="700" fill="#1F4E79">C. 去关联后的等价计划</text>
+  <text x="716" y="185" font-size="9.5" fill="#595959">无 $cor，可被任意重排/下推</text>
+
+  <rect x="730" y="206" width="190" height="46" rx="6" fill="#1F4E79"/>
+  <text x="825" y="227" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">Filter sal &gt; avg_sal</text>
+  <text x="825" y="243" text-anchor="middle" font-size="9" fill="#DEEBF7">普通谓词，无相关变量</text>
+
+  <rect x="730" y="272" width="190" height="46" rx="6" fill="#ED7D31" stroke="#7F3F00"/>
+  <text x="825" y="293" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">LogicalJoin (inner)</text>
+  <text x="825" y="309" text-anchor="middle" font-size="9" fill="#FFF2CC">e.deptno = agg.deptno</text>
+
+  <rect x="715" y="346" width="100" height="44" rx="6" fill="#FFFFFF" stroke="#1F4E79"/>
+  <text x="765" y="366" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1F4E79">Scan(emp e)</text>
+  <text x="765" y="381" text-anchor="middle" font-size="8.5" fill="#595959">外层</text>
+
+  <rect x="835" y="346" width="100" height="44" rx="6" fill="#5B9BD5"/>
+  <text x="885" y="362" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">Aggregate</text>
+  <text x="885" y="377" text-anchor="middle" font-size="8.5" fill="#DEEBF7">avg by deptno</text>
+
+  <line x1="825" y1="252" x2="825" y2="272" stroke="#1F4E79" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <line x1="790" y1="318" x2="765" y2="346" stroke="#1F4E79" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <line x1="860" y1="318" x2="885" y2="346" stroke="#1F4E79" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+  <text x="716" y="424" font-size="10.5" font-weight="700" fill="#385723">收益（数据工程视角）：</text>
+  <text x="716" y="442" font-size="9.5" fill="#595959">• 子查询只算一次（按 deptno 聚合），</text>
+  <text x="716" y="456" font-size="9.5" fill="#595959">  而非外层每行重算一次</text>
+  <text x="716" y="474" font-size="9.5" fill="#595959">• Join 可走 HashJoin / 重排 / 下推</text>
+  <text x="716" y="492" font-size="9.5" fill="#595959">• 行类型与字段数与去关联前一致</text>
+
+  <text x="716" y="520" font-size="9.5" fill="#888">开关：config.decorrelationEnabled</text>
+  <text x="716" y="535" font-size="9.5" fill="#888">另有 TopDownGeneralDecorrelator</text>
+  <text x="716" y="550" font-size="9.5" fill="#888">作为更通用的替代实现。</text>
+
+  <text x="490" y="664" text-anchor="middle" font-size="10" fill="#A6A6A6">图 08-3 — 棕色粗箭头为阶段推进；A 处 RexSubQuery 是行表达式，C 处已成纯关系算子，可交优化器</text>
+</svg>

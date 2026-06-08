@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 640" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#595959"/>
+    </marker>
+    <linearGradient id="bgCore" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#BDD7EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="900" height="640" fill="#ffffff"/>
+  <text x="450" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">Apache Calcite 整体架构与模块分层</text>
+  <text x="450" y="52" text-anchor="middle" font-size="12" fill="#595959">无存储层 · 可插拔 Adapter · 基于 Cascades 的 CBO 优化器</text>
+
+  <!-- Layer 1: Clients -->
+  <g>
+    <rect x="40" y="78" width="820" height="58" rx="8" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5"/>
+    <text x="60" y="100" font-size="13" font-weight="700" fill="#7F6000">① Clients / API 入口</text>
+    <rect x="200" y="92" width="140" height="32" rx="4" fill="#ffffff" stroke="#BF8F00"/>
+    <text x="270" y="113" text-anchor="middle" font-size="12" fill="#595959">JDBC Driver  (jdbc:calcite:)</text>
+    <rect x="360" y="92" width="180" height="32" rx="4" fill="#ffffff" stroke="#BF8F00"/>
+    <text x="450" y="113" text-anchor="middle" font-size="12" fill="#595959">Frameworks / Planner API</text>
+    <rect x="560" y="92" width="160" height="32" rx="4" fill="#ffffff" stroke="#BF8F00"/>
+    <text x="640" y="113" text-anchor="middle" font-size="12" fill="#595959">RelBuilder (Programmatic)</text>
+  </g>
+
+  <!-- Layer 2: Core engine -->
+  <g>
+    <rect x="40" y="156" width="600" height="180" rx="8" fill="url(#bgCore)" stroke="#1F4E79" stroke-width="2"/>
+    <text x="60" y="178" font-size="13" font-weight="700" fill="#1F4E79">② Core Engine  (core/)</text>
+
+    <rect x="60" y="196" width="100" height="56" rx="6" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="110" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">Parser</text>
+    <text x="110" y="238" text-anchor="middle" font-size="10" fill="#595959">SqlParserImpl</text>
+
+    <rect x="172" y="196" width="100" height="56" rx="6" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="222" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">Validator</text>
+    <text x="222" y="238" text-anchor="middle" font-size="10" fill="#595959">SqlValidatorImpl</text>
+
+    <rect x="284" y="196" width="100" height="56" rx="6" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="334" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">SqlToRel</text>
+    <text x="334" y="238" text-anchor="middle" font-size="10" fill="#595959">SqlToRelConverter</text>
+
+    <rect x="396" y="196" width="116" height="56" rx="6" fill="#ED7D31" stroke="#7F3F00"/>
+    <text x="454" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">Optimizer</text>
+    <text x="454" y="238" text-anchor="middle" font-size="10" fill="#FFF2CC">Volcano / Hep</text>
+
+    <rect x="524" y="196" width="100" height="56" rx="6" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="574" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">Implement</text>
+    <text x="574" y="238" text-anchor="middle" font-size="10" fill="#595959">Enumerable+Janino</text>
+
+    <!-- arrows between core stages -->
+    <line x1="160" y1="224" x2="172" y2="224" stroke="#595959" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <line x1="272" y1="224" x2="284" y2="224" stroke="#595959" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <line x1="384" y1="224" x2="396" y2="224" stroke="#595959" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <line x1="512" y1="224" x2="524" y2="224" stroke="#595959" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <!-- Supporting modules -->
+    <text x="60" y="280" font-size="11" font-weight="700" fill="#1F4E79">支撑模块</text>
+    <rect x="60" y="290" width="110" height="32" rx="4" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="115" y="311" text-anchor="middle" font-size="11" fill="#595959">RelNode / RexNode</text>
+    <rect x="180" y="290" width="110" height="32" rx="4" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="235" y="311" text-anchor="middle" font-size="11" fill="#595959">RelOptCluster</text>
+    <rect x="300" y="290" width="110" height="32" rx="4" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="355" y="311" text-anchor="middle" font-size="11" fill="#595959">RelTraitSet</text>
+    <rect x="420" y="290" width="110" height="32" rx="4" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="475" y="311" text-anchor="middle" font-size="11" fill="#595959">RelMetadataQuery</text>
+  </g>
+
+  <!-- Right side: Schema/Catalog -->
+  <g>
+    <rect x="660" y="156" width="200" height="180" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="2"/>
+    <text x="680" y="178" font-size="13" font-weight="700" fill="#385723">③ Schema / Catalog</text>
+    <rect x="680" y="196" width="160" height="28" rx="4" fill="#ffffff" stroke="#548235"/>
+    <text x="760" y="214" text-anchor="middle" font-size="11" fill="#595959">Schema · SchemaPlus</text>
+    <rect x="680" y="232" width="160" height="28" rx="4" fill="#ffffff" stroke="#548235"/>
+    <text x="760" y="250" text-anchor="middle" font-size="11" fill="#595959">Table · TranslatableTable</text>
+    <rect x="680" y="268" width="160" height="28" rx="4" fill="#ffffff" stroke="#548235"/>
+    <text x="760" y="286" text-anchor="middle" font-size="11" fill="#595959">CalciteCatalogReader</text>
+    <rect x="680" y="304" width="160" height="22" rx="4" fill="#ffffff" stroke="#548235"/>
+    <text x="760" y="319" text-anchor="middle" font-size="11" fill="#595959">RelOptSchema</text>
+  </g>
+
+  <!-- Layer 3: Adapter Conventions -->
+  <g>
+    <rect x="40" y="356" width="820" height="148" rx="8" fill="#FBE5D6" stroke="#C65911" stroke-width="2"/>
+    <text x="60" y="378" font-size="13" font-weight="700" fill="#833C0C">④ Adapters  (各模块独立)  — 每个 Adapter = Schema + Table + Convention + Rules</text>
+
+    <g font-size="11" fill="#ffffff">
+      <rect x="60"  y="394" width="90" height="36" rx="6" fill="#ED7D31"/><text x="105" y="417" text-anchor="middle">enumerable</text>
+      <rect x="160" y="394" width="90" height="36" rx="6" fill="#5B9BD5"/><text x="205" y="417" text-anchor="middle">jdbc</text>
+      <rect x="260" y="394" width="90" height="36" rx="6" fill="#70AD47"/><text x="305" y="417" text-anchor="middle">mongodb</text>
+      <rect x="360" y="394" width="90" height="36" rx="6" fill="#A5A5A5"/><text x="405" y="417" text-anchor="middle">elasticsearch</text>
+      <rect x="460" y="394" width="90" height="36" rx="6" fill="#FFC000"/><text x="505" y="417" text-anchor="middle">druid</text>
+      <rect x="560" y="394" width="90" height="36" rx="6" fill="#7030A0"/><text x="605" y="417" text-anchor="middle">cassandra</text>
+      <rect x="660" y="394" width="90" height="36" rx="6" fill="#264478"/><text x="705" y="417" text-anchor="middle">kafka</text>
+      <rect x="760" y="394" width="90" height="36" rx="6" fill="#9E480E"/><text x="805" y="417" text-anchor="middle">arrow</text>
+
+      <rect x="60"  y="438" width="90" height="36" rx="6" fill="#636363"/><text x="105" y="461" text-anchor="middle">file</text>
+      <rect x="160" y="438" width="90" height="36" rx="6" fill="#997300"/><text x="205" y="461" text-anchor="middle">spark</text>
+      <rect x="260" y="438" width="90" height="36" rx="6" fill="#43682B"/><text x="305" y="461" text-anchor="middle">splunk</text>
+      <rect x="360" y="438" width="90" height="36" rx="6" fill="#255E91"/><text x="405" y="461" text-anchor="middle">redis</text>
+      <rect x="460" y="438" width="90" height="36" rx="6" fill="#806000"/><text x="505" y="461" text-anchor="middle">geode</text>
+      <rect x="560" y="438" width="90" height="36" rx="6" fill="#1F3864"/><text x="605" y="461" text-anchor="middle">innodb</text>
+      <rect x="660" y="438" width="90" height="36" rx="6" fill="#525252"/><text x="705" y="461" text-anchor="middle">pig / piglet</text>
+      <rect x="760" y="438" width="90" height="36" rx="6" fill="#7F6000"/><text x="805" y="461" text-anchor="middle">example/csv</text>
+    </g>
+    <text x="450" y="494" text-anchor="middle" font-size="11" fill="#7F3F00">每个 Adapter 通过 ConverterRule 把逻辑算子转换成自己的 Convention，从而完成下推与执行</text>
+  </g>
+
+  <!-- Layer 4: External systems -->
+  <g>
+    <rect x="40" y="520" width="820" height="74" rx="8" fill="#F2F2F2" stroke="#595959" stroke-width="1.5"/>
+    <text x="60" y="542" font-size="13" font-weight="700" fill="#262626">⑤ External Data Sources / 执行引擎</text>
+    <text x="60" y="566" font-size="11" fill="#595959">MySQL · PostgreSQL · Oracle  |  MongoDB · Cassandra · Elasticsearch  |  Kafka · Druid · Splunk  |  本地文件 / Parquet / Avro / Arrow  |  Spark Cluster</text>
+    <text x="60" y="584" font-size="11" fill="#595959">Calcite 自身不存数据；execution 由 enumerable (Janino in-process) 或 push-down 到外部系统完成</text>
+  </g>
+
+  <!-- Connecting arrows between layers -->
+  <line x1="450" y1="136" x2="450" y2="156" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="640" y1="246" x2="660" y2="246" stroke="#548235" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="450" y1="336" x2="450" y2="356" stroke="#C65911" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="450" y1="504" x2="450" y2="520" stroke="#595959" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Footer -->
+  <text x="450" y="618" text-anchor="middle" font-size="10" fill="#A6A6A6">图 1 — 数据源在底，执行引擎居中，API 在顶；Schema/Catalog 横跨各层为 Validator 与 Planner 提供元数据</text>
+</svg>

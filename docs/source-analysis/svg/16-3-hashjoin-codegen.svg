@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <linearGradient id="bgBox" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#BDD7EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="960" height="720" fill="#ffffff"/>
+  <text x="480" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">EnumerableHashJoin.implement() 生成的伪码结构</text>
+  <text x="480" y="52" text-anchor="middle" font-size="12" fill="#595959">每个算子的 implement() 把"调用约定"翻译成对 EnumerableDefaults.hashJoin(..) 的一次调用 + 一组 lambda 参数</text>
+
+  <!-- left/right child results -->
+  <rect x="40" y="78" width="200" height="64" rx="8" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="140" y="100" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">visitChild(left)</text>
+  <text x="140" y="118" text-anchor="middle" font-size="9.5" fill="#595959">→ leftResult.block</text>
+  <text x="140" y="133" text-anchor="middle" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">Expression leftExpression</text>
+
+  <rect x="720" y="78" width="200" height="64" rx="8" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="820" y="100" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">visitChild(right)</text>
+  <text x="820" y="118" text-anchor="middle" font-size="9.5" fill="#595959">→ rightResult.block</text>
+  <text x="820" y="133" text-anchor="middle" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">Expression rightExpression</text>
+
+  <line x1="240" y1="110" x2="318" y2="110" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="720" y1="110" x2="642" y2="110" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- BlockBuilder center -->
+  <rect x="320" y="78" width="320" height="64" rx="8" fill="url(#bgBox)" stroke="#1F4E79" stroke-width="2"/>
+  <text x="480" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">BlockBuilder builder</text>
+  <text x="480" y="118" text-anchor="middle" font-size="9.5" fill="#1a1a1a">append 子块；下面追加一次 HASH_JOIN 调用</text>
+  <text x="480" y="133" text-anchor="middle" font-size="9" fill="#595959">CSE / 变量复用由 BlockBuilder 负责（→ 第 15 篇）</text>
+
+  <!-- generated pseudo-code body -->
+  <rect x="60" y="172" width="840" height="346" rx="10" fill="#F7F9FB" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="76" y="194" font-size="11" font-weight="700" fill="#1F4E79">生成的 Java 伪码（实际由 EnumerableDefaults.hashJoin 内部展开）</text>
+
+  <text x="84" y="218" font-size="10.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">final Enumerable left  = &lt;leftExpression&gt;;</text>
+  <text x="84" y="236" font-size="10.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">final Enumerable right = &lt;rightExpression&gt;;</text>
+
+  <text x="84" y="262" font-size="10.5" font-family="'SF Mono',Menlo,monospace" fill="#7F3F00">// ① build 阶段：用 left 建哈希表，key = leftKeySelector</text>
+  <text x="84" y="280" font-size="10.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">return left.hashJoin(</text>
+  <text x="104" y="298" font-size="10.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">right,</text>
+
+  <text x="104" y="320" font-size="10.5" font-family="'SF Mono',Menlo,monospace" fill="#385723">/*leftKey*/  v0 -&gt; FlatLists.of(v0[k1], v0[k2]),   // generateNullAwareAccessor(leftKeys)</text>
+  <text x="104" y="338" font-size="10.5" font-family="'SF Mono',Menlo,monospace" fill="#385723">/*rightKey*/ v1 -&gt; FlatLists.of(v1[m1], v1[m2]),   // generateNullAwareAccessor(rightKeys)</text>
+
+  <text x="84" y="362" font-size="10.5" font-family="'SF Mono',Menlo,monospace" fill="#7F3F00">// ② probe 阶段：右行查表命中后拼结果行</text>
+  <text x="104" y="380" font-size="10.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">/*result*/   (l, r) -&gt; new Object[]{ l[0], l[1], ..., r[0], ... },  // EnumUtils.joinSelector</text>
+
+  <text x="84" y="404" font-size="10.5" font-family="'SF Mono',Menlo,monospace" fill="#7F3F00">// ③ 附加参数：key 比较器 + 外连接补 null 标志 + 非等值残余谓词</text>
+  <text x="104" y="422" font-size="10.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">/*comparator*/ keyPhysType.comparer(),</text>
+  <text x="104" y="440" font-size="10.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">/*genNullLeft*/  joinType.generatesNullsOnLeft(),</text>
+  <text x="104" y="458" font-size="10.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">/*genNullRight*/ joinType.generatesNullsOnRight(),</text>
+  <text x="104" y="476" font-size="10.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">/*predicate*/    (l, r) -&gt; &lt;non-equi condition&gt; );   // 仅 nonEquiConditions 非空时生成</text>
+
+  <text x="84" y="502" font-size="9.5" fill="#595959">注：SEMI/ANTI 走 implementHashSemiJoin（SEMI_JOIN/ANTI_JOIN 方法）；LEFT_MARK 走 implementHashMarkJoin。三者共享同一套 selector/comparer 装配逻辑。</text>
+
+  <!-- result triple -->
+  <rect x="60" y="538" width="840" height="64" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="2"/>
+  <text x="76" y="560" font-size="12" font-weight="700" fill="#385723">返回 EnumerableRel.Result（三元组）</text>
+  <text x="76" y="580" font-size="10" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">Result{ block = builder.toBlock(),  physType = PhysTypeImpl.of(.., preferArray()),  format }</text>
+  <text x="76" y="595" font-size="9.5" fill="#385723">block 交给父算子继续 append；physType 告诉父算子"我产出的行长什么样"</text>
+
+  <line x1="480" y1="518" x2="480" y2="536" stroke="#548235" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- footnote / takeaway -->
+  <rect x="60" y="620" width="840" height="58" rx="6" fill="#FBE5D6" stroke="#C65911" stroke-width="1.2"/>
+  <text x="76" y="640" font-size="11" font-weight="700" fill="#833C0C">工程要点</text>
+  <text x="76" y="658" font-size="9.5" fill="#7F3F00">算子不手写循环 —— 把"怎么连接"交给 EnumerableDefaults 运行时库，只生成"取哪些 key / 怎么拼行 / 残余谓词"这些 lambda。</text>
+  <text x="76" y="672" font-size="9.5" fill="#7F3F00">算法骨架在库里（可单测、可复用），代码生成只填策略，这是"生成代码量最小化"的关键取舍。</text>
+
+  <text x="480" y="706" text-anchor="middle" font-size="10" fill="#A6A6A6">图 16-3 — 蓝箭头为表达式拼装方向；绿框是算子契约产物 Result；橙色注释标出生成代码的三段语义</text>
+</svg>

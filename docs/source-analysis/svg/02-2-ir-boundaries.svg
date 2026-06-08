@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="ref" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#888"/>
+    </marker>
+  </defs>
+
+  <rect width="960" height="640" fill="#ffffff"/>
+  <text x="480" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">层间转换边界：谁把 A 变成 B</text>
+  <text x="480" y="54" text-anchor="middle" font-size="12" fill="#595959">四层 IR 的三条转换边界各有一个唯一的"翻译官"组件；类型系统横贯三层</text>
+
+  <!-- four IR boxes (horizontal lane) -->
+  <!-- SqlNode -->
+  <rect x="40" y="96" width="190" height="92" rx="8" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.8"/>
+  <text x="135" y="122" text-anchor="middle" font-size="14" font-weight="700" fill="#7F6000">SqlNode</text>
+  <text x="135" y="142" text-anchor="middle" font-size="10.5" fill="#262626">AST / 文本结构</text>
+  <text x="135" y="160" text-anchor="middle" font-size="9.5" fill="#595959" font-family="'SF Mono',Menlo,monospace">sql.SqlNode</text>
+  <text x="135" y="177" text-anchor="middle" font-size="9.5" fill="#7F6000">尚无类型</text>
+
+  <!-- RelNode -->
+  <rect x="270" y="96" width="190" height="92" rx="8" fill="#DEEBF7" stroke="#1F4E79" stroke-width="1.8"/>
+  <text x="365" y="122" text-anchor="middle" font-size="14" font-weight="700" fill="#1F4E79">RelNode</text>
+  <text x="365" y="142" text-anchor="middle" font-size="10.5" fill="#262626">关系代数（整表）</text>
+  <text x="365" y="160" text-anchor="middle" font-size="9.5" fill="#595959" font-family="'SF Mono',Menlo,monospace">rel.RelNode</text>
+  <text x="365" y="177" text-anchor="middle" font-size="9.5" fill="#1F4E79">含 traitSet</text>
+
+  <!-- RexNode -->
+  <rect x="500" y="96" width="190" height="92" rx="8" fill="#FBE5D6" stroke="#C65911" stroke-width="1.8"/>
+  <text x="595" y="122" text-anchor="middle" font-size="14" font-weight="700" fill="#833C0C">RexNode</text>
+  <text x="595" y="142" text-anchor="middle" font-size="10.5" fill="#262626">行表达式（标量）</text>
+  <text x="595" y="160" text-anchor="middle" font-size="9.5" fill="#595959" font-family="'SF Mono',Menlo,monospace">rex.RexNode</text>
+  <text x="595" y="177" text-anchor="middle" font-size="9.5" fill="#833C0C">嵌于 Rel 内部</text>
+
+  <!-- Expression -->
+  <rect x="730" y="96" width="190" height="92" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.8"/>
+  <text x="825" y="122" text-anchor="middle" font-size="14" font-weight="700" fill="#385723">Expression</text>
+  <text x="825" y="142" text-anchor="middle" font-size="10.5" fill="#262626">Java 表达式树</text>
+  <text x="825" y="160" text-anchor="middle" font-size="9.5" fill="#595959" font-family="'SF Mono',Menlo,monospace">linq4j.tree</text>
+  <text x="825" y="177" text-anchor="middle" font-size="9.5" fill="#385723">交给 Janino</text>
+
+  <!-- boundary 1: SqlNode -> RelNode -->
+  <line x1="230" y1="142" x2="270" y2="142" stroke="#1F4E79" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="155" y="232" width="190" height="92" rx="8" fill="#ffffff" stroke="#1F4E79" stroke-width="1.6"/>
+  <text x="250" y="254" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">SqlToRelConverter</text>
+  <text x="250" y="272" text-anchor="middle" font-size="9.5" fill="#595959" font-family="'SF Mono',Menlo,monospace">#convertQuery</text>
+  <text x="250" y="290" text-anchor="middle" font-size="10" fill="#262626">先 validate（注入类型）</text>
+  <text x="250" y="306" text-anchor="middle" font-size="10" fill="#262626">再 convertQueryRecursive</text>
+  <text x="250" y="320" text-anchor="middle" font-size="9.5" fill="#1F4E79">→ RelRoot{ Rel + Rex }</text>
+  <line x1="250" y1="188" x2="250" y2="231" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+
+  <!-- boundary 0: parse + validate feeding SqlNode -->
+  <rect x="40" y="232" width="100" height="92" rx="8" fill="#ffffff" stroke="#BF8F00" stroke-width="1.6"/>
+  <text x="90" y="256" text-anchor="middle" font-size="11" font-weight="700" fill="#7F6000">SqlParser</text>
+  <text x="90" y="272" text-anchor="middle" font-size="9" fill="#595959" font-family="'SF Mono',Menlo,monospace">#parseQuery</text>
+  <text x="90" y="293" text-anchor="middle" font-size="11" font-weight="700" fill="#7F6000">SqlValidator</text>
+  <text x="90" y="309" text-anchor="middle" font-size="9" fill="#595959" font-family="'SF Mono',Menlo,monospace">#validate</text>
+  <line x1="90" y1="231" x2="115" y2="189" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+
+  <!-- Rex lives inside Rel -->
+  <line x1="460" y1="142" x2="500" y2="142" stroke="#888" stroke-width="1.4" stroke-dasharray="5,3" marker-end="url(#ref)"/>
+  <text x="480" y="134" text-anchor="middle" font-size="9" fill="#888">持有</text>
+
+  <!-- boundary 2: Rex -> Expression -->
+  <line x1="690" y1="142" x2="730" y2="142" stroke="#1F4E79" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="540" y="232" width="210" height="92" rx="8" fill="#ffffff" stroke="#C65911" stroke-width="1.6"/>
+  <text x="645" y="254" text-anchor="middle" font-size="12" font-weight="700" fill="#833C0C">RexToLixTranslator</text>
+  <text x="645" y="272" text-anchor="middle" font-size="9.5" fill="#595959" font-family="'SF Mono',Menlo,monospace">#translateProjects</text>
+  <text x="645" y="290" text-anchor="middle" font-size="10" fill="#262626">由 RexImpTable 查实现器</text>
+  <text x="645" y="306" text-anchor="middle" font-size="10" fill="#262626">按 NullPolicy 生成 null 传播</text>
+  <text x="645" y="320" text-anchor="middle" font-size="9.5" fill="#833C0C">RexNode → Expression</text>
+  <line x1="620" y1="188" x2="620" y2="231" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+
+  <!-- Expression -> Janino -->
+  <rect x="775" y="232" width="145" height="92" rx="8" fill="#F2F2F2" stroke="#595959" stroke-width="1.6"/>
+  <text x="847" y="256" text-anchor="middle" font-size="11" font-weight="700" fill="#262626">Janino</text>
+  <text x="847" y="274" text-anchor="middle" font-size="10" fill="#595959">编译 Java 源码</text>
+  <text x="847" y="292" text-anchor="middle" font-size="10" fill="#262626">→ Bindable 字节码</text>
+  <text x="847" y="310" text-anchor="middle" font-size="9.5" fill="#595959">就地执行</text>
+  <line x1="825" y1="188" x2="847" y2="231" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+
+  <!-- Type system spanning band -->
+  <rect x="40" y="360" width="880" height="58" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.6"/>
+  <text x="56" y="382" font-size="12" font-weight="700" fill="#385723">横切关注点 · 类型系统 RelDataType（→ 第 06 篇）</text>
+  <text x="56" y="402" font-size="10.5" fill="#262626">validate 阶段为 SqlNode 推出类型 → RexNode 出生即带 getType() → RexToLix 据此选 Java 类型与装箱策略。类型贯穿后三层，是层间转换的"通用货币"。</text>
+  <line x1="135" y1="188" x2="135" y2="359" stroke="#548235" stroke-width="1" stroke-dasharray="3,4"/>
+  <line x1="595" y1="188" x2="595" y2="359" stroke="#548235" stroke-width="1" stroke-dasharray="3,4"/>
+  <line x1="365" y1="188" x2="365" y2="359" stroke="#548235" stroke-width="1" stroke-dasharray="3,4"/>
+
+  <!-- responsibility note -->
+  <rect x="40" y="436" width="880" height="120" rx="8" fill="#F2F2F2" stroke="#BFBFBF"/>
+  <text x="56" y="458" font-size="12" font-weight="700" fill="#262626">边界设计的工程价值</text>
+  <text x="56" y="479" font-size="10.5" fill="#262626">1. 每条边界只有一个"翻译官"：转换逻辑集中，便于测试与替换（如换执行后端只改 RexToLix 那一层）。</text>
+  <text x="56" y="498" font-size="10.5" fill="#262626">2. 单向降级：上层不依赖下层，下层不回看上层；优化只在 RelNode/RexNode 层闭环，不必回到 SqlNode。</text>
+  <text x="56" y="517" font-size="10.5" fill="#262626">3. RexNode 嵌在 RelNode 内（持有，非降级）：行表达式与关系算子正交，规则可单独改写谓词。</text>
+  <text x="56" y="536" font-size="10.5" fill="#262626">坑：降级不可逆 —— SqlNode 的源位置/书写形态在转成 RelNode 后丢失，错误信息须在 validate 阶段尽早报出。</text>
+
+  <text x="480" y="592" text-anchor="middle" font-size="11" fill="#595959">实线箭头 = 类型转换（降级）；灰色虚线 = "产出/持有"关系；绿色虚线 = 类型系统横切三层</text>
+
+  <!-- legend -->
+  <g>
+    <rect x="320" y="606" width="320" height="24" rx="4" fill="#ffffff" stroke="#BFBFBF"/>
+    <line x1="332" y1="618" x2="356" y2="618" stroke="#1F4E79" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="362" y="622" font-size="9.5" fill="#262626">转换</text>
+    <line x1="408" y1="618" x2="432" y2="618" stroke="#888" stroke-width="1.4" stroke-dasharray="5,3" marker-end="url(#ref)"/>
+    <text x="438" y="622" font-size="9.5" fill="#262626">产出/持有</text>
+    <line x1="520" y1="618" x2="544" y2="618" stroke="#548235" stroke-width="1" stroke-dasharray="3,4"/>
+    <text x="550" y="622" font-size="9.5" fill="#262626">类型横切</text>
+  </g>
+
+  <text x="480" y="636" text-anchor="middle" font-size="10" fill="#A6A6A6">图 02-2 — 三条转换边界各一个唯一翻译官：SqlToRelConverter / (Rex 内嵌) / RexToLixTranslator；类型系统横贯后三层</text>
+</svg>

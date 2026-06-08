@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 700" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="arrowO" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#C65911"/>
+    </marker>
+    <marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#548235"/>
+    </marker>
+  </defs>
+
+  <rect width="980" height="700" fill="#ffffff"/>
+  <text x="490" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">JDBC adapter：从逻辑算子到远端 SQL 的下推与反向翻译</text>
+  <text x="490" y="53" text-anchor="middle" font-size="12" fill="#595959">ConverterRule 把整棵子树压进 JDBC convention，再由 RelToSqlConverter + SqlDialect 生成方言 SQL 推给数据库执行</text>
+
+  <!-- Stage 1: logical tree (NONE) -->
+  <g>
+    <rect x="30" y="78" width="220" height="270" rx="8" fill="#F2F8FD" stroke="#1F4E79" stroke-width="1.5"/>
+    <text x="140" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">① 逻辑算子树 (Convention.NONE)</text>
+
+    <rect x="70" y="116" width="140" height="34" rx="6" fill="#1F4E79"/>
+    <text x="140" y="137" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">LogicalAggregate</text>
+    <rect x="70" y="162" width="140" height="34" rx="6" fill="#2E75B6"/>
+    <text x="140" y="183" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">LogicalProject</text>
+    <rect x="70" y="208" width="140" height="34" rx="6" fill="#5B9BD5"/>
+    <text x="140" y="229" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">LogicalFilter</text>
+    <rect x="70" y="254" width="140" height="34" rx="6" fill="#70AD47"/>
+    <text x="140" y="275" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">LogicalJoin</text>
+    <rect x="70" y="300" width="140" height="34" rx="6" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="140" y="321" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1F4E79">JdbcTableScan ×2</text>
+
+    <line x1="140" y1="150" x2="140" y2="161" stroke="#1F4E79" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <line x1="140" y1="196" x2="140" y2="207" stroke="#1F4E79" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <line x1="140" y1="242" x2="140" y2="253" stroke="#1F4E79" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <line x1="140" y1="288" x2="140" y2="299" stroke="#1F4E79" stroke-width="1.2" marker-end="url(#arrow)"/>
+  </g>
+
+  <!-- Stage 2: converter rules -->
+  <g>
+    <rect x="290" y="78" width="220" height="270" rx="8" fill="#FBE5D6" stroke="#C65911" stroke-width="1.5"/>
+    <text x="400" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="#833C0C">② ConverterRule（每库一份）</text>
+    <text x="400" y="118" text-anchor="middle" font-size="9.5" fill="#833C0C">JdbcConvention.register() 注入到 planner</text>
+
+    <rect x="306" y="130" width="188" height="30" rx="5" fill="#ffffff" stroke="#C65911"/>
+    <text x="400" y="150" text-anchor="middle" font-size="10" fill="#833C0C">JdbcAggregateRule  Agg&#8594;JdbcAggregate</text>
+    <rect x="306" y="166" width="188" height="30" rx="5" fill="#ffffff" stroke="#C65911"/>
+    <text x="400" y="186" text-anchor="middle" font-size="10" fill="#833C0C">JdbcProjectRule  Project&#8594;JdbcProject</text>
+    <rect x="306" y="202" width="188" height="30" rx="5" fill="#ffffff" stroke="#C65911"/>
+    <text x="400" y="222" text-anchor="middle" font-size="10" fill="#833C0C">JdbcFilterRule  Filter&#8594;JdbcFilter</text>
+    <rect x="306" y="238" width="188" height="30" rx="5" fill="#ffffff" stroke="#C65911"/>
+    <text x="400" y="258" text-anchor="middle" font-size="10" fill="#833C0C">JdbcJoinRule  Join&#8594;JdbcJoin</text>
+    <rect x="306" y="274" width="188" height="58" rx="5" fill="#FFF2CC" stroke="#BF8F00"/>
+    <text x="400" y="292" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7F6000">matches() 守门：</text>
+    <text x="400" y="307" text-anchor="middle" font-size="9" fill="#7F6000">dialect.supportsJoinType()</text>
+    <text x="400" y="321" text-anchor="middle" font-size="9" fill="#7F6000">supportsWindowFunctions() · 无 UDF</text>
+  </g>
+
+  <!-- Stage 3: jdbc tree -->
+  <g>
+    <rect x="550" y="78" width="200" height="270" rx="8" fill="#FFF6E9" stroke="#C65911" stroke-width="1.5"/>
+    <text x="650" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="#833C0C">③ JDBC 算子树 (JdbcConvention)</text>
+
+    <rect x="580" y="120" width="140" height="30" rx="6" fill="#ED7D31"/>
+    <text x="650" y="140" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">JdbcAggregate</text>
+    <rect x="580" y="160" width="140" height="30" rx="6" fill="#ED7D31"/>
+    <text x="650" y="180" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">JdbcProject</text>
+    <rect x="580" y="200" width="140" height="30" rx="6" fill="#ED7D31"/>
+    <text x="650" y="220" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">JdbcFilter</text>
+    <rect x="580" y="240" width="140" height="30" rx="6" fill="#ED7D31"/>
+    <text x="650" y="260" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">JdbcJoin</text>
+    <rect x="580" y="280" width="140" height="46" rx="6" fill="#FFFFFF" stroke="#C65911"/>
+    <text x="650" y="298" text-anchor="middle" font-size="9.5" font-weight="700" fill="#833C0C">整棵子树 = 一个</text>
+    <text x="650" y="313" text-anchor="middle" font-size="9.5" font-weight="700" fill="#833C0C">JdbcToEnumerableConverter</text>
+  </g>
+
+  <!-- Stage 4: RelToSql + dialect -->
+  <g>
+    <rect x="790" y="78" width="170" height="270" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+    <text x="875" y="100" text-anchor="middle" font-size="13" font-weight="700" fill="#385723">④ 反向翻译</text>
+
+    <rect x="806" y="116" width="138" height="56" rx="6" fill="#ffffff" stroke="#548235"/>
+    <text x="875" y="134" text-anchor="middle" font-size="10" font-weight="700" fill="#385723">RelToSqlConverter</text>
+    <text x="875" y="149" text-anchor="middle" font-size="8" fill="#385723">ReflectiveVisitor</text>
+    <text x="875" y="162" text-anchor="middle" font-size="8" fill="#385723">visit(Join/Filter/…)&#8594;SqlNode</text>
+
+    <rect x="806" y="182" width="138" height="56" rx="6" fill="#FFF2CC" stroke="#BF8F00"/>
+    <text x="875" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#7F6000">SqlDialect</text>
+    <text x="875" y="214" text-anchor="middle" font-size="8" fill="#7F6000">quoteIdentifier / getCastSpec</text>
+    <text x="875" y="227" text-anchor="middle" font-size="8" fill="#7F6000">unparseOffsetFetch / supports*</text>
+
+    <rect x="806" y="248" width="138" height="40" rx="6" fill="#548235"/>
+    <text x="875" y="266" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">SqlString</text>
+    <text x="875" y="280" text-anchor="middle" font-size="8" fill="#E2EFDA">方言 SQL 文本</text>
+
+    <rect x="806" y="298" width="138" height="36" rx="6" fill="#F2F2F2" stroke="#595959"/>
+    <text x="875" y="315" text-anchor="middle" font-size="9.5" font-weight="700" fill="#262626">远端 DB 执行</text>
+    <text x="875" y="328" text-anchor="middle" font-size="8" fill="#595959">ResultSetEnumerable</text>
+
+    <line x1="875" y1="172" x2="875" y2="181" stroke="#548235" stroke-width="1.2" marker-end="url(#arrowG)"/>
+    <line x1="875" y1="238" x2="875" y2="247" stroke="#548235" stroke-width="1.2" marker-end="url(#arrowG)"/>
+    <line x1="875" y1="288" x2="875" y2="297" stroke="#548235" stroke-width="1.2" marker-end="url(#arrowG)"/>
+  </g>
+
+  <!-- Inter-stage arrows -->
+  <line x1="250" y1="200" x2="289" y2="200" stroke="#C65911" stroke-width="1.8" marker-end="url(#arrowO)"/>
+  <text x="270" y="192" text-anchor="middle" font-size="9" fill="#C65911">onMatch</text>
+  <line x1="510" y1="200" x2="549" y2="200" stroke="#C65911" stroke-width="1.8" marker-end="url(#arrowO)"/>
+  <text x="530" y="192" text-anchor="middle" font-size="9" fill="#C65911">transformTo</text>
+  <line x1="750" y1="200" x2="789" y2="200" stroke="#548235" stroke-width="1.8" marker-end="url(#arrowG)"/>
+  <text x="770" y="192" text-anchor="middle" font-size="9" fill="#385723">implement</text>
+
+  <!-- Cost annotation -->
+  <rect x="550" y="356" width="200" height="40" rx="6" fill="#FFF2CC" stroke="#BF8F00"/>
+  <text x="650" y="373" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7F6000">JdbcConvention.COST_MULTIPLIER = 0.8</text>
+  <text x="650" y="387" text-anchor="middle" font-size="8.5" fill="#7F6000">让 CBO 偏好「推到 DB 算」而非本地 Enumerable</text>
+
+  <!-- Lower band: the dialect customization detail -->
+  <g>
+    <rect x="30" y="416" width="930" height="200" rx="8" fill="#FCFCFC" stroke="#BFBFBF"/>
+    <text x="44" y="438" font-size="13" font-weight="700" fill="#1F4E79">关键解耦：一个 RelToSqlConverter，N 个 SqlDialect</text>
+
+    <rect x="50" y="452" width="270" height="148" rx="6" fill="#F2F8FD" stroke="#1F4E79"/>
+    <text x="185" y="472" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">骨架（方言无关，core 一份）</text>
+    <text x="64" y="494" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#262626">visit(Aggregate) &#8594; SqlSelect.GROUP BY</text>
+    <text x="64" y="512" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#262626">visit(Filter)   &#8594; setWhere / setHaving</text>
+    <text x="64" y="530" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#262626">visit(Join)     &#8594; SqlJoin</text>
+    <text x="64" y="548" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#262626">visit(Sort)     &#8594; ORDER BY + OFFSET/FETCH</text>
+    <text x="64" y="572" font-size="9" fill="#595959">由 ReflectiveVisitor 按运行时类型分派</text>
+    <text x="64" y="588" font-size="9" fill="#595959">遇方言差异处回调 dialect.xxx()</text>
+
+    <rect x="340" y="452" width="300" height="148" rx="6" fill="#FFFBEF" stroke="#BF8F00"/>
+    <text x="490" y="472" text-anchor="middle" font-size="11" font-weight="700" fill="#7F6000">差异（每方言子类各覆写若干钩子）</text>
+    <text x="354" y="494" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#7F6000">MySQL: unparseOffsetFetch &#8594; LIMIT</text>
+    <text x="354" y="512" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#7F6000">MySQL: supportsAggregateFunction(ROLLUP)</text>
+    <text x="354" y="526" font-size="8.5" fill="#7F6000">          仅 majorVersion&#8805;8 返回 true</text>
+    <text x="354" y="544" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#7F6000">Oracle: getCastSpec &#8594; NUMBER / VARCHAR2</text>
+    <text x="354" y="562" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#7F6000">通用: quoteIdentifier &#8594; `x` / "x" / [x]</text>
+    <text x="354" y="586" font-size="9" fill="#595959">新增方言 = 写一个 SqlDialect 子类，core 零改动</text>
+
+    <rect x="660" y="452" width="284" height="148" rx="6" fill="#E8F0E0" stroke="#548235"/>
+    <text x="802" y="472" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">工程收益</text>
+    <text x="674" y="494" font-size="9.5" fill="#385723">• 关注点分离：结构走查 vs 文本细节</text>
+    <text x="674" y="514" font-size="9.5" fill="#385723">• 开闭原则：扩展靠子类，不改骨架</text>
+    <text x="674" y="534" font-size="9.5" fill="#385723">• matches() 把「能否下推」收敛到一处</text>
+    <text x="674" y="554" font-size="9.5" fill="#385723">坑：方言 supports* 漏判 &#8594; 生成对端</text>
+    <text x="674" y="570" font-size="9.5" fill="#385723">   不识别的 SQL，运行期才报错</text>
+    <text x="674" y="590" font-size="9.5" fill="#385723">坑：JdbcConvention 非单例，规则按库实例化</text>
+  </g>
+
+  <text x="490" y="650" text-anchor="middle" font-size="10" fill="#A6A6A6">图 18-2 — 橙线为优化期下推（ConverterRule），绿线为代码生成期反向翻译（RelToSql+Dialect）；蓝线为算子父子关系</text>
+  <text x="490" y="668" text-anchor="middle" font-size="10" fill="#A6A6A6">能力边界由 ConverterRule.matches() + SqlDialect.supports* 共同决定：不支持的算子留在 NONE/Enumerable 侧本地执行</text>
+</svg>

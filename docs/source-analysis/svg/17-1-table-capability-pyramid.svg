@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7F3F00"/>
+    </marker>
+  </defs>
+
+  <rect width="940" height="660" fill="#ffffff"/>
+  <text x="470" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">Table 能力分层金字塔（标记接口渐进式扩展）</text>
+  <text x="470" y="56" text-anchor="middle" font-size="12" fill="#595959">实现哪个接口 = 声明拥有哪一级 pushdown 能力；都不实现也能跑（回退到 Enumerable 全表扫描）</text>
+
+  <!-- Pyramid levels: bottom (widest, simplest) to top (narrowest, most powerful) -->
+  <!-- Level 0: Table base -->
+  <polygon points="120,548 820,548 760,602 180,602" fill="#F2F2F2" stroke="#595959" stroke-width="1.5"/>
+  <text x="470" y="572" text-anchor="middle" font-size="13" font-weight="700" fill="#262626">interface Table  —  仅声明 getRowType / getStatistic（无读数能力）</text>
+  <text x="470" y="590" text-anchor="middle" font-size="10.5" fill="#595959">不实现下列任一标记接口：Calcite 包成 EnumerableTableScan，数据由框架兜底</text>
+
+  <!-- Level 1: ScannableTable -->
+  <polygon points="180,490 760,490 712,540 228,540" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="470" y="512" text-anchor="middle" font-size="13" font-weight="700" fill="#385723">ScannableTable</text>
+  <text x="470" y="530" text-anchor="middle" font-size="10.5" fill="#385723" font-family="'SF Mono',Menlo,monospace">Enumerable&lt;Object[]&gt; scan(root)  —  能力：整表读</text>
+
+  <!-- Level 2: FilterableTable -->
+  <polygon points="228,432 712,432 666,482 274,482" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="470" y="454" text-anchor="middle" font-size="13" font-weight="700" fill="#385723">FilterableTable</text>
+  <text x="470" y="472" text-anchor="middle" font-size="10.5" fill="#385723" font-family="'SF Mono',Menlo,monospace">scan(root, List&lt;RexNode&gt; filters)  —  能力：+ 谓词下推</text>
+
+  <!-- Level 3: ProjectableFilterableTable -->
+  <polygon points="274,374 666,374 620,424 320,424" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="470" y="396" text-anchor="middle" font-size="13" font-weight="700" fill="#385723">ProjectableFilterableTable</text>
+  <text x="470" y="414" text-anchor="middle" font-size="10.5" fill="#385723" font-family="'SF Mono',Menlo,monospace">scan(root, filters, int[] projects)  —  能力：+ 列裁剪下推</text>
+
+  <!-- Level 4: TranslatableTable (apex, highlighted) -->
+  <polygon points="320,250 620,250 470,360" fill="#ED7D31" stroke="#7F3F00" stroke-width="2"/>
+  <text x="470" y="292" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">TranslatableTable</text>
+  <text x="470" y="312" text-anchor="middle" font-size="10.5" fill="#FFF2CC" font-family="'SF Mono',Menlo,monospace">toRel(context, table)</text>
+  <text x="470" y="330" text-anchor="middle" font-size="10.5" fill="#FFF2CC">能力：自定义 RelNode + 规则</text>
+  <text x="470" y="346" text-anchor="middle" font-size="10.5" fill="#FFF2CC">→ 任意算子下推</text>
+
+  <!-- Capability axis arrow on the right -->
+  <line x1="868" y1="600" x2="868" y2="258" stroke="#7F3F00" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="884" y="430" font-size="12" font-weight="700" fill="#7F3F00" transform="rotate(90 884 430)">能力 / pushdown 粒度递增</text>
+
+  <!-- Left annotations: dispatch sites -->
+  <g font-size="10.5" fill="#595959">
+    <text x="60" y="200" font-size="13" font-weight="700" fill="#1F4E79">框架如何"问"能力（运行期分派）</text>
+    <text x="60" y="222">Interpreter 路径：TableScanNode.create() 按 PF → F → S 顺序</text>
+    <text x="60" y="238" font-family="'SF Mono',Menlo,monospace">relOptTable.unwrap(ProjectableFilterableTable.class)</text>
+    <text x="60" y="254">Enumerable 路径：EnumerableTableScan.canHandle(table) 用 instanceof 探测</text>
+    <text x="60" y="270">能力越高 → 命中越早 → 框架兜底的 Filter / Project 越少</text>
+  </g>
+
+  <!-- Concrete examples mapped to levels -->
+  <g font-size="10.5">
+    <rect x="40" y="490" width="100" height="50" rx="6" fill="#ffffff" stroke="#548235"/>
+    <text x="90" y="512" text-anchor="middle" font-weight="700" fill="#385723">CsvScannable</text>
+    <text x="90" y="528" text-anchor="middle" fill="#595959">Table</text>
+
+    <rect x="40" y="432" width="100" height="50" rx="6" fill="#ffffff" stroke="#548235"/>
+    <text x="90" y="454" text-anchor="middle" font-weight="700" fill="#385723">CsvFilterable</text>
+    <text x="90" y="470" text-anchor="middle" fill="#595959">Table</text>
+
+    <rect x="800" y="250" width="110" height="50" rx="6" fill="#ffffff" stroke="#7F3F00"/>
+    <text x="855" y="272" text-anchor="middle" font-weight="700" fill="#7F3F00">CsvTranslatable</text>
+    <text x="855" y="288" text-anchor="middle" fill="#595959">/ JdbcTable</text>
+
+    <line x1="140" y1="515" x2="228" y2="515" stroke="#888" stroke-width="1" stroke-dasharray="4,3"/>
+    <line x1="140" y1="457" x2="274" y2="457" stroke="#888" stroke-width="1" stroke-dasharray="4,3"/>
+    <line x1="800" y1="275" x2="560" y2="290" stroke="#888" stroke-width="1" stroke-dasharray="4,3"/>
+  </g>
+
+  <text x="470" y="640" text-anchor="middle" font-size="10" fill="#A6A6A6">图 17-1 — 越往上能力越强、实现成本越高；接口互不继承（Filterable 不 extends Scannable），各自独立按需实现</text>
+</svg>

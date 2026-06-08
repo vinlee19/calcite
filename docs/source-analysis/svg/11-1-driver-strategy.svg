@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 680" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="inh" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="13" markerHeight="13" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#ffffff" stroke="#1F4E79" stroke-width="1"/>
+    </marker>
+    <marker id="ref" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#888"/>
+    </marker>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7F3F00"/>
+    </marker>
+    <linearGradient id="ctn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#BDD7EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="920" height="680" fill="#ffffff"/>
+  <text x="460" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">RuleDriver 策略：Iterative / TopDown 双驱动可插拔</text>
+  <text x="460" y="52" text-anchor="middle" font-size="12" fill="#595959">VolcanoPlanner 持有一个 RuleDriver 接口，由 setTopDownOpt 在运行期切换实现 — 经典 Strategy 模式</text>
+
+  <!-- VolcanoPlanner (context) -->
+  <rect x="320" y="80" width="280" height="118" rx="8" fill="url(#ctn)" stroke="#1F4E79" stroke-width="2"/>
+  <text x="460" y="102" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">VolcanoPlanner</text>
+  <text x="460" y="118" text-anchor="middle" font-size="9.5" fill="#595959">«context» plan.volcano</text>
+  <line x1="328" y1="126" x2="592" y2="126" stroke="#1F4E79" stroke-width="0.8"/>
+  <text x="334" y="142" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">- ruleDriver : RuleDriver</text>
+  <text x="334" y="156" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">- topDownOpt : boolean</text>
+  <line x1="328" y1="164" x2="592" y2="164" stroke="#1F4E79" stroke-width="0.8"/>
+  <text x="334" y="180" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">+ findBestExp() : RelNode</text>
+  <text x="334" y="193" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">- initRuleQueue() / setTopDownOpt(b)</text>
+
+  <!-- RuleDriver interface -->
+  <rect x="330" y="248" width="260" height="118" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="2"/>
+  <text x="460" y="270" text-anchor="middle" font-size="13" font-weight="700" fill="#385723">«interface» RuleDriver</text>
+  <line x1="338" y1="278" x2="582" y2="278" stroke="#548235" stroke-width="0.8"/>
+  <text x="344" y="294" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#385723">+ drive()</text>
+  <text x="344" y="308" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#385723">+ getRuleQueue() : RuleQueue</text>
+  <text x="344" y="322" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#385723">+ onProduce(rel, subset)</text>
+  <text x="344" y="336" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#385723">+ onSetMerged(set)</text>
+  <text x="344" y="350" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#385723">+ clear()</text>
+
+  <!-- holds (context -> interface) -->
+  <line x1="460" y1="198" x2="460" y2="246" stroke="#888" stroke-width="1.4" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="468" y="226" font-size="9.5" fill="#888">holds 1</text>
+
+  <!-- IterativeRuleDriver (concrete) -->
+  <rect x="60" y="430" width="370" height="150" rx="8" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="245" y="452" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1F4E79">IterativeRuleDriver</text>
+  <text x="245" y="467" text-anchor="middle" font-size="9" fill="#595959">«concrete» 默认 · 经典 Volcano</text>
+  <line x1="68" y1="474" x2="422" y2="474" stroke="#1F4E79" stroke-width="0.8"/>
+  <text x="74" y="490" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">- ruleQueue : IterativeRuleQueue</text>
+  <line x1="68" y1="498" x2="422" y2="498" stroke="#1F4E79" stroke-width="0.8"/>
+  <text x="74" y="514" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">drive(): while(popMatch != null)</text>
+  <text x="74" y="528" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">  match.onMatch(); canonize();</text>
+  <text x="74" y="546" font-size="9" fill="#595959">FIFO 无优先级出队 · 队列空即停机</text>
+  <text x="74" y="562" font-size="9" fill="#595959">SubstitutionRule 走 preQueue 优先</text>
+  <text x="74" y="575" font-size="9" fill="#C65911">坑：无序出队，规则爆炸时可能 O(n²)</text>
+
+  <!-- TopDownRuleDriver (concrete) -->
+  <rect x="490" y="430" width="370" height="150" rx="8" fill="#FFFFFF" stroke="#7F3F00" stroke-width="1.5"/>
+  <text x="675" y="452" text-anchor="middle" font-size="12.5" font-weight="700" fill="#7F3F00">TopDownRuleDriver</text>
+  <text x="675" y="467" text-anchor="middle" font-size="9" fill="#595959">«concrete» Cascades 任务化</text>
+  <line x1="498" y1="474" x2="852" y2="474" stroke="#7F3F00" stroke-width="0.8"/>
+  <text x="504" y="490" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">- tasks : Stack&lt;Task&gt;</text>
+  <line x1="498" y1="498" x2="852" y2="498" stroke="#7F3F00" stroke-width="0.8"/>
+  <text x="504" y="514" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">drive(): push OptimizeGroup(root)</text>
+  <text x="504" y="528" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">  while(!tasks.empty) task.perform()</text>
+  <text x="504" y="546" font-size="9" fill="#595959">按需探索 · upperBound 剪枝</text>
+  <text x="504" y="562" font-size="9" fill="#595959">passThroughCache 去重 derive/passThrough</text>
+  <text x="504" y="575" font-size="9" fill="#7F3F00">-Dcalcite.planner.topdown.opt=true 启用</text>
+
+  <!-- inheritance edges -->
+  <line x1="300" y1="430" x2="420" y2="367" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#inh)"/>
+  <line x1="620" y1="430" x2="500" y2="367" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#inh)"/>
+
+  <!-- RuleQueue side -->
+  <rect x="640" y="248" width="230" height="118" rx="8" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="755" y="270" text-anchor="middle" font-size="12.5" font-weight="700" fill="#7F6000">«abstract» RuleQueue</text>
+  <line x1="648" y1="278" x2="862" y2="278" stroke="#BF8F00" stroke-width="0.8"/>
+  <text x="654" y="294" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7F6000">+ addMatch(match)</text>
+  <text x="654" y="308" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7F6000"># skipMatch(match):boolean</text>
+  <text x="654" y="322" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7F6000"># checkDuplicateSubsets()</text>
+  <text x="654" y="338" font-size="9" fill="#595959">↳ Iterative / TopDownRuleQueue</text>
+  <text x="654" y="354" font-size="9" fill="#C65911">环防护：路径重复 subset → 跳过</text>
+
+  <line x1="590" y1="307" x2="638" y2="307" stroke="#888" stroke-width="1.4" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="596" y="300" font-size="9" fill="#888">manages</text>
+
+  <!-- switch note -->
+  <rect x="60" y="248" width="250" height="118" rx="8" fill="#F2F2F2" stroke="#595959" stroke-width="1.2"/>
+  <text x="185" y="268" text-anchor="middle" font-size="11.5" font-weight="700" fill="#262626">initRuleQueue() 选择实现</text>
+  <line x1="68" y1="276" x2="302" y2="276" stroke="#595959" stroke-width="0.8"/>
+  <text x="74" y="293" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">if (topDownOpt)</text>
+  <text x="74" y="307" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7F3F00">  new TopDownRuleDriver(this)</text>
+  <text x="74" y="321" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">else</text>
+  <text x="74" y="335" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1F4E79">  new IterativeRuleDriver(this)</text>
+  <text x="74" y="356" font-size="9" fill="#595959">切换实现无需改 findBestExp 主流程</text>
+  <line x1="310" y1="307" x2="328" y2="307" stroke="#7F3F00" stroke-width="1.4" marker-end="url(#arrow)"/>
+
+  <!-- Legend -->
+  <rect x="60" y="600" width="800" height="56" rx="6" fill="#FAFAFA" stroke="#BFBFBF"/>
+  <text x="72" y="618" font-size="10.5" font-weight="700" fill="#595959">图例</text>
+  <rect x="120" y="608" width="22" height="14" fill="#E2EFDA" stroke="#548235"/><text x="148" y="619" font-size="10" fill="#385723">interface</text>
+  <rect x="220" y="608" width="22" height="14" fill="#FFF2CC" stroke="#BF8F00" stroke-dasharray="4,2"/><text x="248" y="619" font-size="10" fill="#7F6000">abstract</text>
+  <rect x="320" y="608" width="22" height="14" fill="#FFFFFF" stroke="#1F4E79"/><text x="348" y="619" font-size="10" fill="#1a1a1a">具体类</text>
+  <line x1="410" y1="615" x2="442" y2="615" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#inh)"/><text x="448" y="619" font-size="10" fill="#1a1a1a">继承/实现(空心三角)</text>
+  <line x1="600" y1="615" x2="632" y2="615" stroke="#888" stroke-width="1.4" stroke-dasharray="4,3" marker-end="url(#ref)"/><text x="638" y="619" font-size="10" fill="#888">持有/引用</text>
+  <text x="72" y="646" font-size="10" fill="#595959">橙色描边 = 关键优化路径(TopDown)；灰底块 = 工厂式选择点；红字 = pitfall / 权衡</text>
+
+  <text x="460" y="674" text-anchor="middle" font-size="10" fill="#A6A6A6">图 11-1 — 一个接口、两套实现：把"用什么搜索算法"做成可替换策略，主流程只依赖 RuleDriver 抽象</text>
+</svg>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 720" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="inh" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="13" markerHeight="13" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#ffffff" stroke="#595959" stroke-width="1"/>
+    </marker>
+    <marker id="ref" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#888888"/>
+    </marker>
+    <linearGradient id="grpHdr" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#BDD7EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="920" height="720" fill="#ffffff"/>
+  <text x="460" y="30" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">Scope 与 Namespace：两条平行继承树</text>
+  <text x="460" y="50" text-anchor="middle" font-size="12" fill="#595959">左：位置语境（名字解析）— 右：数据源（行类型）；二者由 SqlValidatorImpl 的两张 IdentityHashMap 关联</text>
+
+  <!-- ===================== LEFT: Scope tree ===================== -->
+  <rect x="22" y="70" width="430" height="568" rx="10" fill="url(#grpHdr)" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="40" y="92" font-size="13" font-weight="700" fill="#1F4E79">SqlValidatorScope —「我在哪、能看见谁」</text>
+  <text x="40" y="108" font-size="10" fill="#385723">resolve(names) · fullyQualify(id) · getOperandScope(call)</text>
+
+  <!-- interface SqlValidatorScope -->
+  <rect x="120" y="120" width="236" height="52" rx="6" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="238" y="138" text-anchor="middle" font-size="10" fill="#548235">&#171;interface&#187;</text>
+  <text x="238" y="154" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">SqlValidatorScope</text>
+  <text x="238" y="167" text-anchor="middle" font-size="8.5" font-family="'SF Mono',Menlo,monospace" fill="#385723">resolve / fullyQualify / resolveColumn</text>
+
+  <!-- EmptyScope (terminator) -->
+  <rect x="40" y="208" width="150" height="46" rx="6" fill="#F2F2F2" stroke="#595959" stroke-width="1.2"/>
+  <text x="115" y="226" text-anchor="middle" font-size="11" font-weight="700" fill="#262626">EmptyScope</text>
+  <text x="115" y="242" text-anchor="middle" font-size="8.5" fill="#595959">链尾 · 查 catalog/schema</text>
+
+  <!-- DelegatingScope (abstract) -->
+  <rect x="240" y="208" width="170" height="56" rx="6" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="325" y="226" text-anchor="middle" font-size="10" fill="#7F6000">&#171;abstract&#187;</text>
+  <text x="325" y="241" text-anchor="middle" font-size="11" font-weight="700" fill="#7F6000">DelegatingScope</text>
+  <text x="325" y="256" text-anchor="middle" font-size="8.5" font-family="'SF Mono',Menlo,monospace" fill="#7F6000">parent · resolve&#8594;parent</text>
+
+  <!-- ListScope (abstract) -->
+  <rect x="240" y="300" width="170" height="50" rx="6" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="325" y="318" text-anchor="middle" font-size="10" fill="#7F6000">&#171;abstract&#187;</text>
+  <text x="325" y="334" text-anchor="middle" font-size="11" font-weight="700" fill="#7F6000">ListScope</text>
+  <text x="325" y="346" text-anchor="middle" font-size="8.5" font-family="'SF Mono',Menlo,monospace" fill="#7F6000">children: List&lt;ScopeChild&gt;</text>
+
+  <!-- GroupByScope / OrderByScope (concrete, off DelegatingScope) -->
+  <rect x="40" y="300" width="160" height="50" rx="6" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.2"/>
+  <text x="120" y="320" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1F4E79">GroupByScope</text>
+  <text x="120" y="338" text-anchor="middle" font-size="8.5" fill="#595959">OrderByScope · 方言别名</text>
+
+  <!-- SelectScope (concrete) -->
+  <rect x="240" y="392" width="170" height="56" rx="6" fill="#ED7D31" stroke="#7F3F00" stroke-width="1.5"/>
+  <text x="325" y="412" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">SelectScope</text>
+  <text x="325" y="428" text-anchor="middle" font-size="8.5" fill="#FFF2CC">FROM 项可见 + 继承父 scope</text>
+  <text x="325" y="441" text-anchor="middle" font-size="8.5" font-family="'SF Mono',Menlo,monospace" fill="#FFF2CC">既是 Scope 又是 Namespace</text>
+
+  <!-- JoinScope (concrete, off ListScope) -->
+  <rect x="40" y="392" width="160" height="50" rx="6" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.2"/>
+  <text x="120" y="412" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1F4E79">JoinScope</text>
+  <text x="120" y="430" text-anchor="middle" font-size="8.5" fill="#595959">JOIN 左右两侧</text>
+
+  <!-- AggregatingSelectScope (concrete) -->
+  <rect x="190" y="488" width="220" height="50" rx="6" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.2"/>
+  <text x="300" y="508" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1F4E79">AggregatingSelectScope</text>
+  <text x="300" y="526" text-anchor="middle" font-size="8.5" fill="#595959">GROUP BY 后只见分组列</text>
+
+  <!-- inheritance edges (left) -->
+  <line x1="115" y1="208" x2="200" y2="172" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="325" y1="208" x2="270" y2="172" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="325" y1="300" x2="325" y2="264" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="120" y1="300" x2="280" y2="264" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="325" y1="392" x2="325" y2="350" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="120" y1="392" x2="280" y2="350" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="300" y1="488" x2="320" y2="448" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+
+  <!-- delegating chain note -->
+  <rect x="40" y="556" width="372" height="68" rx="6" fill="#ffffff" stroke="#7030A0" stroke-width="1" stroke-dasharray="6,3"/>
+  <text x="50" y="574" font-size="9.5" font-weight="700" fill="#7030A0">resolve 链（位置 &#8594; 外层）</text>
+  <text x="50" y="590" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7030A0">OrderByScope &#8594; SelectScope &#8594; (parent SelectScope)</text>
+  <text x="50" y="604" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7030A0">  &#8594; ... &#8594; EmptyScope &#8594; catalog/schema</text>
+  <text x="50" y="618" font-size="9" fill="#595959">子查询能引用外层列，靠的就是这条 parent 链</text>
+
+  <!-- ===================== RIGHT: Namespace tree ===================== -->
+  <rect x="468" y="70" width="430" height="568" rx="10" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="486" y="92" font-size="13" font-weight="700" fill="#385723">SqlValidatorNamespace —「这块查询输出什么行」</text>
+  <text x="486" y="108" font-size="10" fill="#1F4E79">getRowType() · validate(target) · field(name) · unwrap(Class)</text>
+
+  <!-- interface SqlValidatorNamespace -->
+  <rect x="566" y="120" width="236" height="52" rx="6" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="684" y="138" text-anchor="middle" font-size="10" fill="#548235">&#171;interface&#187;</text>
+  <text x="684" y="154" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">SqlValidatorNamespace</text>
+  <text x="684" y="167" text-anchor="middle" font-size="8.5" font-family="'SF Mono',Menlo,monospace" fill="#385723">getRowType / validate / unwrap</text>
+
+  <!-- AbstractNamespace (abstract) -->
+  <rect x="566" y="208" width="236" height="58" rx="6" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="684" y="226" text-anchor="middle" font-size="10" fill="#7F6000">&#171;abstract&#187;</text>
+  <text x="684" y="241" text-anchor="middle" font-size="11" font-weight="700" fill="#7F6000">AbstractNamespace</text>
+  <text x="684" y="256" text-anchor="middle" font-size="8.5" font-family="'SF Mono',Menlo,monospace" fill="#7F6000">status · rowType(懒) · validateImpl()</text>
+
+  <!-- concrete namespaces -->
+  <rect x="486" y="300" width="180" height="52" rx="6" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.2"/>
+  <text x="576" y="320" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1F4E79">SelectNamespace</text>
+  <text x="576" y="337" text-anchor="middle" font-size="8.5" fill="#595959">子查询/SELECT 的输出</text>
+  <text x="576" y="349" text-anchor="middle" font-size="8" font-family="'SF Mono',Menlo,monospace" fill="#595959">validateImpl&#8594;validateSelect</text>
+
+  <rect x="700" y="300" width="180" height="52" rx="6" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.2"/>
+  <text x="790" y="320" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1F4E79">IdentifierNamespace</text>
+  <text x="790" y="337" text-anchor="middle" font-size="8.5" fill="#595959">FROM 表名 / WITH 项</text>
+  <text x="790" y="349" text-anchor="middle" font-size="8" font-family="'SF Mono',Menlo,monospace" fill="#595959">resolvedNamespace(懒)</text>
+
+  <rect x="486" y="372" width="180" height="48" rx="6" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.2"/>
+  <text x="576" y="392" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1F4E79">TableNamespace</text>
+  <text x="576" y="409" text-anchor="middle" font-size="8.5" fill="#595959">物理表 · getTable()&#8800;null</text>
+
+  <rect x="700" y="372" width="180" height="48" rx="6" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.2"/>
+  <text x="790" y="392" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1F4E79">SetopNamespace</text>
+  <text x="790" y="409" text-anchor="middle" font-size="8.5" fill="#595959">UNION/EXCEPT/INTERSECT</text>
+
+  <!-- inheritance edges (right) -->
+  <line x1="684" y1="208" x2="684" y2="172" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="576" y1="300" x2="660" y2="266" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="790" y1="300" x2="708" y2="266" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="576" y1="372" x2="640" y2="266" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="790" y1="372" x2="730" y2="266" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+
+  <!-- lazy-eval note -->
+  <rect x="486" y="440" width="394" height="68" rx="6" fill="#ffffff" stroke="#7030A0" stroke-width="1" stroke-dasharray="6,3"/>
+  <text x="496" y="458" font-size="9.5" font-weight="700" fill="#7030A0">懒求值 + 环检测（数据 &#8594; 行类型）</text>
+  <text x="496" y="474" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7030A0">getRowType(): rowType==null ? validate() : rowType</text>
+  <text x="496" y="488" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7030A0">status: UNVALIDATED &#8594; IN_PROGRESS &#8594; VALID</text>
+  <text x="496" y="502" font-size="9" fill="#595959">IN_PROGRESS 再入 = 类型环，直接抛错</text>
+
+  <!-- SelectScope bridge note (spans both) -->
+  <rect x="486" y="522" width="394" height="62" rx="6" fill="#FBE5D6" stroke="#C65911" stroke-width="1.2"/>
+  <text x="496" y="540" font-size="9.5" font-weight="700" fill="#833C0C">特例：SelectScope 同时实现两个接口</text>
+  <text x="496" y="556" font-size="9" fill="#833C0C">外层把它当 Namespace 取行类型；内层把它当 Scope 解析列。</text>
+  <text x="496" y="570" font-size="9" fill="#833C0C">绝大多数类只占一棵树；这是少数“身兼两职”的桥接点。</text>
+
+  <!-- cross-tree association: scopes / namespaces maps -->
+  <line x1="412" y1="420" x2="486" y2="396" stroke="#888888" stroke-width="1.4" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <rect x="356" y="648" width="208" height="44" rx="6" fill="#ffffff" stroke="#888888" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="460" y="665" text-anchor="middle" font-size="9" font-weight="700" fill="#595959">SqlValidatorImpl</text>
+  <text x="460" y="679" text-anchor="middle" font-size="8.5" font-family="'SF Mono',Menlo,monospace" fill="#595959">scopes[] · clauseScopes[] · namespaces[]</text>
+
+  <!-- ===================== Legend ===================== -->
+  <rect x="586" y="600" width="312" height="84" rx="8" fill="#ffffff" stroke="#BFBFBF" stroke-width="1"/>
+  <text x="596" y="617" font-size="10" font-weight="700" fill="#262626">图例</text>
+  <rect x="596" y="624" width="20" height="12" rx="2" fill="#E2EFDA" stroke="#548235"/>
+  <text x="622" y="634" font-size="9" fill="#385723">interface</text>
+  <rect x="690" y="624" width="20" height="12" rx="2" fill="#FFF2CC" stroke="#BF8F00" stroke-dasharray="4,2"/>
+  <text x="716" y="634" font-size="9" fill="#7F6000">abstract</text>
+  <rect x="790" y="624" width="20" height="12" rx="2" fill="#FFFFFF" stroke="#1F4E79"/>
+  <text x="816" y="634" font-size="9" fill="#1a1a1a">具体类</text>
+  <rect x="596" y="644" width="20" height="12" rx="2" fill="#ED7D31" stroke="#7F3F00"/>
+  <text x="622" y="654" font-size="9" fill="#262626">桥接热点</text>
+  <line x1="694" y1="650" x2="716" y2="650" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <text x="722" y="654" font-size="9" fill="#262626">继承(空心三角)</text>
+  <line x1="596" y1="670" x2="618" y2="670" stroke="#888888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="624" y="674" font-size="9" fill="#888888">引用/持有(虚线)</text>
+
+  <text x="460" y="710" text-anchor="middle" font-size="10" fill="#A6A6A6">图 07-1 — 左树管“位置语境”，右树管“行类型”；两棵树由 SqlValidatorImpl 的 IdentityHashMap 牵线，SelectScope 是唯一横跨两侧的桥接点</text>
+</svg>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#548235"/>
+    </marker>
+    <linearGradient id="gBox" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#BDD7EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="960" height="700" fill="#ffffff"/>
+  <text x="480" y="30" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">unparse：优先级决定括号 + 方言决定语法</text>
+  <text x="480" y="50" text-anchor="middle" font-size="12" fill="#595959">SqlNode.toSqlString() 把 AST 反序列化为 SQL 文本；括号由 prec 推导，词法由 SqlDialect 注入</text>
+
+  <!-- ===== Top: entry ===== -->
+  <rect x="330" y="70" width="300" height="44" rx="8" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5"/>
+  <text x="480" y="89" text-anchor="middle" font-size="12" font-weight="700" fill="#7F6000">SqlNode.toSqlString(transform)</text>
+  <text x="480" y="105" text-anchor="middle" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#7F6000">new SqlPrettyWriter(config); unparse(writer, 0, 0)</text>
+
+  <line x1="480" y1="114" x2="480" y2="142" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- SqlCall.unparse -->
+  <rect x="300" y="142" width="360" height="86" rx="8" fill="url(#gBox)" stroke="#1F4E79" stroke-width="1.6"/>
+  <text x="480" y="161" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1F4E79">SqlCall.unparse(writer, leftPrec, rightPrec)</text>
+  <line x1="312" y1="168" x2="648" y2="168" stroke="#1F4E79" stroke-width="0.7"/>
+  <text x="316" y="184" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">if needsParentheses(writer, leftPrec, rightPrec)</text>
+  <text x="330" y="198" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">writer.startList("(", ")"); dialect.unparseCall(..0,0)</text>
+  <text x="316" y="212" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">else  dialect.unparseCall(.., leftPrec, rightPrec)</text>
+
+  <!-- branch to precedence box -->
+  <line x1="300" y1="200" x2="180" y2="270" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="200" y="246" font-size="9.5" fill="#1F4E79">① 是否要括号？</text>
+
+  <!-- Precedence decision box -->
+  <rect x="40" y="270" width="320" height="170" rx="8" fill="#ffffff" stroke="#1F4E79" stroke-width="1.4"/>
+  <text x="200" y="289" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">① 优先级 → 括号（needsParentheses）</text>
+  <text x="54" y="309" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">leftPrec &gt; op.getLeftPrec()</text>
+  <text x="54" y="324" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a"> || op.getRightPrec() &lt;= rightPrec ...</text>
+  <text x="54" y="338" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a"> || writer.alwaysUseParentheses &amp;&amp; isA(EXPRESSION)</text>
+  <line x1="52" y1="348" x2="348" y2="348" stroke="#BFBFBF" stroke-width="0.7"/>
+  <text x="54" y="366" font-size="10" font-weight="700" fill="#7F3F00">例：5 * (2 + 3)</text>
+  <text x="54" y="382" font-size="9.5" fill="#595959">PLUS prec=40，MULTIPLY prec=60</text>
+  <text x="54" y="397" font-size="9.5" fill="#595959">外层 * 传入 leftPrec=60 &gt; +(40)</text>
+  <text x="54" y="412" font-size="9.5" fill="#595959">→ + 节点判定需要括号</text>
+  <text x="54" y="430" font-size="9.5" fill="#385723">关联性靠 leftPrec/rightPrec 差 1 实现</text>
+
+  <!-- branch to dialect -->
+  <line x1="660" y1="190" x2="790" y2="265" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="700" y="232" font-size="9.5" fill="#1F4E79">② 怎么写这个算子？</text>
+
+  <!-- Dialect dispatch box -->
+  <rect x="600" y="270" width="330" height="200" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.6"/>
+  <text x="765" y="289" text-anchor="middle" font-size="12" font-weight="700" fill="#385723">② SqlDialect.unparseCall(...)</text>
+  <text x="614" y="308" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#385723">switch (call.getKind()) { …</text>
+  <text x="614" y="322" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#385723">default: operator.unparse(writer, call,…)</text>
+  <line x1="612" y1="332" x2="918" y2="332" stroke="#548235" stroke-width="0.7"/>
+  <text x="614" y="350" font-size="10" font-weight="700" fill="#385723">子类按方言覆写（开放扩展点）</text>
+  <rect x="614" y="358" width="300" height="22" rx="4" fill="#ffffff" stroke="#548235"/>
+  <text x="620" y="373" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">MysqlSqlDialect: POSITION → LOCATE(...)</text>
+  <rect x="614" y="384" width="300" height="22" rx="4" fill="#ffffff" stroke="#548235"/>
+  <text x="620" y="399" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">MysqlSqlDialect: EXTRACT(DOW..) → DAYOFWEEK</text>
+  <rect x="614" y="410" width="300" height="22" rx="4" fill="#ffffff" stroke="#548235"/>
+  <text x="620" y="425" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">PostgresqlSqlDialect / BigQuerySqlDialect …</text>
+  <text x="614" y="450" font-size="9.5" fill="#385723">core 算子无需改动；新方言只覆写差异分支</text>
+  <text x="614" y="464" font-size="9.5" fill="#385723">→ 关注点分离：优先级（算子）⊥ 语法（方言）</text>
+
+  <!-- recurse to operands -->
+  <line x1="480" y1="228" x2="480" y2="500" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="2,0"/>
+  <text x="495" y="365" font-size="9.5" fill="#1F4E79">递归：operand.unparse(writer, leftPrec', rightPrec')</text>
+
+  <!-- output -->
+  <rect x="300" y="500" width="360" height="56" rx="8" fill="#F2F2F2" stroke="#595959" stroke-width="1.4"/>
+  <text x="480" y="520" text-anchor="middle" font-size="11.5" font-weight="700" fill="#262626">SqlString（最终 SQL 文本）</text>
+  <text x="480" y="540" text-anchor="middle" font-size="10" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">SELECT `name` FROM `emp` WHERE `sal` &gt; 1000</text>
+
+  <line x1="480" y1="556" x2="480" y2="586" stroke="#548235" stroke-width="1.4" stroke-dasharray="5,3" marker-end="url(#arrowG)"/>
+
+  <!-- use cases -->
+  <rect x="180" y="586" width="600" height="56" rx="8" fill="#ffffff" stroke="#548235" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="480" y="606" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">用途</text>
+  <text x="480" y="624" text-anchor="middle" font-size="9.5" fill="#385723">EXPLAIN / 错误信息回显 · RelToSqlConverter 把优化后的计划写回目标库方言（JDBC pushdown，见第 18 篇）· 解析往返测试</text>
+
+  <text x="480" y="678" text-anchor="middle" font-size="10" fill="#A6A6A6">图 03-2 — 蓝色实线为正向调用与递归，绿色虚线为返回；左路按优先级决定括号，右路按方言决定写法，二者正交</text>
+</svg>

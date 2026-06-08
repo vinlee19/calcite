@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" font-family="-apple-system, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif">
+  <rect width="960" height="560" fill="#ffffff"/>
+  <text x="480" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">RelDistribution.Type 对照矩阵</text>
+  <text x="480" y="52" text-anchor="middle" font-size="12" fill="#595959">7 种物理分布 × 是否有 keys / apply 行为 / satisfies 偏序 / 物化算子（Exchange）</text>
+
+  <!-- table header -->
+  <g font-size="11" font-weight="700" fill="#ffffff">
+    <rect x="30"  y="72" width="150" height="40" fill="#1F4E79"/><text x="105" y="97" text-anchor="middle">Type 枚举</text>
+    <rect x="180" y="72" width="92"  height="40" fill="#1F4E79"/><text x="226" y="97" text-anchor="middle">shortName</text>
+    <rect x="272" y="72" width="80"  height="40" fill="#1F4E79"/><text x="312" y="97" text-anchor="middle">有 keys?</text>
+    <rect x="352" y="72" width="210" height="40" fill="#1F4E79"/><text x="457" y="97" text-anchor="middle">apply(mapping) 行为</text>
+    <rect x="562" y="72" width="230" height="40" fill="#1F4E79"/><text x="677" y="97" text-anchor="middle">satisfies 关系（偏序）</text>
+    <rect x="792" y="72" width="138" height="40" fill="#1F4E79"/><text x="861" y="91" text-anchor="middle">语义 /</text><text x="861" y="105" text-anchor="middle">物化算子</text>
+  </g>
+
+  <!-- rows -->
+  <g font-size="10.5">
+    <!-- SINGLETON -->
+    <rect x="30"  y="112" width="150" height="48" fill="#FFF2CC" stroke="#BFBFBF"/><text x="40" y="134" font-weight="700" fill="#7F6000">SINGLETON</text><text x="40" y="150" font-size="9" fill="#595959">单实例，见全部记录</text>
+    <rect x="180" y="112" width="92"  height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="226" y="140" text-anchor="middle" font-family="'SF Mono',Menlo,monospace" fill="#262626">single</text>
+    <rect x="272" y="112" width="80"  height="48" fill="#F2F2F2" stroke="#BFBFBF"/><text x="312" y="140" text-anchor="middle" fill="#595959">无</text>
+    <rect x="352" y="112" width="210" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="362" y="140" fill="#262626">不变（无 keys 直接返回 this）</text>
+    <rect x="562" y="112" width="230" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="572" y="140" fill="#262626">仅被自身与 ANY 满足</text>
+    <rect x="792" y="112" width="138" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="802" y="140" fill="#595959">汇聚到单点</text>
+
+    <!-- HASH -->
+    <rect x="30"  y="160" width="150" height="48" fill="#ED7D31" stroke="#BFBFBF"/><text x="40" y="182" font-weight="700" fill="#ffffff">HASH_DISTRIBUTED</text><text x="40" y="198" font-size="9" fill="#FFF2CC">按 key 哈希分片</text>
+    <rect x="180" y="160" width="92"  height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="226" y="188" text-anchor="middle" font-family="'SF Mono',Menlo,monospace" fill="#262626">hash</text>
+    <rect x="272" y="160" width="80"  height="48" fill="#E2EFDA" stroke="#BFBFBF"/><text x="312" y="188" text-anchor="middle" fill="#385723">有(有序)</text>
+    <rect x="352" y="160" width="210" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="362" y="183" fill="#262626">key 重映射；缺 key→ANY；</text><text x="362" y="197" fill="#595959">重排后 normalize 排序</text>
+    <rect x="562" y="160" width="230" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="572" y="183" fill="#262626">仅 Hash[x,y]==Hash[x,y]；</text><text x="572" y="197" fill="#595959">无"前缀"宽容；满足 RANDOM</text>
+    <rect x="792" y="160" width="138" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="802" y="188" fill="#595959">Exchange(hash)</text>
+
+    <!-- RANGE -->
+    <rect x="30"  y="208" width="150" height="48" fill="#FFF2CC" stroke="#BFBFBF"/><text x="40" y="230" font-weight="700" fill="#7F6000">RANGE_DISTRIBUTED</text><text x="40" y="246" font-size="9" fill="#595959">按 key 区间分片</text>
+    <rect x="180" y="208" width="92"  height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="226" y="236" text-anchor="middle" font-family="'SF Mono',Menlo,monospace" fill="#262626">range</text>
+    <rect x="272" y="208" width="80"  height="48" fill="#E2EFDA" stroke="#BFBFBF"/><text x="312" y="236" text-anchor="middle" fill="#385723">有(顺序敏感)</text>
+    <rect x="352" y="208" width="210" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="362" y="236" fill="#262626">key 重映射；缺 key→ANY</text>
+    <rect x="562" y="208" width="230" height="48" fill="#E2EFDA" stroke="#BFBFBF"/><text x="572" y="231" fill="#385723">Range[x] satisfies Range[x,y,z]</text><text x="572" y="245" fill="#595959">前缀（leading-edge）宽容</text>
+    <rect x="792" y="208" width="138" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="802" y="236" fill="#595959">Exchange(range)</text>
+
+    <!-- RANDOM -->
+    <rect x="30"  y="256" width="150" height="48" fill="#FFF2CC" stroke="#BFBFBF"/><text x="40" y="278" font-weight="700" fill="#7F6000">RANDOM_DISTRIBUTED</text><text x="40" y="294" font-size="9" fill="#595959">随机分片</text>
+    <rect x="180" y="256" width="92"  height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="226" y="284" text-anchor="middle" font-family="'SF Mono',Menlo,monospace" fill="#262626">random</text>
+    <rect x="272" y="256" width="80"  height="48" fill="#F2F2F2" stroke="#BFBFBF"/><text x="312" y="284" text-anchor="middle" fill="#595959">无</text>
+    <rect x="352" y="256" width="210" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="362" y="284" fill="#262626">不变</text>
+    <rect x="562" y="256" width="230" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="572" y="280" fill="#262626">被 HASH / ROUND_ROBIN /</text><text x="572" y="294" fill="#595959">RANGE / RANDOM 满足</text>
+    <rect x="792" y="256" width="138" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="802" y="284" fill="#595959">Exchange(random)</text>
+
+    <!-- ROUND_ROBIN -->
+    <rect x="30"  y="304" width="150" height="48" fill="#FFF2CC" stroke="#BFBFBF"/><text x="40" y="326" font-weight="700" fill="#7F6000">ROUND_ROBIN</text><text x="40" y="342" font-size="9" fill="#595959">轮流分配</text>
+    <rect x="180" y="304" width="92"  height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="226" y="332" text-anchor="middle" font-family="'SF Mono',Menlo,monospace" fill="#262626">rr</text>
+    <rect x="272" y="304" width="80"  height="48" fill="#F2F2F2" stroke="#BFBFBF"/><text x="312" y="332" text-anchor="middle" fill="#595959">无</text>
+    <rect x="352" y="304" width="210" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="362" y="332" fill="#262626">不变</text>
+    <rect x="562" y="304" width="230" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="572" y="332" fill="#262626">仅自身与 ANY；可满足 RANDOM</text>
+    <rect x="792" y="304" width="138" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="802" y="332" fill="#595959">Exchange(rr)</text>
+
+    <!-- BROADCAST -->
+    <rect x="30"  y="352" width="150" height="48" fill="#FFF2CC" stroke="#BFBFBF"/><text x="40" y="374" font-weight="700" fill="#7F6000">BROADCAST</text><text x="40" y="390" font-size="9" fill="#595959">每实例全量副本</text>
+    <rect x="180" y="352" width="92"  height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="226" y="380" text-anchor="middle" font-family="'SF Mono',Menlo,monospace" fill="#262626">broadcast</text>
+    <rect x="272" y="352" width="80"  height="48" fill="#F2F2F2" stroke="#BFBFBF"/><text x="312" y="380" text-anchor="middle" fill="#595959">无</text>
+    <rect x="352" y="352" width="210" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="362" y="380" fill="#262626">不变</text>
+    <rect x="562" y="352" width="230" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="572" y="380" fill="#262626">仅自身与 ANY</text>
+    <rect x="792" y="352" width="138" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="802" y="380" fill="#595959">Exchange(broadcast)</text>
+
+    <!-- ANY -->
+    <rect x="30"  y="400" width="150" height="48" fill="#E2EFDA" stroke="#BFBFBF"/><text x="40" y="422" font-weight="700" fill="#385723">ANY  (= default)</text><text x="40" y="438" font-size="9" fill="#595959">消费方接受任意分布</text>
+    <rect x="180" y="400" width="92"  height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="226" y="428" text-anchor="middle" font-family="'SF Mono',Menlo,monospace" fill="#262626">any</text>
+    <rect x="272" y="400" width="80"  height="48" fill="#F2F2F2" stroke="#BFBFBF"/><text x="312" y="428" text-anchor="middle" fill="#595959">无</text>
+    <rect x="352" y="400" width="210" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="362" y="428" fill="#262626">不变（isTop()=true）</text>
+    <rect x="562" y="400" width="230" height="48" fill="#E2EFDA" stroke="#BFBFBF"/><text x="572" y="424" fill="#385723">被所有分布满足（顶元素）；</text><text x="572" y="438" fill="#595959">RelDistributionTraitDef.getDefault()</text>
+    <rect x="792" y="400" width="138" height="48" fill="#ffffff" stroke="#BFBFBF"/><text x="802" y="428" fill="#595959">无需转换</text>
+  </g>
+
+  <!-- footnote box -->
+  <rect x="30" y="462" width="900" height="64" rx="6" fill="#F8F8F8" stroke="#BFBFBF"/>
+  <text x="44" y="482" font-size="10.5" font-weight="700" fill="#595959">读图要点</text>
+  <text x="44" y="500" font-size="9.5" fill="#595959">· satisfies 是偏序：A satisfies B 表示"有 A 分布的关系可直接喂给需要 B 的父节点"，省去一次 Exchange。RANGE 有前缀宽容、HASH 没有。</text>
+  <text x="44" y="516" font-size="9.5" fill="#595959">· 黄=有序键/键敏感行；橙=最常用的 HASH（join/group 重分区热点）；绿=偏序中的"宽松/顶"元素，最容易被满足。注意 core 不真正实现并行执行，分布是为下游引擎/规则预留的属性。</text>
+
+  <text x="480" y="548" text-anchor="middle" font-size="10" fill="#A6A6A6">图 14-3 — RelDistribution.Type 七态；keys 仅 HASH/RANGE 持有，satisfies 决定能否省去 Exchange 物化</text>
+</svg>

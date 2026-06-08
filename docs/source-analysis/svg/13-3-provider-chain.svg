@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 680" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#548235"/>
+    </marker>
+    <marker id="arrowP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7030A0"/>
+    </marker>
+    <linearGradient id="bgMod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#BDD7EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="940" height="680" fill="#ffffff"/>
+  <text x="470" y="30" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">Provider 链：Janino &#8594; Chained &#8594; Default，以及循环防护</text>
+  <text x="470" y="50" text-anchor="middle" font-size="12" fill="#595959">门面问一个问题，沿链收集 handler 列表，编译成一个 dispatch 类；递归调用靠 map+NullSentinel 防环</text>
+
+  <!-- Top: facade -->
+  <rect x="330" y="74" width="280" height="56" rx="8" fill="#ED7D31" stroke="#7F3F00" stroke-width="1.5"/>
+  <text x="470" y="98" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">RelMetadataQuery (门面)</text>
+  <text x="470" y="118" text-anchor="middle" font-size="10" fill="#FFF2CC">getRowCount / getSelectivity / getNonCumulativeCost …</text>
+
+  <!-- THREAD_PROVIDERS -->
+  <rect x="660" y="74" width="250" height="56" rx="8" fill="#F2F2F2" stroke="#595959" stroke-width="1.2"/>
+  <text x="785" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#262626">THREAD_PROVIDERS (ThreadLocal)</text>
+  <text x="785" y="114" text-anchor="middle" font-size="9" fill="#595959">RelOptCluster.setMetadataProvider() 写入</text>
+  <line x1="660" y1="102" x2="612" y2="102" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+
+  <!-- Janino provider -->
+  <rect x="290" y="160" width="360" height="84" rx="8" fill="url(#bgMod)" stroke="#1F4E79" stroke-width="2"/>
+  <text x="470" y="182" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">JaninoRelMetadataProvider</text>
+  <text x="470" y="200" text-anchor="middle" font-size="10" fill="#1F4E79">handlers(handlerClass) 收集 &#8594; generate &#8594; compile &#8594; cache</text>
+  <rect x="310" y="210" width="320" height="24" rx="4" fill="#ffffff" stroke="#1F4E79"/>
+  <text x="470" y="227" text-anchor="middle" font-size="9.5" fill="#1a1a1a">HANDLERS: LoadingCache&lt;(handlerClass, provider), Handler&gt;</text>
+  <line x1="470" y1="130" x2="470" y2="160" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="478" y="148" font-size="9" fill="#1F4E79">handler()/revise()</text>
+
+  <!-- Chained provider -->
+  <rect x="290" y="276" width="360" height="58" rx="8" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="470" y="298" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">ChainedRelMetadataProvider</text>
+  <text x="470" y="316" text-anchor="middle" font-size="10" fill="#595959">Chain of Responsibility：按序拼接子 provider 的 handlers</text>
+  <line x1="470" y1="244" x2="470" y2="276" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="478" y="262" font-size="9" fill="#1F4E79">handlers() 委托</text>
+
+  <!-- Default provider -->
+  <rect x="290" y="366" width="360" height="46" rx="8" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="470" y="388" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">DefaultRelMetadataProvider.INSTANCE</text>
+  <text x="470" y="404" text-anchor="middle" font-size="9.5" fill="#595959">extends Chained… —— 持有 25 个 RelMd*.SOURCE（兜底，最低优先级）</text>
+  <line x1="470" y1="334" x2="470" y2="366" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- RelMd* sources row -->
+  <g font-size="9.5" fill="#385723">
+    <rect x="60"  y="446" width="125" height="34" rx="5" fill="#E2EFDA" stroke="#548235"/><text x="122" y="467" text-anchor="middle">RelMdRowCount</text>
+    <rect x="195" y="446" width="125" height="34" rx="5" fill="#E2EFDA" stroke="#548235"/><text x="257" y="467" text-anchor="middle">RelMdSelectivity</text>
+    <rect x="330" y="446" width="135" height="34" rx="5" fill="#E2EFDA" stroke="#548235"/><text x="397" y="467" text-anchor="middle">RelMdColumnUniqueness</text>
+    <rect x="475" y="446" width="135" height="34" rx="5" fill="#E2EFDA" stroke="#548235"/><text x="542" y="467" text-anchor="middle">RelMdDistinctRowCount</text>
+    <rect x="620" y="446" width="120" height="34" rx="5" fill="#E2EFDA" stroke="#548235"/><text x="680" y="467" text-anchor="middle">RelMdSize</text>
+    <rect x="750" y="446" width="130" height="34" rx="5" fill="#E2EFDA" stroke="#548235"/><text x="815" y="467" text-anchor="middle">…共 25 个 SOURCE</text>
+  </g>
+  <line x1="360" y1="412" x2="160" y2="445" stroke="#548235" stroke-width="1.2" marker-end="url(#arrowG)"/>
+  <line x1="470" y1="412" x2="470" y2="445" stroke="#548235" stroke-width="1.2" marker-end="url(#arrowG)"/>
+  <line x1="580" y1="412" x2="760" y2="445" stroke="#548235" stroke-width="1.2" marker-end="url(#arrowG)"/>
+  <text x="470" y="430" text-anchor="middle" font-size="9" fill="#548235">每个 SOURCE 按 RelNode 子类重载 getXyz()，反射收集成 handler 列表</text>
+
+  <!-- Cycle protection box -->
+  <rect x="40" y="506" width="500" height="148" rx="8" fill="#F3EAFB" stroke="#7030A0" stroke-width="1.5"/>
+  <text x="60" y="528" font-size="13" font-weight="700" fill="#7030A0">循环防护（生成代码内置，BuiltInMetadata 层）</text>
+  <rect x="60" y="540" width="200" height="40" rx="5" fill="#ffffff" stroke="#7030A0"/>
+  <text x="160" y="556" text-anchor="middle" font-size="9.5" fill="#7030A0">入口：map.put(r,key,ACTIVE)</text>
+  <text x="160" y="572" text-anchor="middle" font-size="9.5" fill="#7030A0">标记"正在计算"</text>
+  <rect x="290" y="540" width="230" height="40" rx="5" fill="#ffffff" stroke="#7030A0"/>
+  <text x="405" y="556" text-anchor="middle" font-size="9.5" fill="#7030A0">递归再次进入同一 (r,key)</text>
+  <text x="405" y="572" text-anchor="middle" font-size="9.5" fill="#7030A0">读到 ACTIVE &#8594; throw Cyclic…</text>
+  <line x1="260" y1="560" x2="288" y2="560" stroke="#7030A0" stroke-width="1.4" marker-end="url(#arrowP)"/>
+  <text x="60" y="600" font-size="9.5" fill="#7030A0">完成：map.put(r,key,mask(x))  覆盖 ACTIVE 为真值（null 存 INSTANCE）</text>
+  <text x="60" y="616" font-size="9.5" fill="#7030A0">异常：map.row(r).clear()  清空该 RelNode 的全部在途键，避免脏标记残留</text>
+  <text x="60" y="638" font-size="9.5" fill="#9E480E">坑：防护只覆盖经过此缓存的 BuiltInMetadata；自定义绕过缓存的查询不受保护</text>
+
+  <!-- Volcano cost usage box -->
+  <rect x="560" y="506" width="340" height="148" rx="8" fill="#FBE5D6" stroke="#C65911" stroke-width="1.5"/>
+  <text x="580" y="528" font-size="13" font-weight="700" fill="#833C0C">代价如何被使用（详见第 11 篇）</text>
+  <rect x="580" y="540" width="300" height="30" rx="5" fill="#ffffff" stroke="#C65911"/>
+  <text x="730" y="559" text-anchor="middle" font-size="9.5" fill="#833C0C">VolcanoPlanner.getCost(rel, mq)</text>
+  <text x="588" y="588" font-size="9.5" fill="#833C0C">= mq.getNonCumulativeCost(rel)  +  &#931; 输入 cost</text>
+  <rect x="580" y="596" width="300" height="28" rx="5" fill="#ffffff" stroke="#C65911"/>
+  <text x="730" y="614" text-anchor="middle" font-size="9.5" fill="#833C0C">RelOptCost：rows / cpu / io + isLe / plus / multiplyBy</text>
+  <text x="588" y="642" font-size="9" fill="#833C0C">VolcanoCost 常量池 INFINITY / HUGE / ZERO / TINY 复用</text>
+
+  <text x="470" y="672" text-anchor="middle" font-size="10" fill="#A6A6A6">图 13-3 — 蓝实线=门面/委托链，绿实线=SOURCE 收集，紫=防环状态机；代价计算最终落到 RelOptCost 的 rows/cpu/io 三元组</text>
+</svg>

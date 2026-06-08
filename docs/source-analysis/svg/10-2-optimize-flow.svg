@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="arrowH" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7F3F00"/>
+    </marker>
+    <marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#548235"/>
+    </marker>
+  </defs>
+
+  <rect width="960" height="720" fill="#ffffff"/>
+  <text x="480" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">findBestExp() 主循环：applyRules 的迭代 + replaceRel 原位替换</text>
+  <text x="480" y="52" text-anchor="middle" font-size="12" fill="#595959">HepPlanner 对每条指令在整图上迭代到 fixpoint；命中规则即贪心替换顶点，无回溯</text>
+
+  <!-- entry -->
+  <rect x="360" y="72" width="240" height="44" rx="22" fill="#ED7D31" stroke="#7F3F00" stroke-width="1.5"/>
+  <text x="480" y="99" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">findBestExp() / executeProgram</text>
+
+  <!-- for each instruction -->
+  <rect x="320" y="138" width="320" height="48" rx="8" fill="#DEEBF7" stroke="#1F4E79" stroke-width="1.4"/>
+  <text x="480" y="158" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">遍历 program.instructionStates</text>
+  <text x="480" y="175" text-anchor="middle" font-size="10" fill="#595959">每条指令 state.execute() &#8594; 回调 planner.executeXxx</text>
+  <line x1="480" y1="116" x2="480" y2="138" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#arrow)"/>
+
+  <!-- applyRules outer loop frame -->
+  <rect x="120" y="210" width="720" height="288" rx="10" fill="none" stroke="#7030A0" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <text x="134" y="228" font-size="11" font-weight="700" fill="#7030A0">do { ... } while (!fixedPoint)   —  applyRules() 外层定点迭代</text>
+
+  <!-- get iterator -->
+  <rect x="150" y="244" width="300" height="58" rx="8" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.3"/>
+  <text x="300" y="266" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">getGraphIterator(root)</text>
+  <text x="300" y="283" text-anchor="middle" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#595959">DEPTH_FIRST / ARBITRARY / TOP_DOWN</text>
+  <text x="300" y="296" text-anchor="middle" font-size="9" fill="#595959">按 matchOrder 选遍历器</text>
+  <line x1="480" y1="186" x2="300" y2="244" stroke="#1F4E79" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+  <!-- per vertex -->
+  <rect x="510" y="244" width="300" height="58" rx="8" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.3"/>
+  <text x="660" y="266" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">对每个 vertex × 每条 rule</text>
+  <text x="660" y="283" text-anchor="middle" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#595959">applyRule(rule, vertex, force)</text>
+  <text x="660" y="296" text-anchor="middle" font-size="9" fill="#595959">matchOperands &#8594; matches &#8594; fireRule</text>
+  <line x1="450" y1="273" x2="510" y2="273" stroke="#1F4E79" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+  <!-- match? decision -->
+  <polygon points="660,326 760,366 660,406 560,366" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.4"/>
+  <text x="660" y="362" text-anchor="middle" font-size="11" font-weight="700" fill="#7F6000">命中且产生</text>
+  <text x="660" y="378" text-anchor="middle" font-size="11" font-weight="700" fill="#7F6000">新结果?</text>
+  <line x1="660" y1="302" x2="660" y2="326" stroke="#1F4E79" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+  <!-- no branch -->
+  <text x="785" y="362" font-size="10" fill="#595959">否 &#8594; 试下一规则/顶点</text>
+  <path d="M760,366 L830,366 L830,273 L810,273" fill="none" stroke="#595959" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+
+  <!-- yes -> applyTransformationResults -->
+  <rect x="150" y="338" width="370" height="84" rx="8" fill="#ED7D31" stroke="#7F3F00" stroke-width="1.5"/>
+  <text x="335" y="360" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">applyTransformationResults()</text>
+  <text x="335" y="378" text-anchor="middle" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#FFF2CC">多结果 &#8594; getCost 取本地最优 bestRel</text>
+  <text x="335" y="392" text-anchor="middle" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#FFF2CC">addRelToGraph(bestRel) + contractVertices</text>
+  <text x="335" y="408" text-anchor="middle" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#FFF2CC">parent.replaceInput(i, preservedVertex)</text>
+  <line x1="560" y1="366" x2="520" y2="372" stroke="#7F3F00" stroke-width="1.4" marker-end="url(#arrowH)"/>
+  <text x="528" y="356" font-size="10" font-weight="700" fill="#7F3F00">是</text>
+
+  <!-- replaceRel in-place note -->
+  <rect x="150" y="436" width="370" height="48" rx="8" fill="#FBE5D6" stroke="#C65911" stroke-width="1.2"/>
+  <text x="335" y="455" text-anchor="middle" font-size="11" font-weight="700" fill="#833C0C">原位替换：vertex.replaceRel(newRel)</text>
+  <text x="335" y="471" text-anchor="middle" font-size="9" fill="#833C0C">顶点身份不变，仅换 currentRel；父引用透明更新 &#8594; 无须重建上层</text>
+  <line x1="335" y1="422" x2="335" y2="436" stroke="#C65911" stroke-width="1.3" marker-end="url(#arrowH)"/>
+
+  <!-- continue iter / fixedPoint=false -->
+  <path d="M520,460 L640,460 L640,460" fill="none" stroke="#7030A0" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <path d="M640,460 L640,410" fill="none" stroke="#7030A0" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="548" y="452" font-size="9" fill="#7030A0">fixedPoint=false，继续迭代</text>
+
+  <!-- exit fixpoint -->
+  <rect x="320" y="524" width="320" height="48" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.4"/>
+  <text x="480" y="544" text-anchor="middle" font-size="12" font-weight="700" fill="#385723">本指令到达 fixpoint（一整轮无匹配）</text>
+  <text x="480" y="561" text-anchor="middle" font-size="9.5" fill="#385723">或 nMatches &#8805; matchLimit &#8594; 提前停止</text>
+  <line x1="480" y1="498" x2="480" y2="524" stroke="#548235" stroke-width="1.4" marker-end="url(#arrowG)"/>
+
+  <!-- gc -->
+  <rect x="120" y="596" width="350" height="46" rx="8" fill="#F2F2F2" stroke="#595959" stroke-width="1.2"/>
+  <text x="295" y="614" text-anchor="middle" font-size="11" font-weight="700" fill="#262626">collectGarbage()（指令间摊销）</text>
+  <text x="295" y="630" text-anchor="middle" font-size="9" fill="#595959">delta &gt; graphSizeLastGC 时 mark-and-sweep 丢弃失活顶点</text>
+  <line x1="400" y1="572" x2="320" y2="596" stroke="#595959" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- buildFinalPlan -->
+  <rect x="500" y="596" width="350" height="46" rx="8" fill="#1F4E79" stroke="#0F2C46" stroke-width="1.2"/>
+  <text x="675" y="614" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">buildFinalPlan(root)</text>
+  <text x="675" y="630" text-anchor="middle" font-size="9" fill="#DEEBF7">递归剥离 HepRelVertex &#8594; 还原纯 RelNode 树返回</text>
+  <line x1="560" y1="572" x2="640" y2="596" stroke="#548235" stroke-width="1.4" marker-end="url(#arrowG)"/>
+
+  <text x="480" y="676" text-anchor="middle" font-size="10.5" fill="#595959">橙色 = 写图热点（贪心替换）；紫色虚线框 = 定点迭代区；绿色 = 终止/返回</text>
+  <text x="480" y="700" text-anchor="middle" font-size="10" fill="#A6A6A6">图 10-2 — applyRules 在整图上反复扫描；命中即就地替换并继续，直到一整轮无匹配（fixpoint）</text>
+</svg>

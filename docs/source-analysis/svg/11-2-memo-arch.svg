@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 700" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="ref" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#888"/>
+    </marker>
+    <marker id="hot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7F3F00"/>
+    </marker>
+    <linearGradient id="ctn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#BDD7EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="940" height="700" fill="#ffffff"/>
+  <text x="470" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">Memo 数据结构：Planner → RelSet → RelSubset 三层</text>
+  <text x="470" y="52" text-anchor="middle" font-size="12" fill="#595959">用"等价集合 + 按 trait 分组"压缩搜索空间；同一语义只存一份，物理变体共享逻辑表达式</text>
+
+  <!-- Layer 1: Planner -->
+  <rect x="40" y="74" width="860" height="74" rx="8" fill="url(#ctn)" stroke="#1F4E79" stroke-width="2"/>
+  <text x="60" y="96" font-size="13" font-weight="700" fill="#1F4E79">① VolcanoPlanner — Memo 的拥有者与索引</text>
+  <rect x="60" y="106" width="250" height="32" rx="4" fill="#ffffff" stroke="#1F4E79"/>
+  <text x="185" y="126" text-anchor="middle" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">allSets : List&lt;RelSet&gt;</text>
+  <rect x="325" y="106" width="270" height="32" rx="4" fill="#ffffff" stroke="#1F4E79"/>
+  <text x="460" y="126" text-anchor="middle" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">mapDigestToRel : Map&lt;RelDigest,RelNode&gt;</text>
+  <rect x="610" y="106" width="270" height="32" rx="4" fill="#ffffff" stroke="#1F4E79"/>
+  <text x="745" y="126" text-anchor="middle" font-size="9.5" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">mapRel2Subset : IdentityHashMap</text>
+
+  <line x1="470" y1="148" x2="470" y2="172" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Layer 2: RelSet -->
+  <rect x="40" y="174" width="860" height="190" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="2"/>
+  <text x="60" y="196" font-size="13" font-weight="700" fill="#385723">② RelSet — 语义等价集合（同一查询语义的所有改写都落在这里）</text>
+  <text x="60" y="213" font-size="10" fill="#595959">rels: 所有等价 RelNode · parents: 反向父指针 · equivalentSet: 并查集合并链 · conversions: 已加 enforcer 记录</text>
+
+  <!-- RelSet card -->
+  <rect x="70" y="226" width="370" height="124" rx="6" fill="#ffffff" stroke="#548235" stroke-width="1.5"/>
+  <text x="255" y="246" text-anchor="middle" font-size="12" font-weight="700" fill="#385723">RelSet#7  (例：Join 的等价类)</text>
+  <line x1="80" y1="254" x2="430" y2="254" stroke="#548235" stroke-width="0.8"/>
+  <text x="86" y="270" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">rels = [ LogicalJoin, EnumerableHashJoin,</text>
+  <text x="86" y="283" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">        EnumerableMergeJoin, ... ]</text>
+  <text x="86" y="299" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">parents = [ LogicalProject#9 ]</text>
+  <text x="86" y="313" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">subsets = [ #7.NONE, #7.ENUM, #7.ENUM[0] ]</text>
+  <text x="86" y="329" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#888">equivalentSet = null  (本集为 leader)</text>
+  <text x="86" y="344" font-size="9" fill="#C65911">merge 用并查集：older/larger 为 leader</text>
+
+  <!-- RelDigest dedup note -->
+  <rect x="470" y="226" width="410" height="124" rx="6" fill="#F2F2F2" stroke="#595959" stroke-width="1.2"/>
+  <text x="675" y="246" text-anchor="middle" font-size="11.5" font-weight="700" fill="#262626">去重靠 RelDigest（见第 04 篇）</text>
+  <line x1="480" y1="254" x2="870" y2="254" stroke="#595959" stroke-width="0.8"/>
+  <text x="486" y="271" font-size="9.5" fill="#1a1a1a">registerImpl: 算 digest → 查 mapDigestToRel</text>
+  <text x="486" y="287" font-size="9.5" fill="#1a1a1a">命中已存在等价表达式 → 直接复用其 subset</text>
+  <text x="486" y="303" font-size="9.5" fill="#1a1a1a">未命中 → putIfAbsent + 加入 set + fireRules</text>
+  <text x="486" y="322" font-size="9.5" fill="#548235">收益：相同子表达式只展开一次，避免组合爆炸</text>
+  <text x="486" y="340" font-size="9" fill="#C65911">坑：digest 含子 set 标识，set 合并后须 rename 重算</text>
+
+  <line x1="255" y1="350" x2="255" y2="392" stroke="#548235" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="262" y="378" font-size="9.5" fill="#548235">按 RelTraitSet 分组</text>
+
+  <!-- Layer 3: RelSubset -->
+  <rect x="40" y="394" width="860" height="216" rx="8" fill="#FBE5D6" stroke="#C65911" stroke-width="2"/>
+  <text x="60" y="416" font-size="13" font-weight="700" fill="#833C0C">③ RelSubset — 同一 trait 下的物理变体组（动规缓存 best / bestCost 在此）</text>
+  <text x="60" y="433" font-size="10" fill="#595959">subset extends AbstractRelNode：它本身就是一个 RelNode，可以当作父节点的输入占位（lazy 物化）</text>
+
+  <!-- subset cards -->
+  <rect x="70" y="446" width="250" height="150" rx="6" fill="#ffffff" stroke="#C65911" stroke-width="1.5"/>
+  <text x="195" y="466" text-anchor="middle" font-size="11.5" font-weight="700" fill="#833C0C">RelSubset#7.NONE</text>
+  <text x="195" y="481" text-anchor="middle" font-size="9" fill="#595959">逻辑 · convention=NONE</text>
+  <line x1="80" y1="488" x2="310" y2="488" stroke="#C65911" stroke-width="0.8"/>
+  <text x="86" y="504" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">best = null</text>
+  <text x="86" y="518" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">bestCost = INFINITY</text>
+  <text x="86" y="534" font-size="9" fill="#595959">NONE 约定成本无穷</text>
+  <text x="86" y="550" font-size="9" fill="#595959">只承载逻辑算子</text>
+  <text x="86" y="568" font-size="9" fill="#C65911">无法直接实现</text>
+  <text x="86" y="585" font-size="9" fill="#595959">state=0</text>
+
+  <rect x="345" y="446" width="250" height="150" rx="6" fill="#ffffff" stroke="#ED7D31" stroke-width="2"/>
+  <text x="470" y="466" text-anchor="middle" font-size="11.5" font-weight="700" fill="#833C0C">RelSubset#7.ENUMERABLE</text>
+  <text x="470" y="481" text-anchor="middle" font-size="9" fill="#595959">物理 · 无排序要求</text>
+  <line x1="355" y1="488" x2="585" y2="488" stroke="#ED7D31" stroke-width="0.8"/>
+  <text x="361" y="504" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7F3F00">best = EnumerableHashJoin</text>
+  <text x="361" y="518" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7F3F00">bestCost = {1000 rows,...}</text>
+  <text x="361" y="534" font-size="9" fill="#595959">timestamp++ 标记元数据失效</text>
+  <text x="361" y="550" font-size="9" fill="#548235">getRels(): 过滤 satisfies(traits)</text>
+  <text x="361" y="566" font-size="9" fill="#548235">state=DELIVERED(1)</text>
+  <text x="361" y="585" font-size="9" fill="#7F3F00">动规最优解缓存于此 ★</text>
+
+  <rect x="620" y="446" width="250" height="150" rx="6" fill="#ffffff" stroke="#C65911" stroke-width="1.5"/>
+  <text x="745" y="466" text-anchor="middle" font-size="11.5" font-weight="700" fill="#833C0C">RelSubset#7.ENUM[sort 0]</text>
+  <text x="745" y="481" text-anchor="middle" font-size="9" fill="#595959">物理 · 要求按 $0 排序</text>
+  <line x1="630" y1="488" x2="860" y2="488" stroke="#C65911" stroke-width="0.8"/>
+  <text x="636" y="504" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">best = EnumerableMergeJoin</text>
+  <text x="636" y="518" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">bestCost = {1200 rows,...}</text>
+  <text x="636" y="534" font-size="9" fill="#595959">satisfies 偏序：本组 ⊑ 上组</text>
+  <text x="636" y="550" font-size="9" fill="#595959">required 由父节点提出</text>
+  <text x="636" y="566" font-size="9" fill="#595959">state=REQUIRED(2)</text>
+  <text x="636" y="585" font-size="9" fill="#888">AbstractConverter 兜底</text>
+
+  <!-- subset back-pointer to set -->
+  <line x1="320" y1="500" x2="345" y2="500" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <line x1="595" y1="500" x2="620" y2="500" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="470" y="612" text-anchor="middle" font-size="9" fill="#888">三个 subset 共享 RelSet#7 的 rels 列表；各自只挑出 traits 满足者 → 逻辑表达式零拷贝复用</text>
+
+  <!-- Legend -->
+  <rect x="40" y="624" width="860" height="48" rx="6" fill="#FAFAFA" stroke="#BFBFBF"/>
+  <text x="52" y="642" font-size="10.5" font-weight="700" fill="#595959">读图</text>
+  <text x="92" y="642" font-size="10" fill="#595959">蓝=Planner 层(索引)；绿=RelSet 层(语义等价)；橙=RelSubset 层(物理变体+动规缓存)；橙粗边=当前最优解所在 subset。</text>
+  <text x="52" y="662" font-size="10" fill="#595959">关键不变式：每个 RelNode 恰好属于一个 RelSet 的一个 RelSubset；set 合并后用 equivalentSet 链 + canonize 找 leader。</text>
+
+  <text x="470" y="692" text-anchor="middle" font-size="10" fill="#A6A6A6">图 11-2 — Memo 三层：Planner 建索引、RelSet 管语义、RelSubset 管物理属性与最优解，分层即关注点分离</text>
+</svg>

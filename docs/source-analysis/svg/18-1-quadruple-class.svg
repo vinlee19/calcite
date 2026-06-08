@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="inh" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="13" markerHeight="13" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#ffffff" stroke="#548235" stroke-width="1"/>
+    </marker>
+    <marker id="ref" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#888"/>
+    </marker>
+    <linearGradient id="bgCore18a" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#BDD7EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="960" height="720" fill="#ffffff"/>
+  <text x="480" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">Adapter「四件套」：同一套抽象，五种数据源各填一格</text>
+  <text x="480" y="53" text-anchor="middle" font-size="12" fill="#595959">Schema（命名空间）· Table（元数据+读取）· Convention（物理约定）· Rules（下推规则）</text>
+
+  <!-- Column headers: the four roles -->
+  <g font-size="13" font-weight="700" fill="#1F4E79">
+    <rect x="30"  y="70" width="216" height="30" rx="6" fill="url(#bgCore18a)" stroke="#1F4E79"/>
+    <text x="138" y="90" text-anchor="middle">① Schema  (SchemaFactory)</text>
+    <rect x="256" y="70" width="216" height="30" rx="6" fill="url(#bgCore18a)" stroke="#1F4E79"/>
+    <text x="364" y="90" text-anchor="middle">② Table</text>
+    <rect x="482" y="70" width="216" height="30" rx="6" fill="url(#bgCore18a)" stroke="#1F4E79"/>
+    <text x="590" y="90" text-anchor="middle">③ Convention</text>
+    <rect x="708" y="70" width="222" height="30" rx="6" fill="#ED7D31" stroke="#7F3F00"/>
+    <text x="819" y="90" text-anchor="middle" fill="#ffffff">④ Rules (ConverterRule)</text>
+  </g>
+
+  <!-- Row labels (adapters) on the far left vertical band -->
+  <!-- Shared abstraction row (interfaces) -->
+  <g>
+    <rect x="30" y="112" width="900" height="86" rx="8" fill="#F7FBF4" stroke="#548235" stroke-width="1.2" stroke-dasharray="2,2"/>
+    <text x="40" y="130" font-size="12" font-weight="700" fill="#385723">公共 SPI（core 定义，见第 17 篇）</text>
+
+    <rect x="40" y="138" width="196" height="50" rx="6" fill="#E2EFDA" stroke="#548235"/>
+    <text x="138" y="156" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">&#171;interface&#187; Schema</text>
+    <text x="138" y="174" text-anchor="middle" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#385723">getTable() · getSubSchema()</text>
+
+    <rect x="256" y="138" width="196" height="50" rx="6" fill="#E2EFDA" stroke="#548235"/>
+    <text x="354" y="156" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">&#171;interface&#187; Table</text>
+    <text x="354" y="174" text-anchor="middle" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#385723">getRowType() (+能力子接口)</text>
+
+    <rect x="482" y="138" width="196" height="50" rx="6" fill="#FFF2CC" stroke="#BF8F00" stroke-dasharray="4,2"/>
+    <text x="580" y="156" text-anchor="middle" font-size="11" font-weight="700" fill="#7F6000">&#171;abstract&#187; Convention</text>
+    <text x="580" y="174" text-anchor="middle" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7F6000">register() · getInterface()</text>
+
+    <rect x="708" y="138" width="212" height="50" rx="6" fill="#FFF2CC" stroke="#BF8F00" stroke-dasharray="4,2"/>
+    <text x="814" y="156" text-anchor="middle" font-size="11" font-weight="700" fill="#7F6000">&#171;abstract&#187; ConverterRule</text>
+    <text x="814" y="174" text-anchor="middle" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7F6000">convert(RelNode) NONE&#8594;X</text>
+  </g>
+
+  <!-- helper: each adapter is a row of 4 concrete cells -->
+  <!-- JDBC row -->
+  <g>
+    <rect x="30" y="210" width="900" height="56" rx="6" fill="#F2F8FD" stroke="#5B9BD5"/>
+    <text x="40" y="232" font-size="12" font-weight="700" fill="#1F4E79">JDBC</text>
+    <text x="40" y="250" font-size="9" fill="#595959">最完整</text>
+
+    <rect x="118" y="218" width="118" height="40" rx="5" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="177" y="234" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">JdbcSchema</text>
+    <text x="177" y="249" text-anchor="middle" font-size="8.5" fill="#595959">含 DataSource+dialect</text>
+
+    <rect x="256" y="218" width="196" height="40" rx="5" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="354" y="232" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">JdbcTable</text>
+    <text x="354" y="250" text-anchor="middle" font-size="8" fill="#595959">Translatable+Scannable+Modifiable</text>
+
+    <rect x="482" y="218" width="196" height="40" rx="5" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="580" y="234" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">JdbcConvention</text>
+    <text x="580" y="250" text-anchor="middle" font-size="8.5" fill="#595959">非单例！每库一份</text>
+
+    <rect x="708" y="218" width="212" height="40" rx="5" fill="#FBE5D6" stroke="#C65911"/>
+    <text x="814" y="234" text-anchor="middle" font-size="10" font-weight="700" fill="#833C0C">Jdbc{Join,Project,Filter,Aggregate,Sort,Union…}Rule</text>
+    <text x="814" y="250" text-anchor="middle" font-size="8.5" fill="#833C0C">11 条 + RelToSql 反向翻译</text>
+  </g>
+
+  <!-- MongoDB row -->
+  <g>
+    <rect x="30" y="272" width="900" height="56" rx="6" fill="#F4FAF0" stroke="#70AD47"/>
+    <text x="40" y="294" font-size="12" font-weight="700" fill="#385723">MongoDB</text>
+    <text x="40" y="312" font-size="9" fill="#595959">动态 schema</text>
+
+    <rect x="118" y="280" width="118" height="40" rx="5" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="177" y="296" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">MongoSchema</text>
+    <text x="177" y="311" text-anchor="middle" font-size="8.5" fill="#595959">持有 mongoDb</text>
+
+    <rect x="256" y="280" width="196" height="40" rx="5" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="354" y="296" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">MongoTable</text>
+    <text x="354" y="311" text-anchor="middle" font-size="8.5" fill="#595959">Translatable · rowType=单列 _MAP</text>
+
+    <rect x="482" y="280" width="196" height="40" rx="5" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="580" y="296" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">MongoRel.CONVENTION</text>
+    <text x="580" y="311" text-anchor="middle" font-size="8.5" fill="#595959">单例</text>
+
+    <rect x="708" y="280" width="212" height="40" rx="5" fill="#FBE5D6" stroke="#C65911"/>
+    <text x="814" y="296" text-anchor="middle" font-size="10" font-weight="700" fill="#833C0C">Mongo{Sort,Filter,Project,Aggregate}Rule</text>
+    <text x="814" y="311" text-anchor="middle" font-size="8.5" fill="#833C0C">生成 BSON $match/$project/$group</text>
+  </g>
+
+  <!-- Druid row -->
+  <g>
+    <rect x="30" y="334" width="900" height="56" rx="6" fill="#FFFBEF" stroke="#FFC000"/>
+    <text x="40" y="356" font-size="12" font-weight="700" fill="#7F6000">Druid</text>
+    <text x="40" y="374" font-size="9" fill="#595959">时序聚合</text>
+
+    <rect x="118" y="342" width="118" height="40" rx="5" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="177" y="358" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">DruidSchema</text>
+    <text x="177" y="373" text-anchor="middle" font-size="8.5" fill="#595959">REST 端点</text>
+
+    <rect x="256" y="342" width="196" height="40" rx="5" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="354" y="358" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">DruidTable</text>
+    <text x="354" y="373" text-anchor="middle" font-size="8" fill="#595959">timestamp/metric/intervals/complexMetrics</text>
+
+    <rect x="482" y="342" width="196" height="40" rx="5" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="580" y="358" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">DruidQuery (BindableConvention)</text>
+    <text x="580" y="373" text-anchor="middle" font-size="8" fill="#595959">复用 Bindable，不另立约定</text>
+
+    <rect x="708" y="342" width="212" height="40" rx="5" fill="#FBE5D6" stroke="#C65911"/>
+    <text x="814" y="358" text-anchor="middle" font-size="10" font-weight="700" fill="#833C0C">Druid{Filter,Project,Aggregate,Sort,Having}Rule + 时间粒度</text>
+    <text x="814" y="373" text-anchor="middle" font-size="8.5" fill="#833C0C">13 条（含多条 Transpose）</text>
+  </g>
+
+  <!-- Elasticsearch row -->
+  <g>
+    <rect x="30" y="396" width="900" height="56" rx="6" fill="#F3F3F3" stroke="#A5A5A5"/>
+    <text x="40" y="418" font-size="12" font-weight="700" fill="#595959">Elastic</text>
+    <text x="40" y="436" font-size="9" fill="#595959">DSL 翻译</text>
+
+    <rect x="118" y="404" width="118" height="40" rx="5" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="177" y="420" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">ElasticsearchSchema</text>
+    <text x="177" y="435" text-anchor="middle" font-size="8" fill="#595959">RestClient</text>
+
+    <rect x="256" y="404" width="196" height="40" rx="5" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="354" y="420" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">ElasticsearchTable</text>
+    <text x="354" y="435" text-anchor="middle" font-size="8.5" fill="#595959">Translatable · 版本适配</text>
+
+    <rect x="482" y="404" width="196" height="40" rx="5" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="580" y="420" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">ElasticsearchRel.CONVENTION</text>
+    <text x="580" y="435" text-anchor="middle" font-size="8.5" fill="#595959">单例</text>
+
+    <rect x="708" y="404" width="212" height="40" rx="5" fill="#FBE5D6" stroke="#C65911"/>
+    <text x="814" y="420" text-anchor="middle" font-size="10" font-weight="700" fill="#833C0C">Elasticsearch{Sort,Filter,Project,Aggregate}Rule</text>
+    <text x="814" y="435" text-anchor="middle" font-size="8.5" fill="#833C0C">PredicateAnalyzer &#8594; ES Query DSL</text>
+  </g>
+
+  <!-- CSV row -->
+  <g>
+    <rect x="30" y="458" width="900" height="56" rx="6" fill="#FBF6EA" stroke="#BF8F00"/>
+    <text x="40" y="480" font-size="12" font-weight="700" fill="#7F6000">CSV</text>
+    <text x="40" y="498" font-size="9" fill="#595959">教学样板</text>
+
+    <rect x="118" y="466" width="118" height="40" rx="5" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="177" y="482" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">CsvSchema(Factory)</text>
+    <text x="177" y="497" text-anchor="middle" font-size="8" fill="#595959">三 Flavor</text>
+
+    <rect x="256" y="466" width="196" height="40" rx="5" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="354" y="482" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">Csv{Scannable,Filterable,Translatable}Table</text>
+    <text x="354" y="497" text-anchor="middle" font-size="8" fill="#595959">三档能力各一实现</text>
+
+    <rect x="482" y="466" width="196" height="40" rx="5" fill="#F2F2F2" stroke="#888" stroke-dasharray="4,3"/>
+    <text x="580" y="485" text-anchor="middle" font-size="10" font-weight="700" fill="#595959">无自有 Convention</text>
+    <text x="580" y="500" text-anchor="middle" font-size="8" fill="#595959">复用 Enumerable / Filterable 接口</text>
+
+    <rect x="708" y="466" width="212" height="40" rx="5" fill="#F2F2F2" stroke="#888" stroke-dasharray="4,3"/>
+    <text x="814" y="485" text-anchor="middle" font-size="10" font-weight="700" fill="#595959">无 ConverterRule</text>
+    <text x="814" y="500" text-anchor="middle" font-size="8" fill="#595959">下推只靠 scan(filters) 接口回调</text>
+  </g>
+
+  <!-- vertical inheritance arrows from interfaces to one representative concrete (JDBC) -->
+  <line x1="138" y1="218" x2="138" y2="190" stroke="#548235" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="354" y1="218" x2="354" y2="190" stroke="#548235" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="580" y1="218" x2="580" y2="190" stroke="#548235" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="814" y1="218" x2="814" y2="190" stroke="#548235" stroke-width="1.2" marker-end="url(#inh)"/>
+
+  <!-- Convention -> Rules 引用 (register 注册规则) -->
+  <line x1="678" y1="238" x2="708" y2="238" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="693" y="212" text-anchor="middle" font-size="8" fill="#888">register()</text>
+
+  <!-- Legend -->
+  <g>
+    <rect x="30" y="532" width="900" height="116" rx="8" fill="#FCFCFC" stroke="#BFBFBF"/>
+    <text x="44" y="552" font-size="12" font-weight="700" fill="#262626">图例</text>
+
+    <rect x="44"  y="562" width="22" height="14" rx="3" fill="#E2EFDA" stroke="#548235"/>
+    <text x="74" y="573" font-size="10.5" fill="#385723">&#171;interface&#187; 公共 SPI</text>
+    <rect x="200" y="562" width="22" height="14" rx="3" fill="#FFF2CC" stroke="#BF8F00" stroke-dasharray="4,2"/>
+    <text x="230" y="573" font-size="10.5" fill="#7F6000">&#171;abstract&#187; 抽象基类</text>
+    <rect x="370" y="562" width="22" height="14" rx="3" fill="#FFFFFF" stroke="#1F4E79"/>
+    <text x="400" y="573" font-size="10.5" fill="#1a1a1a">具体类（adapter 填充）</text>
+    <rect x="560" y="562" width="22" height="14" rx="3" fill="#FBE5D6" stroke="#C65911"/>
+    <text x="590" y="573" font-size="10.5" fill="#833C0C">下推规则集（热点）</text>
+    <rect x="740" y="562" width="22" height="14" rx="3" fill="#F2F2F2" stroke="#888" stroke-dasharray="4,3"/>
+    <text x="770" y="573" font-size="10.5" fill="#595959">缺省/复用（未自填）</text>
+
+    <line x1="44" y1="596" x2="80" y2="596" stroke="#548235" stroke-width="1.2" marker-end="url(#inh)"/>
+    <text x="90" y="600" font-size="10.5" fill="#385723">实现 / 继承（空心三角）</text>
+    <line x1="280" y1="596" x2="316" y2="596" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+    <text x="326" y="600" font-size="10.5" fill="#888">引用 / 持有（register 注册规则）</text>
+
+    <text x="44" y="624" font-size="10.5" fill="#595959">读法：四列 = 一个 adapter 必须提供的四种角色；每一行 = 一个数据源如何填满这四格。</text>
+    <text x="44" y="640" font-size="10.5" fill="#595959">CSV 没有自己的 Convention / Rules——它停留在 Enumerable 世界，下推靠 Filterable.scan 回调而非 ConverterRule。</text>
+  </g>
+
+  <text x="480" y="700" text-anchor="middle" font-size="10" fill="#A6A6A6">图 18-1 — 同一套 Schema/Table/Convention/Rules 抽象，五种数据源各按能力填格；JDBC 填满四格且额外有反向 SQL 翻译，CSV 只填前两格</text>
+</svg>

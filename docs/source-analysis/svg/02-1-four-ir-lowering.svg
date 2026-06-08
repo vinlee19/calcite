@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <linearGradient id="bgBox" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#BDD7EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="960" height="700" fill="#ffffff"/>
+  <text x="480" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">四层 IR 降级流水线：从文本到可执行字节码</text>
+  <text x="480" y="56" text-anchor="middle" font-size="12" fill="#595959">每层只携带本阶段必需的信息；下一层信息更具体，可逆性更弱；每层节点都不可变</text>
+
+  <!-- column headers -->
+  <g font-size="11" fill="#595959">
+    <text x="250" y="86" text-anchor="middle" font-weight="700" fill="#1F4E79">表示什么</text>
+    <text x="560" y="86" text-anchor="middle" font-weight="700" fill="#1F4E79">关键能力（核实自源码）</text>
+    <text x="850" y="86" text-anchor="middle" font-weight="700" fill="#1F4E79">不可变性</text>
+  </g>
+
+  <!-- ===== Layer 1: SqlNode ===== -->
+  <g>
+    <rect x="40" y="98" width="420" height="96" rx="8" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.6"/>
+    <text x="60" y="122" font-size="14" font-weight="700" fill="#7F6000">① SqlNode  ·  抽象语法树 AST</text>
+    <text x="60" y="143" font-size="11" fill="#7F6000">包：org.apache.calcite.sql</text>
+    <text x="60" y="162" font-size="11" fill="#262626">忠实于书写：保留源位置、关键字、语法结构</text>
+    <text x="60" y="180" font-size="11" fill="#262626">尚无类型、未解析标识符（validate 之前）</text>
+  </g>
+  <g font-size="9.5" fill="#262626" font-family="'SF Mono', Menlo, Consolas, monospace">
+    <rect x="478" y="98" width="290" height="96" rx="6" fill="#ffffff" stroke="#BF8F00"/>
+    <text x="490" y="118">final SqlParserPos pos;  // 行列+范围</text>
+    <text x="490" y="136">abstract void unparse(SqlWriter,..)</text>
+    <text x="490" y="154">abstract void validate(SqlValidator,..)</text>
+    <text x="490" y="172">abstract &lt;R&gt; R accept(SqlVisitor&lt;R&gt;)</text>
+    <text x="490" y="189" fill="#7F6000">无 getType() —— 类型尚不可得</text>
+  </g>
+  <g>
+    <rect x="782" y="118" width="138" height="56" rx="6" fill="#E2EFDA" stroke="#548235"/>
+    <text x="851" y="140" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">不可变 + clone()</text>
+    <text x="851" y="159" text-anchor="middle" font-size="9.5" fill="#385723">clone(SqlParserPos)</text>
+  </g>
+
+  <!-- transition 1 -->
+  <line x1="250" y1="194" x2="250" y2="222" stroke="#1F4E79" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <rect x="284" y="198" width="392" height="20" rx="4" fill="#F2F2F2" stroke="#BFBFBF"/>
+  <text x="296" y="212" font-size="10" fill="#262626">parse → validate：SqlParser#parseQuery，再 SqlValidator#validate 注入类型/作用域</text>
+
+  <!-- ===== Layer 2: RelNode ===== -->
+  <g>
+    <rect x="40" y="226" width="420" height="96" rx="8" fill="url(#bgBox)" stroke="#1F4E79" stroke-width="1.8"/>
+    <text x="60" y="250" font-size="14" font-weight="700" fill="#1F4E79">② RelNode  ·  关系代数（整张关系）</text>
+    <text x="60" y="271" font-size="11" fill="#1F4E79">包：org.apache.calcite.rel</text>
+    <text x="60" y="290" font-size="11" fill="#262626">算子语义：Scan/Filter/Join/Project/Aggregate</text>
+    <text x="60" y="308" font-size="11" fill="#262626">携带 RelTraitSet（convention/collation/...）驱动 CBO</text>
+  </g>
+  <g font-size="9.5" fill="#262626" font-family="'SF Mono', Menlo, Consolas, monospace">
+    <rect x="478" y="226" width="290" height="96" rx="6" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="490" y="246">List&lt;RelNode&gt; getInputs()</text>
+    <text x="490" y="264">RelDataType getRowType()  // 缓存</text>
+    <text x="490" y="282">copy(RelTraitSet, List&lt;RelNode&gt;)</text>
+    <text x="490" y="300">RelNode accept(RelShuttle)</text>
+    <text x="490" y="317" fill="#1F4E79">RelDigest getRelDigest()  // memo 去重</text>
+  </g>
+  <g>
+    <rect x="782" y="246" width="138" height="56" rx="6" fill="#E2EFDA" stroke="#548235"/>
+    <text x="851" y="268" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">不可变 + copy()</text>
+    <text x="851" y="287" text-anchor="middle" font-size="9.5" fill="#385723">final traitSet/id/digest</text>
+  </g>
+
+  <!-- transition 2 -->
+  <line x1="250" y1="322" x2="250" y2="350" stroke="#1F4E79" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <rect x="284" y="326" width="392" height="20" rx="4" fill="#F2F2F2" stroke="#BFBFBF"/>
+  <text x="296" y="340" font-size="10" fill="#262626">sql2rel：SqlToRelConverter#convertQuery 产出 RelNode，内部含 RexNode</text>
+
+  <!-- ===== Layer 3: RexNode ===== -->
+  <g>
+    <rect x="40" y="354" width="420" height="96" rx="8" fill="#FBE5D6" stroke="#C65911" stroke-width="1.8"/>
+    <text x="60" y="378" font-size="14" font-weight="700" fill="#833C0C">③ RexNode  ·  行表达式（一行内的标量）</text>
+    <text x="60" y="399" font-size="11" fill="#833C0C">包：org.apache.calcite.rex</text>
+    <text x="60" y="418" font-size="11" fill="#262626">Filter.condition / Project.exps 的内容物</text>
+    <text x="60" y="436" font-size="11" fill="#262626">每个表达式都已带类型；输入列用 $序号 引用</text>
+  </g>
+  <g font-size="9.5" fill="#262626" font-family="'SF Mono', Menlo, Consolas, monospace">
+    <rect x="478" y="354" width="290" height="96" rx="6" fill="#ffffff" stroke="#C65911"/>
+    <text x="490" y="374">abstract RelDataType getType()</text>
+    <text x="490" y="392">abstract &lt;R&gt; R accept(RexVisitor)</text>
+    <text x="490" y="410">abstract equals / hashCode</text>
+    <text x="490" y="428">int nodeCount()  // 复杂度护栏</text>
+    <text x="490" y="445" fill="#833C0C">javadoc: All sub-classes are immutable</text>
+  </g>
+  <g>
+    <rect x="782" y="374" width="138" height="56" rx="6" fill="#E2EFDA" stroke="#548235"/>
+    <text x="851" y="396" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">深度不可变</text>
+    <text x="851" y="415" text-anchor="middle" font-size="9.5" fill="#385723">RexBuilder 消重/缓存</text>
+  </g>
+
+  <!-- transition 3 -->
+  <line x1="250" y1="450" x2="250" y2="478" stroke="#1F4E79" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <rect x="284" y="454" width="392" height="20" rx="4" fill="#F2F2F2" stroke="#BFBFBF"/>
+  <text x="296" y="468" font-size="10" fill="#262626">RexToLix：RexToLixTranslator#translateProjects 把 RexNode→Expression</text>
+
+  <!-- ===== Layer 4: Expression ===== -->
+  <g>
+    <rect x="40" y="482" width="420" height="96" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.8"/>
+    <text x="60" y="506" font-size="14" font-weight="700" fill="#385723">④ Expression  ·  Java 表达式树（linq4j）</text>
+    <text x="60" y="527" font-size="11" fill="#385723">包：org.apache.calcite.linq4j.tree</text>
+    <text x="60" y="546" font-size="11" fill="#262626">面向 Java 语义：变量/方法调用/三目/装箱</text>
+    <text x="60" y="564" font-size="11" fill="#262626">再交 Janino 编译为 Bindable 字节码就地执行</text>
+  </g>
+  <g font-size="9.5" fill="#262626" font-family="'SF Mono', Menlo, Consolas, monospace">
+    <rect x="478" y="482" width="290" height="96" rx="6" fill="#ffffff" stroke="#548235"/>
+    <text x="490" y="502">final ExpressionType nodeType;</text>
+    <text x="490" y="520">final Type type;  // java 类型</text>
+    <text x="490" y="538">abstract Expression accept(Shuttle)</text>
+    <text x="490" y="556">boolean canReduce()</text>
+    <text x="490" y="573" fill="#385723">最终经 ExpressionWriter → Java 源码</text>
+  </g>
+  <g>
+    <rect x="782" y="502" width="138" height="56" rx="6" fill="#E2EFDA" stroke="#548235"/>
+    <text x="851" y="524" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">不可变 + Shuttle</text>
+    <text x="851" y="543" text-anchor="middle" font-size="9.5" fill="#385723">accept 返回新树</text>
+  </g>
+
+  <!-- specificity gradient annotation on the left -->
+  <line x1="22" y1="98" x2="22" y2="578" stroke="#7030A0" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <text x="16" y="98" font-size="9.5" fill="#7030A0" transform="rotate(90 16 98)">越往下：信息越具体 · 可逆性越弱 · 越贴近执行</text>
+
+  <!-- bottom note -->
+  <rect x="40" y="598" width="880" height="56" rx="6" fill="#F2F2F2" stroke="#BFBFBF"/>
+  <text x="56" y="618" font-size="11" font-weight="700" fill="#262626">为什么分四层而不是一个万能 IR？</text>
+  <text x="56" y="636" font-size="10.5" fill="#262626">关注点分离：每层各自演进、各自有 Visitor 与单元测试；行表达式（Rex）独立于关系（Rel），优化器规则可单独改写谓词而不动算子。</text>
+  <text x="56" y="650" font-size="10.5" fill="#262626">代价：每层都要写一套节点类 + Visitor + 转换器，模板代码多；跨层调试需在四套对象间切换。</text>
+
+  <text x="480" y="684" text-anchor="middle" font-size="10" fill="#A6A6A6">图 02-1 — 黄=AST/蓝=关系/橙=行表达式/绿=Java 表达式；中间灰条为层间转换器，紫色虚线表示"具体度递增"</text>
+</svg>

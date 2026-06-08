@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 680" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+  </defs>
+
+  <rect width="980" height="680" fill="#ffffff"/>
+  <text x="490" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">同一模板，三套方言：config.fmpp 的差异对照</text>
+  <text x="490" y="52" text-anchor="middle" font-size="12" fill="#595959">Core（标准 SQL）/ Babel（多方言宽松）/ Server（DDL）共用 Parser.jj，仅靠配置分化</text>
+
+  <!-- shared template banner -->
+  <rect x="60" y="70" width="860" height="40" rx="8" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5"/>
+  <text x="490" y="95" text-anchor="middle" font-size="12" font-weight="700" fill="#7F6000">共享模板 codegen/templates/Parser.jj（9500+ 行）+ default_config.fmpp（缺省值）</text>
+  <line x1="280" y1="110" x2="280" y2="132" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="490" y1="110" x2="490" y2="132" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="700" y1="110" x2="700" y2="132" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#arrow)"/>
+
+  <!-- table header -->
+  <g font-size="12" font-weight="700">
+    <rect x="60"  y="134" width="240" height="36" fill="#1F4E79"/><text x="180" y="158" text-anchor="middle" fill="#ffffff">配置项 / 维度</text>
+    <rect x="300" y="134" width="206" height="36" fill="#2E75B6"/><text x="403" y="158" text-anchor="middle" fill="#ffffff">Core（core）</text>
+    <rect x="506" y="134" width="206" height="36" fill="#548235"/><text x="609" y="158" text-anchor="middle" fill="#ffffff">Babel（babel）</text>
+    <rect x="712" y="134" width="208" height="36" fill="#7030A0"/><text x="816" y="158" text-anchor="middle" fill="#ffffff">Server（server）</text>
+  </g>
+
+  <!-- rows -->
+  <g font-size="10.5" fill="#262626">
+    <!-- row helper bg -->
+    <rect x="60"  y="170" width="860" height="38" fill="#F7FAFD"/>
+    <rect x="60"  y="208" width="860" height="38" fill="#ffffff"/>
+    <rect x="60"  y="246" width="860" height="38" fill="#F7FAFD"/>
+    <rect x="60"  y="284" width="860" height="38" fill="#ffffff"/>
+    <rect x="60"  y="322" width="860" height="38" fill="#F7FAFD"/>
+    <rect x="60"  y="360" width="860" height="38" fill="#ffffff"/>
+    <rect x="60"  y="398" width="860" height="38" fill="#F7FAFD"/>
+    <rect x="60"  y="436" width="860" height="38" fill="#ffffff"/>
+    <rect x="60"  y="474" width="860" height="38" fill="#F7FAFD"/>
+    <rect x="60"  y="512" width="860" height="38" fill="#ffffff"/>
+
+    <!-- column separators -->
+    <g stroke="#D9D9D9" stroke-width="1">
+      <line x1="300" y1="170" x2="300" y2="550"/>
+      <line x1="506" y1="170" x2="506" y2="550"/>
+      <line x1="712" y1="170" x2="712" y2="550"/>
+      <line x1="60"  y1="550" x2="920" y2="550"/>
+    </g>
+
+    <!-- r1 package/class -->
+    <text x="70" y="194" font-weight="700">package / class</text>
+    <text x="310" y="188" font-family="'SF Mono',Menlo,monospace" fill="#385723">…parser.impl</text>
+    <text x="310" y="202" font-family="'SF Mono',Menlo,monospace">SqlParserImpl</text>
+    <text x="516" y="188" font-family="'SF Mono',Menlo,monospace" fill="#385723">…parser.babel</text>
+    <text x="516" y="202" font-family="'SF Mono',Menlo,monospace">SqlBabelParserImpl</text>
+    <text x="722" y="188" font-family="'SF Mono',Menlo,monospace" fill="#385723">…parser.ddl</text>
+    <text x="722" y="202" font-family="'SF Mono',Menlo,monospace">SqlDdlParserImpl</text>
+
+    <!-- r2 keywords -->
+    <text x="70" y="231" font-weight="700">新增关键字 keywords</text>
+    <text x="310" y="231" fill="#888">无（[]）</text>
+    <text x="516" y="231">10 个（ANTI/SEMI/IF/TEMP…）</text>
+    <text x="722" y="231">DDL 相关少量</text>
+
+    <!-- r3 nonReservedKeywordsToAdd -->
+    <text x="70" y="262" font-weight="700">放宽保留字</text>
+    <text x="70" y="276" font-size="9" fill="#888">nonReservedKeywordsToAdd</text>
+    <text x="310" y="269" fill="#888">无</text>
+    <text x="516" y="269">~400 个降级为非保留</text>
+    <text x="722" y="269" fill="#888">基本沿用 Core</text>
+
+    <!-- r4 statementParserMethods -->
+    <text x="70" y="307" font-weight="700">statementParserMethods</text>
+    <text x="310" y="307" fill="#888">无</text>
+    <text x="516" y="300">PostgresSqlBegin/Commit</text>
+    <text x="516" y="314">/Discard/Rollback/Show</text>
+    <text x="722" y="307" fill="#888">无</text>
+
+    <!-- r5 createStatementParserMethods -->
+    <text x="70" y="345" font-weight="700">createStatementParserMethods</text>
+    <text x="310" y="345" fill="#888">无（不开 SqlCreate）</text>
+    <text x="516" y="345">SqlCreateTable</text>
+    <text x="722" y="338">SqlCreateTable/View/Schema</text>
+    <text x="722" y="352">/Type/Function/MView…</text>
+
+    <!-- r6 dropStatementParserMethods -->
+    <text x="70" y="383" font-weight="700">drop/truncate 扩展</text>
+    <text x="310" y="383" fill="#888">无</text>
+    <text x="516" y="383" fill="#888">无</text>
+    <text x="722" y="383">SqlDropTable/View/Schema…</text>
+
+    <!-- r7 binaryOperatorsTokens -->
+    <text x="70" y="421" font-weight="700">扩展运算符</text>
+    <text x="70" y="435" font-size="9" fill="#888">binaryOperatorsTokens</text>
+    <text x="310" y="428" fill="#888">无</text>
+    <text x="516" y="421">:: 强转、&lt;=&gt; null-safe 等</text>
+    <text x="516" y="435" font-size="9" fill="#888">+ extraBinaryExpressions</text>
+    <text x="722" y="428" fill="#888">无</text>
+
+    <!-- r8 customIdentifierToken -->
+    <text x="70" y="459" font-weight="700">customIdentifierToken</text>
+    <text x="310" y="459" fill="#888">缺省（标识符）</text>
+    <text x="516" y="459">允许非 Latin / $（PG/MySQL）</text>
+    <text x="722" y="459" fill="#888">缺省</text>
+
+    <!-- r9 implementationFiles -->
+    <text x="70" y="497" font-weight="700">implementationFiles</text>
+    <text x="310" y="497">parserImpls.ftl</text>
+    <text x="516" y="490">parserImpls.ftl +</text>
+    <text x="516" y="504">parserPostgresImpls.ftl</text>
+    <text x="722" y="497">parserImpls.ftl（DDL 版）</text>
+
+    <!-- r10 feature flags -->
+    <text x="70" y="535" font-weight="700">特性开关</text>
+    <text x="310" y="535" fill="#888">多为 false（标准 SQL）</text>
+    <text x="516" y="528">includePosixOperators=true</text>
+    <text x="516" y="542">includeStarExclude=true …</text>
+    <text x="722" y="535" fill="#888">少量打开</text>
+  </g>
+
+  <!-- takeaway -->
+  <rect x="60" y="566" width="860" height="74" rx="6" fill="#F2F2F2" stroke="#BFBFBF"/>
+  <text x="74" y="586" font-size="11" font-weight="700" fill="#262626">读图要点</text>
+  <text x="74" y="604" font-size="10" fill="#595959">· 三套方言零拷贝模板：差异 100% 收敛在各自 config.fmpp 与 includes/*.ftl，核心 Parser.jj 不被任何下游 fork。</text>
+  <text x="74" y="620" font-size="10" fill="#595959">· 增量扩展的代价：新增一个语句 = 加 keyword + 加 *ParserMethods + 在 *.ftl 写一段 JavaCC 产生式，三处对齐缺一不可。</text>
+  <text x="74" y="636" font-size="10" fill="#595959">· Babel 把近 400 个标准保留字降级换取宽松解析，代价是潜在歧义（INNER 等"必须保留"的词被显式注释保留）。</text>
+
+  <text x="490" y="666" text-anchor="middle" font-size="10" fill="#A6A6A6">图 09-2 — 列头颜色仅区分方言，无层级含义；空格"无"表示沿用 default_config.fmpp 缺省值</text>
+</svg>

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 720" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="inh" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="13" markerHeight="13" orient="auto">
+      <path d="M0,0 L14,7 L0,14 z" fill="#ffffff" stroke="#595959" stroke-width="1"/>
+    </marker>
+    <marker id="ref" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#888"/>
+    </marker>
+  </defs>
+
+  <rect width="940" height="720" fill="#ffffff"/>
+  <text x="470" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">Schema SPI 类图：声明式装配 + 能力分层 + 反向查询</text>
+  <text x="470" y="54" text-anchor="middle" font-size="12" fill="#595959">org.apache.calcite.schema —— SchemaFactory 造 Schema，Schema 产 Table，Table 用 Wrapper 暴露子能力</text>
+
+  <!-- ===== 装配侧：SchemaFactory ===== -->
+  <text x="60" y="92" font-size="13" font-weight="700" fill="#1F4E79">① 声明式装配（JSON model → 工厂）</text>
+
+  <rect x="60" y="104" width="220" height="78" rx="6" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="170" y="122" text-anchor="middle" font-size="11" font-style="italic" fill="#385723">&#171;interface&#187;</text>
+  <text x="170" y="138" text-anchor="middle" font-size="12" font-weight="700" fill="#385723">SchemaFactory</text>
+  <line x1="60" y1="146" x2="280" y2="146" stroke="#548235" stroke-width="1"/>
+  <text x="70" y="164" font-size="9" fill="#385723" font-family="'SF Mono',Menlo,monospace">Schema create(parentSchema,</text>
+  <text x="70" y="176" font-size="9" fill="#385723" font-family="'SF Mono',Menlo,monospace">  name, Map&lt;String,Object&gt; operand)</text>
+
+  <!-- model.json operand box -->
+  <rect x="60" y="206" width="220" height="92" rx="6" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5"/>
+  <text x="70" y="224" font-size="10.5" font-weight="700" fill="#7F6000">model.json（声明式）</text>
+  <text x="70" y="242" font-size="9" fill="#7F6000" font-family="'SF Mono',Menlo,monospace">"type": "custom",</text>
+  <text x="70" y="256" font-size="9" fill="#7F6000" font-family="'SF Mono',Menlo,monospace">"factory": "...CsvSchemaFactory",</text>
+  <text x="70" y="270" font-size="9" fill="#7F6000" font-family="'SF Mono',Menlo,monospace">"operand": { directory: "sales",</text>
+  <text x="70" y="284" font-size="9" fill="#7F6000" font-family="'SF Mono',Menlo,monospace">             flavor: "TRANSLATABLE" }</text>
+
+  <line x1="170" y1="206" x2="170" y2="182" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="178" y="198" font-size="9" fill="#888">反射实例化 + operand</text>
+
+  <!-- ===== Schema 树 ===== -->
+  <text x="360" y="92" font-size="13" font-weight="700" fill="#1F4E79">② 命名空间（Schema / SchemaPlus）</text>
+
+  <rect x="360" y="104" width="230" height="96" rx="6" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="475" y="122" text-anchor="middle" font-size="11" font-style="italic" fill="#385723">&#171;interface&#187;</text>
+  <text x="475" y="138" text-anchor="middle" font-size="12" font-weight="700" fill="#385723">Schema</text>
+  <line x1="360" y1="146" x2="590" y2="146" stroke="#548235" stroke-width="1"/>
+  <text x="370" y="162" font-size="9" fill="#385723" font-family="'SF Mono',Menlo,monospace">Lookup&lt;Table&gt; tables()</text>
+  <text x="370" y="175" font-size="9" fill="#385723" font-family="'SF Mono',Menlo,monospace">Lookup&lt;Schema&gt; subSchemas()</text>
+  <text x="370" y="188" font-size="9" fill="#385723" font-family="'SF Mono',Menlo,monospace">Schema snapshot(version)</text>
+
+  <rect x="360" y="224" width="230" height="58" rx="6" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="475" y="242" text-anchor="middle" font-size="11" font-style="italic" fill="#385723">&#171;interface&#187;</text>
+  <text x="475" y="258" text-anchor="middle" font-size="12" font-weight="700" fill="#385723">SchemaPlus</text>
+  <line x1="360" y1="266" x2="590" y2="266" stroke="#548235" stroke-width="1"/>
+  <text x="370" y="278" font-size="9" fill="#385723" font-family="'SF Mono',Menlo,monospace">add(name, Table) · 可写视图</text>
+
+  <line x1="475" y1="224" x2="475" y2="200" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+
+  <rect x="360" y="306" width="230" height="58" rx="6" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="475" y="324" text-anchor="middle" font-size="11" font-style="italic" fill="#7F6000">&#171;abstract&#187;</text>
+  <text x="475" y="340" text-anchor="middle" font-size="12" font-weight="700" fill="#7F6000">AbstractSchema</text>
+  <line x1="360" y1="348" x2="590" y2="348" stroke="#BF8F00" stroke-width="1"/>
+  <text x="370" y="360" font-size="9" fill="#7F6000" font-family="'SF Mono',Menlo,monospace">getTableMap() 覆写即可</text>
+
+  <line x1="475" y1="306" x2="475" y2="282" stroke="#595959" stroke-width="1.2" stroke-dasharray="3,2" marker-end="url(#inh)"/>
+
+  <!-- create() returns Schema -->
+  <line x1="280" y1="143" x2="358" y2="143" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="288" y="136" font-size="9" fill="#888">create() 返回</text>
+
+  <!-- tables() returns Table -->
+  <line x1="590" y1="160" x2="668" y2="160" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="600" y="153" font-size="9" fill="#888">tables() 解析</text>
+
+  <!-- ===== Table 能力族 ===== -->
+  <text x="670" y="92" font-size="13" font-weight="700" fill="#1F4E79">③ Table 能力族</text>
+
+  <rect x="668" y="104" width="232" height="74" rx="6" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="784" y="122" text-anchor="middle" font-size="11" font-style="italic" fill="#385723">&#171;interface&#187;</text>
+  <text x="784" y="138" text-anchor="middle" font-size="12" font-weight="700" fill="#385723">Table</text>
+  <line x1="668" y1="146" x2="900" y2="146" stroke="#548235" stroke-width="1"/>
+  <text x="678" y="162" font-size="9" fill="#385723" font-family="'SF Mono',Menlo,monospace">RelDataType getRowType(factory)</text>
+  <text x="678" y="174" font-size="9" fill="#385723" font-family="'SF Mono',Menlo,monospace">Statistic getStatistic()</text>
+
+  <!-- capability markers -->
+  <g>
+    <rect x="668" y="202" width="232" height="30" rx="5" fill="#E2EFDA" stroke="#548235"/>
+    <text x="784" y="221" text-anchor="middle" font-size="10.5" font-weight="700" fill="#385723">ScannableTable · scan(root)</text>
+
+    <rect x="668" y="238" width="232" height="30" rx="5" fill="#E2EFDA" stroke="#548235"/>
+    <text x="784" y="257" text-anchor="middle" font-size="10.5" font-weight="700" fill="#385723">FilterableTable · scan(root,filters)</text>
+
+    <rect x="668" y="274" width="232" height="30" rx="5" fill="#E2EFDA" stroke="#548235"/>
+    <text x="784" y="293" text-anchor="middle" font-size="9.5" font-weight="700" fill="#385723">ProjectableFilterableTable · +projects</text>
+
+    <rect x="668" y="310" width="232" height="34" rx="5" fill="#ED7D31" stroke="#7F3F00"/>
+    <text x="784" y="324" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">TranslatableTable</text>
+    <text x="784" y="338" text-anchor="middle" font-size="9" fill="#FFF2CC" font-family="'SF Mono',Menlo,monospace">RelNode toRel(ctx, relOptTable)</text>
+
+    <rect x="668" y="350" width="232" height="30" rx="5" fill="#E2EFDA" stroke="#548235"/>
+    <text x="784" y="369" text-anchor="middle" font-size="9.5" font-weight="700" fill="#385723">QueryableTable / ModifiableTable</text>
+  </g>
+  <!-- inheritance from Table to each marker (all extend Table) -->
+  <line x1="784" y1="202" x2="784" y2="178" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <text x="792" y="194" font-size="9" fill="#595959">均 extends Table（互不继承）</text>
+
+  <!-- ===== Wrapper ===== -->
+  <text x="60" y="430" font-size="13" font-weight="700" fill="#1F4E79">④ 类型安全反向查询（Wrapper mix-in）</text>
+
+  <rect x="60" y="442" width="240" height="86" rx="6" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="180" y="460" text-anchor="middle" font-size="11" font-style="italic" fill="#385723">&#171;interface&#187;</text>
+  <text x="180" y="476" text-anchor="middle" font-size="12" font-weight="700" fill="#385723">Wrapper</text>
+  <line x1="60" y1="484" x2="300" y2="484" stroke="#548235" stroke-width="1"/>
+  <text x="70" y="500" font-size="9" fill="#385723" font-family="'SF Mono',Menlo,monospace">&lt;C&gt; C unwrap(Class&lt;C&gt;)</text>
+  <text x="70" y="513" font-size="9" fill="#385723" font-family="'SF Mono',Menlo,monospace">C unwrapOrThrow(Class&lt;C&gt;)</text>
+  <text x="70" y="524" font-size="9" fill="#385723" font-family="'SF Mono',Menlo,monospace">Optional&lt;C&gt; maybeUnwrap(...)</text>
+
+  <rect x="60" y="552" width="240" height="64" rx="6" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="180" y="570" text-anchor="middle" font-size="11" font-style="italic" fill="#7F6000">&#171;abstract&#187;</text>
+  <text x="180" y="586" text-anchor="middle" font-size="12" font-weight="700" fill="#7F6000">AbstractTable</text>
+  <line x1="60" y1="594" x2="300" y2="594" stroke="#BF8F00" stroke-width="1"/>
+  <text x="70" y="610" font-size="9" fill="#7F6000" font-family="'SF Mono',Menlo,monospace">unwrap: aClass.isInstance(this)?cast:null</text>
+
+  <line x1="180" y1="552" x2="180" y2="528" stroke="#595959" stroke-width="1.2" stroke-dasharray="3,2" marker-end="url(#inh)"/>
+  <text x="188" y="544" font-size="9" fill="#595959">implements Table, Wrapper</text>
+
+  <!-- unwrap usage -->
+  <rect x="360" y="442" width="300" height="120" rx="6" fill="#F2F2F2" stroke="#595959" stroke-width="1.2"/>
+  <text x="370" y="460" font-size="10.5" font-weight="700" fill="#262626">框架侧用法（运行期能力探测）</text>
+  <text x="370" y="480" font-size="9" fill="#262626" font-family="'SF Mono',Menlo,monospace">relOptTable.unwrap(</text>
+  <text x="370" y="494" font-size="9" fill="#262626" font-family="'SF Mono',Menlo,monospace">    ProjectableFilterableTable.class)</text>
+  <text x="370" y="514" font-size="9" fill="#262626" font-family="'SF Mono',Menlo,monospace">jdbcSchema.unwrap(DataSource.class)</text>
+  <text x="370" y="528" font-size="9" fill="#262626" font-family="'SF Mono',Menlo,monospace">jdbcSchema.unwrap(SqlDialect.class)</text>
+  <text x="370" y="548" font-size="9.5" fill="#595959">→ 无需在 Table 接口上堆方法即可暴露子能力</text>
+
+  <!-- ===== Legend ===== -->
+  <rect x="690" y="440" width="210" height="176" rx="6" fill="#ffffff" stroke="#BFBFBF" stroke-width="1"/>
+  <text x="700" y="460" font-size="12" font-weight="700" fill="#262626">图例</text>
+
+  <rect x="700" y="470" width="26" height="16" rx="3" fill="#E2EFDA" stroke="#548235"/>
+  <text x="734" y="482" font-size="10.5" fill="#385723">interface（接口）</text>
+
+  <rect x="700" y="492" width="26" height="16" rx="3" fill="#FFF2CC" stroke="#BF8F00" stroke-dasharray="4,2"/>
+  <text x="734" y="504" font-size="10.5" fill="#7F6000">abstract（抽象基类）</text>
+
+  <rect x="700" y="514" width="26" height="16" rx="3" fill="#ED7D31" stroke="#7F3F00"/>
+  <text x="734" y="526" font-size="10.5" fill="#262626">关键热点接口</text>
+
+  <rect x="700" y="536" width="26" height="16" rx="3" fill="#ffffff" stroke="#1F4E79"/>
+  <text x="734" y="548" font-size="10.5" fill="#262626">具体类 / 配置块</text>
+
+  <line x1="700" y1="566" x2="726" y2="566" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <text x="734" y="570" font-size="10.5" fill="#262626">继承 / 实现（空心三角）</text>
+
+  <line x1="700" y1="590" x2="726" y2="590" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="734" y="594" font-size="10.5" fill="#262626">产出 / 引用（虚线）</text>
+
+  <text x="470" y="700" text-anchor="middle" font-size="10" fill="#A6A6A6">图 17-2 — 装配（工厂+JSON）、命名空间（Schema）、能力（Table 族）、反向查询（Wrapper）四个关注点彼此正交</text>
+</svg>

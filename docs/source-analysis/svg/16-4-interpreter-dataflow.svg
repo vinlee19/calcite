@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 680" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="push" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7030A0"/>
+    </marker>
+    <marker id="ref" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#888"/>
+    </marker>
+    <linearGradient id="bgBox" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#BDD7EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="960" height="680" fill="#ffffff"/>
+  <text x="480" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">Interpreter：无需 codegen 的后备执行引擎</text>
+  <text x="480" y="52" text-anchor="middle" font-size="12" fill="#595959">RelNode 树 → Node 树，节点间用 Sink/Source 解耦的 push-based 管道传 Row（Object[]）</text>
+
+  <!-- Interpreter container -->
+  <rect x="36" y="74" width="888" height="392" rx="10" fill="#F7F9FB" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="52" y="96" font-size="12" font-weight="700" fill="#1F4E79">Interpreter（持有 nodes: Map&lt;RelNode, NodeInfo&gt; · dataContext · rootRel）</text>
+
+  <!-- TableScan node (leaf) -->
+  <rect x="70" y="120" width="200" height="86" rx="8" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="170" y="142" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">ScanNode</text>
+  <text x="170" y="160" text-anchor="middle" font-size="9.5" fill="#595959">叶子：从 Table 读行</text>
+  <text x="170" y="178" text-anchor="middle" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">run(): while(...) sink.send(row)</text>
+  <text x="170" y="195" text-anchor="middle" font-size="9" fill="#385723">implements Node, AutoCloseable</text>
+
+  <!-- Sink between scan and filter -->
+  <rect x="300" y="138" width="100" height="50" rx="6" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="350" y="158" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">Sink</text>
+  <text x="350" y="174" text-anchor="middle" font-size="8.5" fill="#385723">send(row)/end()</text>
+
+  <!-- FilterNode -->
+  <rect x="430" y="120" width="200" height="86" rx="8" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="530" y="142" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">FilterNode</text>
+  <text x="530" y="160" text-anchor="middle" font-size="9.5" fill="#595959">从 Source 收 → 判定 → 转发</text>
+  <text x="530" y="178" text-anchor="middle" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">condition 由 JaninoRexCompiler 编译</text>
+  <text x="530" y="195" text-anchor="middle" font-size="9" fill="#7F3F00">行表达式仍走 Janino，算子骨架是解释的</text>
+
+  <!-- Source feeding filter -->
+  <rect x="430" y="226" width="100" height="44" rx="6" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5"/>
+  <text x="480" y="245" text-anchor="middle" font-size="11" font-weight="700" fill="#7F6000">Source</text>
+  <text x="480" y="261" text-anchor="middle" font-size="8.5" fill="#7F6000">receive() → Row</text>
+
+  <!-- Sink between filter and aggregate -->
+  <rect x="660" y="138" width="100" height="50" rx="6" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="710" y="158" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">Sink</text>
+  <text x="710" y="174" text-anchor="middle" font-size="8.5" fill="#385723">ListSink (ArrayDeque)</text>
+
+  <!-- AggregateNode -->
+  <rect x="660" y="232" width="200" height="86" rx="8" fill="url(#bgBox)" stroke="#1F4E79" stroke-width="2"/>
+  <text x="760" y="254" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">AggregateNode (root)</text>
+  <text x="760" y="272" text-anchor="middle" font-size="9.5" fill="#1a1a1a">攒齐输入 → 分组聚合 → 产出</text>
+  <text x="760" y="290" text-anchor="middle" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">run() throws InterruptedException</text>
+  <text x="760" y="307" text-anchor="middle" font-size="9" fill="#595959">结果经 enumerator() 暴露为 Object[]</text>
+
+  <!-- push flows -->
+  <line x1="270" y1="163" x2="298" y2="163" stroke="#7030A0" stroke-width="1.6" marker-end="url(#push)"/>
+  <line x1="400" y1="163" x2="428" y2="163" stroke="#7030A0" stroke-width="1.6" marker-end="url(#push)"/>
+  <line x1="630" y1="163" x2="658" y2="163" stroke="#7030A0" stroke-width="1.6" marker-end="url(#push)"/>
+  <line x1="710" y1="188" x2="760" y2="230" stroke="#7030A0" stroke-width="1.6" marker-end="url(#push)"/>
+
+  <!-- source ref -->
+  <line x1="480" y1="226" x2="480" y2="208" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="492" y="220" font-size="8.5" fill="#888">Compiler.source(rel, i)</text>
+
+  <!-- compiler note -->
+  <rect x="70" y="246" width="320" height="110" rx="8" fill="#F2F2F2" stroke="#595959" stroke-width="1.2"/>
+  <text x="86" y="266" font-size="11" font-weight="700" fill="#262626">CompilerImpl（反射 visit 分派）</text>
+  <text x="86" y="284" font-size="9.5" fill="#262626">· 形如 visit(XxxRel) 的方法用反射查找</text>
+  <text x="86" y="300" font-size="9.5" fill="#262626">· optimize()：HEP 先做 CALC_SPLIT /</text>
+  <text x="98" y="314" font-size="9.5" fill="#262626">  FILTER_INTERPRETER_SCAN 等下推</text>
+  <text x="86" y="332" font-size="9.5" fill="#262626">· sink()/source()/enumerable() 织出数据流图</text>
+  <text x="86" y="348" font-size="9" fill="#595959">leaves-first 顺序执行：start() 逐个 node.run()</text>
+
+  <!-- bridge node -->
+  <rect x="430" y="296" width="200" height="60" rx="8" fill="#FBE5D6" stroke="#C65911" stroke-width="1.5"/>
+  <text x="530" y="316" text-anchor="middle" font-size="11" font-weight="700" fill="#833C0C">EnumerableInterpretable</text>
+  <text x="530" y="332" text-anchor="middle" font-size="9" fill="#7F3F00">把已编译 Enumerable 包成叶子 Node</text>
+  <text x="530" y="346" text-anchor="middle" font-size="9" fill="#7F3F00">两引擎可在同一计划内混用</text>
+
+  <line x1="530" y1="296" x2="530" y2="270" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+
+  <text x="52" y="386" font-size="10" fill="#595959">数据流向：叶子 push 到 Sink → 下游 Node 从 Source 拉/收 → 一直推到 root；root 的结果用 TransformedEnumerator 暴露为 Object[]</text>
+  <text x="52" y="404" font-size="10" fill="#595959">关键取舍：函数调用密集 + cache locality 差，比 codegen 慢；但无需编译、可执行任意算子，适合原型 / 不可编译算子 / 缓存失效场景</text>
+  <text x="52" y="438" font-size="10" font-weight="700" fill="#7F3F00">对照：Enumerable 把整棵树编译成一个类（无 per-row 虚调用）；Interpreter 每个 Node 是一个对象，每行都过一次虚方法分派</text>
+
+  <!-- Legend -->
+  <rect x="36" y="480" width="888" height="160" rx="6" fill="#FCFCFC" stroke="#BFBFBF"/>
+  <text x="52" y="502" font-size="11" font-weight="700" fill="#595959">图例</text>
+  <rect x="52" y="514" width="22" height="14" rx="3" fill="#FFFFFF" stroke="#1F4E79"/>
+  <text x="82" y="525" font-size="10" fill="#1a1a1a">Node（单一职责，AutoCloseable）</text>
+  <rect x="330" y="514" width="22" height="14" rx="3" fill="#E2EFDA" stroke="#548235"/>
+  <text x="360" y="525" font-size="10" fill="#1a1a1a">Sink（输出端：send/end）</text>
+  <rect x="600" y="514" width="22" height="14" rx="3" fill="#FFF2CC" stroke="#BF8F00"/>
+  <text x="630" y="525" font-size="10" fill="#1a1a1a">Source（输入端：receive）</text>
+
+  <line x1="52" y1="550" x2="86" y2="550" stroke="#7030A0" stroke-width="1.6" marker-end="url(#push)"/>
+  <text x="94" y="554" font-size="10" fill="#1a1a1a">push 数据流（Row 沿 Sink→Source 流动）</text>
+  <line x1="380" y1="550" x2="414" y2="550" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="422" y="554" font-size="10" fill="#1a1a1a">引用 / 装配关系（Compiler 织图）</text>
+  <rect x="660" y="543" width="22" height="14" rx="3" fill="#FBE5D6" stroke="#C65911"/>
+  <text x="690" y="554" font-size="10" fill="#1a1a1a">两引擎桥接节点</text>
+
+  <text x="52" y="582" font-size="9.5" fill="#595959">Row = 列索引 + Object[] 的简化执行模型；Sink/Source 把"谁产 / 谁消费"解耦，使图可被任意拓扑装配。</text>
+  <text x="52" y="600" font-size="9.5" fill="#595959">ListSink 用 ArrayDeque 缓冲；DuplicatingSink 在一个输出被多个下游消费时复制；EnumeratorSource 把已编译 Enumerable 接入解释器。</text>
+  <text x="52" y="624" font-size="9.5" fill="#7F3F00">何时用解释器：BindableConvention / 复杂到不便生成代码的算子 / 想避免 Janino 编译开销的一次性查询。</text>
+
+  <text x="480" y="668" text-anchor="middle" font-size="10" fill="#A6A6A6">图 16-4 — 紫箭头为 push 数据流，灰虚线为装配引用；Interpreter 用对象图换取"零编译、可执行任意算子"</text>
+</svg>

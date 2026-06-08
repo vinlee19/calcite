@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 700" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="inh" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="13" markerHeight="13" orient="auto">
+      <path d="M1,1 L11,6 L1,11 z" fill="#ffffff" stroke="#1F4E79" stroke-width="1"/>
+    </marker>
+    <marker id="ref" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#888"/>
+    </marker>
+    <linearGradient id="bgMod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#BDD7EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="940" height="700" fill="#ffffff"/>
+  <text x="470" y="30" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">RelMetadataQuery：强类型门面 + 25 个 Handler 字段 + Provider 链</text>
+  <text x="470" y="50" text-anchor="middle" font-size="12" fill="#595959">门面把每个元数据问题代理给一个 Handler 字段；Handler 由 MetadataHandlerProvider 提供</text>
+
+  <!-- RelMetadataQueryBase -->
+  <rect x="40" y="78" width="320" height="120" rx="8" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5"/>
+  <text x="200" y="98" text-anchor="middle" font-size="11" fill="#7F6000">&#171;abstract&#187;</text>
+  <text x="200" y="114" text-anchor="middle" font-size="13" font-weight="700" fill="#7F6000">RelMetadataQueryBase</text>
+  <line x1="40" y1="122" x2="360" y2="122" stroke="#BF8F00" stroke-width="1"/>
+  <text x="52" y="140" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7F6000">+ map: Table&lt;RelNode,Object,Object&gt;  // 缓存+在途</text>
+  <text x="52" y="156" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7F6000">+ THREAD_PROVIDERS: ThreadLocal&lt;Janino…&gt;</text>
+  <text x="52" y="172" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7F6000"># revise(Class&lt;H&gt;): H   # handler(Class): MH</text>
+  <text x="52" y="188" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7F6000">+ clearCache(RelNode): boolean</text>
+
+  <!-- RelMetadataQuery (facade) -->
+  <rect x="40" y="238" width="360" height="232" rx="8" fill="url(#bgMod)" stroke="#1F4E79" stroke-width="2"/>
+  <text x="220" y="258" text-anchor="middle" font-size="14" font-weight="700" fill="#1F4E79">RelMetadataQuery  (强类型门面)</text>
+  <line x1="40" y1="266" x2="400" y2="266" stroke="#1F4E79" stroke-width="1"/>
+  <text x="52" y="284" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">- rowCountHandler: RowCount.Handler</text>
+  <text x="52" y="300" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">- selectivityHandler: Selectivity.Handler</text>
+  <text x="52" y="316" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">- columnUniquenessHandler: …Handler</text>
+  <text x="52" y="332" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">- nonCumulativeCostHandler: …Handler</text>
+  <text x="52" y="348" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#888">…共 25 个 Handler 字段（可变, 失效后被 revise）</text>
+  <line x1="40" y1="360" x2="400" y2="360" stroke="#1F4E79" stroke-width="1" stroke-dasharray="2,2"/>
+  <text x="52" y="378" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">+ getRowCount(rel): Double</text>
+  <text x="52" y="394" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">+ getSelectivity(rel, pred): Double</text>
+  <text x="52" y="410" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">+ areColumnsUnique(rel, cols): Boolean</text>
+  <text x="52" y="426" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">+ getNonCumulativeCost(rel): RelOptCost</text>
+  <text x="52" y="442" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#888">每个 getXyz 都是  for(;;){ try handler; catch NoHandler revise; }</text>
+  <text x="52" y="460" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7F3F00" font-weight="700">+ instance(): RelMetadataQuery   // 每次规则匹配新建</text>
+
+  <!-- MetadataHandlerProvider interface -->
+  <rect x="560" y="238" width="340" height="92" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="730" y="258" text-anchor="middle" font-size="11" fill="#385723">&#171;interface&#187;</text>
+  <text x="730" y="274" text-anchor="middle" font-size="13" font-weight="700" fill="#385723">MetadataHandlerProvider</text>
+  <line x1="560" y1="282" x2="900" y2="282" stroke="#548235" stroke-width="1"/>
+  <text x="572" y="300" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#385723">+ handler(Class&lt;MH&gt;): MH</text>
+  <text x="572" y="316" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#385723">+ revise(Class&lt;H&gt;): H     // 重新生成 handler</text>
+
+  <!-- JaninoRelMetadataProvider -->
+  <rect x="560" y="368" width="340" height="158" rx="8" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="730" y="388" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">JaninoRelMetadataProvider</text>
+  <line x1="560" y1="396" x2="900" y2="396" stroke="#1F4E79" stroke-width="1"/>
+  <text x="572" y="414" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">- provider: RelMetadataProvider</text>
+  <text x="572" y="430" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">- HANDLERS: LoadingCache&lt;Key, MetadataHandler&gt;</text>
+  <line x1="560" y1="438" x2="900" y2="438" stroke="#1F4E79" stroke-width="1" stroke-dasharray="2,2"/>
+  <text x="572" y="456" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">+ revise(): 查 HANDLERS 缓存 / 缺则即时编译</text>
+  <text x="572" y="472" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1a1a1a">+ handler(): 返回抛 NoHandler 的占位代理</text>
+  <text x="572" y="488" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#7F3F00">static generateCompileAndInstantiate(…)</text>
+  <text x="572" y="504" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#888">DEFAULT = of(DefaultRelMetadataProvider.INSTANCE)</text>
+  <text x="572" y="520" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#888">通过 RelOptCluster 写入 THREAD_PROVIDERS</text>
+
+  <!-- BuiltInMetadata.RowCount.Handler -->
+  <rect x="560" y="566" width="340" height="100" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="730" y="586" text-anchor="middle" font-size="11" fill="#385723">&#171;interface&#187;  @FunctionalInterface</text>
+  <text x="730" y="602" text-anchor="middle" font-size="12" font-weight="700" fill="#385723">BuiltInMetadata.RowCount.Handler</text>
+  <line x1="560" y1="610" x2="900" y2="610" stroke="#548235" stroke-width="1"/>
+  <text x="572" y="628" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#385723">+ getRowCount(RelNode r, RelMetadataQuery mq)</text>
+  <text x="572" y="644" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#385723">+ getDef(): MetadataDef&lt;RowCount&gt;   (default)</text>
+  <text x="572" y="660" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#888">DispatchGenerator 按 RelNode 子类分派到 RelMd*</text>
+
+  <!-- Default/Chained provider chain mini -->
+  <rect x="40" y="510" width="360" height="156" rx="8" fill="#F2F2F2" stroke="#595959" stroke-width="1.2"/>
+  <text x="220" y="530" text-anchor="middle" font-size="12" font-weight="700" fill="#262626">RelMetadataProvider 链（提供 handlers 列表）</text>
+  <rect x="60" y="544" width="320" height="30" rx="5" fill="#ffffff" stroke="#595959"/>
+  <text x="220" y="563" text-anchor="middle" font-size="10" fill="#262626">DefaultRelMetadataProvider extends Chained…</text>
+  <rect x="60" y="582" width="320" height="30" rx="5" fill="#ffffff" stroke="#595959"/>
+  <text x="220" y="601" text-anchor="middle" font-size="10" fill="#262626">RelMdRowCount.SOURCE · RelMdSelectivity.SOURCE …</text>
+  <text x="60" y="632" font-size="9" fill="#595959">25 个 RelMd* provider 各自重载 RelNode 子类的 getXyz()</text>
+  <text x="60" y="648" font-size="9" fill="#595959">由 ReflectiveRelMetadataProvider 反射收集成 handler 列表</text>
+  <text x="60" y="662" font-size="9" fill="#595959">交给 Janino 编译成单个 dispatch 类</text>
+
+  <!-- Relations -->
+  <!-- Base inheritance -->
+  <line x1="200" y1="238" x2="200" y2="198" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#inh)"/>
+  <text x="210" y="222" font-size="9" fill="#1F4E79">extends</text>
+  <!-- RMQ holds Handler -->
+  <line x1="400" y1="380" x2="560" y2="600" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="430" y="500" font-size="9" fill="#888" transform="rotate(33 430 500)">handler 字段持有</text>
+  <!-- RMQ uses provider -->
+  <line x1="400" y1="300" x2="560" y2="290" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="430" y="288" font-size="9" fill="#888">handler()/revise() 委托</text>
+  <!-- Janino implements provider -->
+  <line x1="730" y1="368" x2="730" y2="330" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#inh)"/>
+  <text x="740" y="352" font-size="9" fill="#1F4E79">implements</text>
+  <!-- Janino reads provider chain -->
+  <line x1="400" y1="560" x2="560" y2="430" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="430" y="478" font-size="9" fill="#888" transform="rotate(-38 430 478)">handlers() 读取</text>
+
+  <!-- Legend -->
+  <g>
+    <rect x="40" y="678" width="860" height="0" fill="none"/>
+  </g>
+  <rect x="640" y="78" width="260" height="146" rx="6" fill="#ffffff" stroke="#BFBFBF" stroke-width="1"/>
+  <text x="652" y="96" font-size="11" font-weight="700" fill="#595959">图例</text>
+  <rect x="652" y="104" width="18" height="12" fill="#E2EFDA" stroke="#548235"/>
+  <text x="678" y="114" font-size="10" fill="#385723">interface</text>
+  <rect x="652" y="122" width="18" height="12" fill="#FFF2CC" stroke="#BF8F00"/>
+  <text x="678" y="132" font-size="10" fill="#7F6000">abstract</text>
+  <rect x="652" y="140" width="18" height="12" fill="#FFFFFF" stroke="#1F4E79"/>
+  <text x="678" y="150" font-size="10" fill="#1a1a1a">具体类</text>
+  <line x1="652" y1="166" x2="676" y2="166" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#inh)"/>
+  <text x="684" y="170" font-size="10" fill="#1F4E79">继承 / 实现</text>
+  <line x1="652" y1="186" x2="676" y2="186" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="684" y="190" font-size="10" fill="#888">持有 / 委托</text>
+  <rect x="652" y="200" width="18" height="12" fill="url(#bgMod)" stroke="#1F4E79"/>
+  <text x="678" y="210" font-size="10" fill="#1F4E79">门面 / 模块容器</text>
+
+  <text x="470" y="694" text-anchor="middle" font-size="10" fill="#A6A6A6">图 13-1 — 门面 RelMetadataQuery 把 25 个元数据问题各代理给一个 Handler 字段，Handler 由 Janino 编译的 dispatch 类提供</text>
+</svg>

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 1020" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <rect width="980" height="1020" fill="#ffffff"/>
+  <text x="490" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">全模块巡礼矩阵：26 个 Gradle 子模块 × 定位 / 能力 / 借鉴点</text>
+  <text x="490" y="56" text-anchor="middle" font-size="12" fill="#595959">分组色仅表"并列归类"，不承载层级；settings.gradle.kts 的 include 列表为权威清单</text>
+
+  <!-- header -->
+  <g font-size="11" font-weight="700" fill="#FFFFFF">
+    <rect x="20"  y="74" width="130" height="30" fill="#1F4E79"/><text x="85"  y="94" text-anchor="middle">模块</text>
+    <rect x="150" y="74" width="120" height="30" fill="#1F4E79"/><text x="210" y="94" text-anchor="middle">分组</text>
+    <rect x="270" y="74" width="350" height="30" fill="#1F4E79"/><text x="445" y="94" text-anchor="middle">定位（package-info 核实）</text>
+    <rect x="620" y="74" width="340" height="30" fill="#1F4E79"/><text x="790" y="94" text-anchor="middle">亮点 / 可借鉴点</text>
+  </g>
+
+  <!-- rows: y starts 104, height 32 -->
+  <g font-size="10.5" fill="#1a1a1a">
+    <!-- core group -->
+    <rect x="20" y="104" width="940" height="32" fill="#DEEBF7"/>
+    <text x="30" y="124" font-weight="700" fill="#1F4E79">core</text>
+    <text x="160" y="124" fill="#1F4E79">引擎核心</text>
+    <text x="280" y="124">parser/validator/RelNode/Rex/planner/JDBC 驱动</text>
+    <text x="630" y="124">五阶段全在此；四层 IR + Volcano/Hep + enumerable</text>
+
+    <rect x="20" y="136" width="940" height="32" fill="#EAF1FB"/>
+    <text x="30" y="156" font-weight="700" fill="#1F4E79">linq4j</text>
+    <text x="160" y="156" fill="#1F4E79">执行底座</text>
+    <text x="280" y="156">LINQ 风格 Enumerable + Expression Tree</text>
+    <text x="630" y="156">pull-based 惰性管道；第四层 IR，被 core 编译到 Java</text>
+
+    <rect x="20" y="168" width="940" height="32" fill="#DEEBF7"/>
+    <text x="30" y="188" font-weight="700" fill="#1F4E79">testkit</text>
+    <text x="160" y="188" fill="#1F4E79">测试设施</text>
+    <text x="280" y="188">Fixtures / DiffRepository / Matchers / QuidemTest</text>
+    <text x="630" y="188">不可变 Fixture + golden file；跨模块共享测试 SPI</text>
+
+    <rect x="20" y="200" width="940" height="32" fill="#EAF1FB"/>
+    <text x="30" y="220" font-weight="700" fill="#1F4E79">babel</text>
+    <text x="160" y="220" fill="#1F4E79">语法扩展</text>
+    <text x="280" y="220">Babel 解析器，接纳多方言 SQL 扩展</text>
+    <text x="630" y="220">"一份模板多方言"——FMPP 增量加 140+ 关键字</text>
+
+    <rect x="20" y="232" width="940" height="32" fill="#DEEBF7"/>
+    <text x="30" y="252" font-weight="700" fill="#1F4E79">server</text>
+    <text x="160" y="252" fill="#1F4E79">DDL 扩展</text>
+    <text x="280" y="252">CREATE/DROP TABLE 等 DDL 语句</text>
+    <text x="630" y="252">在 core 之上叠 DDL 解析器；展示语法可插拔</text>
+
+    <rect x="20" y="264" width="940" height="32" fill="#EAF1FB"/>
+    <text x="30" y="284" font-weight="700" fill="#1F4E79">plus</text>
+    <text x="160" y="284" fill="#1F4E79">综合/虚拟化</text>
+    <text x="280" y="284">tpcds / tpch / os 数据虚拟化</text>
+    <text x="630" y="284">os adapter 把 ps/du 命令当表查；联邦演示场</text>
+
+    <!-- JDBC/relational adapters -->
+    <rect x="20" y="296" width="940" height="32" fill="#E2EFDA"/>
+    <text x="30" y="316" font-weight="700" fill="#385723">jdbc(in core)</text>
+    <text x="160" y="316" fill="#385723">Adapter·SQL</text>
+    <text x="280" y="316">JdbcSchema/Table/Rules + RelToSqlConverter</text>
+    <text x="630" y="316">最完整 pushdown；方言与翻译解耦</text>
+
+    <rect x="20" y="328" width="940" height="32" fill="#EFF6E9"/>
+    <text x="30" y="348" font-weight="700" fill="#385723">example/csv</text>
+    <text x="160" y="348" fill="#385723">Adapter·教学</text>
+    <text x="280" y="348">CSV，三种 Flavor（Scannable/Filterable/Translatable）</text>
+    <text x="630" y="348">最佳上手样例；能力分层一目了然</text>
+
+    <rect x="20" y="360" width="940" height="32" fill="#E2EFDA"/>
+    <text x="30" y="380" font-weight="700" fill="#385723">example/function</text>
+    <text x="160" y="380" fill="#385723">Adapter·教学</text>
+    <text x="280" y="380">用户自定义函数（UDF/UDAF/表函数）示例</text>
+    <text x="630" y="380">演示 ScalarFunction 等 SPI 注册</text>
+
+    <rect x="20" y="392" width="940" height="32" fill="#EFF6E9"/>
+    <text x="30" y="412" font-weight="700" fill="#385723">file</text>
+    <text x="160" y="412" fill="#385723">Adapter·文件</text>
+    <text x="280" y="412">从文件与网页读取（CSV/JSON/HTML）</text>
+    <text x="630" y="412">多格式统一为表；HTML 表格直接可查</text>
+
+    <rect x="20" y="424" width="940" height="32" fill="#E2EFDA"/>
+    <text x="30" y="444" font-weight="700" fill="#385723">arrow</text>
+    <text x="160" y="444" fill="#385723">Adapter·列存</text>
+    <text x="280" y="444">读取 Arrow 文件（列式二进制 OLAP）</text>
+    <text x="630" y="444">向量化/跨语言列存接入</text>
+
+    <!-- NoSQL / specialized adapters -->
+    <rect x="20" y="456" width="940" height="32" fill="#FFF2CC"/>
+    <text x="30" y="476" font-weight="700" fill="#7F6000">mongodb</text>
+    <text x="160" y="476" fill="#7F6000">Adapter·NoSQL</text>
+    <text x="280" y="476">基于 MongoDB；动态 schema + BSON 管道</text>
+    <text x="630" y="476">$match/$project/$group 下推；Map 动态行类型</text>
+
+    <rect x="20" y="488" width="940" height="32" fill="#FBF6E3"/>
+    <text x="30" y="508" font-weight="700" fill="#7F6000">elasticsearch</text>
+    <text x="160" y="508" fill="#7F6000">Adapter·搜索</text>
+    <text x="280" y="508">基于 Elasticsearch；PredicateAnalyzer→ES DSL</text>
+    <text x="630" y="508">谓词翻译成查询 DSL；版本适配层</text>
+
+    <rect x="20" y="520" width="940" height="32" fill="#FFF2CC"/>
+    <text x="30" y="540" font-weight="700" fill="#7F6000">druid</text>
+    <text x="160" y="540" fill="#7F6000">Adapter·时序</text>
+    <text x="280" y="540">基于 Druid；Filter/Aggregate/时间粒度下推</text>
+    <text x="630" y="540">最复杂的聚合下推；时间维度特化</text>
+
+    <rect x="20" y="552" width="940" height="32" fill="#FBF6E3"/>
+    <text x="30" y="572" font-weight="700" fill="#7F6000">cassandra</text>
+    <text x="160" y="572" fill="#7F6000">Adapter·宽列</text>
+    <text x="280" y="572">Cassandra；partitionKeys/clusteringKeys 裁剪</text>
+    <text x="630" y="572">利用分区键做分区裁剪下推</text>
+
+    <rect x="20" y="584" width="940" height="32" fill="#FFF2CC"/>
+    <text x="30" y="604" font-weight="700" fill="#7F6000">geode</text>
+    <text x="160" y="604" fill="#7F6000">Adapter·内存网格</text>
+    <text x="280" y="604">基于 Geode/Gemfire 内存数据网格</text>
+    <text x="630" y="604">OQL 下推；内存网格 SQL 化</text>
+
+    <rect x="20" y="616" width="940" height="32" fill="#FBF6E3"/>
+    <text x="30" y="636" font-weight="700" fill="#7F6000">innodb</text>
+    <text x="160" y="636" fill="#7F6000">Adapter·存储引擎</text>
+    <text x="280" y="636">直读 InnoDB 数据文件（绕过 mysqld）</text>
+    <text x="630" y="636">索引选择下推；存储格式逆向接入</text>
+
+    <rect x="20" y="648" width="940" height="32" fill="#FFF2CC"/>
+    <text x="30" y="668" font-weight="700" fill="#7F6000">kafka</text>
+    <text x="160" y="668" fill="#7F6000">Adapter·流</text>
+    <text x="280" y="668">一个 Topic 映射为一张 STREAM 表</text>
+    <text x="630" y="668">流表二象性；流式 SQL 入口</text>
+
+    <rect x="20" y="680" width="940" height="32" fill="#FBF6E3"/>
+    <text x="30" y="700" font-weight="700" fill="#7F6000">redis</text>
+    <text x="160" y="700" fill="#7F6000">Adapter·KV</text>
+    <text x="280" y="700">Redis 适配（含 embedded Redis 测试工具）</text>
+    <text x="630" y="700">KV 存储 SQL 化；内置嵌入式测试件</text>
+
+    <rect x="20" y="712" width="940" height="32" fill="#FFF2CC"/>
+    <text x="30" y="732" font-weight="700" fill="#7F6000">splunk</text>
+    <text x="160" y="732" fill="#7F6000">Adapter·日志</text>
+    <text x="280" y="732">单表 Splunk，固定列 + _others 变长字段</text>
+    <text x="630" y="732">谓词翻译为 SPL；半结构化 schema 处理范本</text>
+
+    <rect x="20" y="744" width="940" height="32" fill="#FBF6E3"/>
+    <text x="30" y="764" font-weight="700" fill="#7F6000">spark</text>
+    <text x="160" y="764" fill="#7F6000">Adapter·计算</text>
+    <text x="280" y="764">基于 Apache Spark；SparkRules 转 RDD</text>
+    <text x="630" y="764">把逻辑算子降级为 Spark DataFrame/RDD</text>
+
+    <rect x="20" y="776" width="940" height="32" fill="#FFF2CC"/>
+    <text x="30" y="796" font-weight="700" fill="#7F6000">pig</text>
+    <text x="160" y="796" fill="#7F6000">Adapter·脚本</text>
+    <text x="280" y="796">Pig 查询提供者（RelNode→Pig Latin）</text>
+    <text x="630" y="796">关系代数反向生成 Pig 脚本</text>
+
+    <rect x="20" y="808" width="940" height="32" fill="#FBF6E3"/>
+    <text x="30" y="828" font-weight="700" fill="#7F6000">piglet</text>
+    <text x="160" y="828" fill="#7F6000">语言·脚本</text>
+    <text x="280" y="828">类 Pig Latin 小语言（独立解析器）</text>
+    <text x="630" y="828">展示用 Calcite 实现非 SQL DSL</text>
+
+    <!-- infra/build -->
+    <rect x="20" y="840" width="940" height="32" fill="#F2F2F2"/>
+    <text x="30" y="860" font-weight="700" fill="#262626">buildSrc</text>
+    <text x="160" y="860" fill="#262626">构建插件</text>
+    <text x="280" y="860">calcite.fmpp / calcite.javacc / calcite.buildext</text>
+    <text x="630" y="860">Kotlin 自定义 Gradle 插件驱动代码生成</text>
+
+    <rect x="20" y="872" width="940" height="32" fill="#FAFAFA"/>
+    <text x="30" y="892" font-weight="700" fill="#262626">bom</text>
+    <text x="160" y="892" fill="#262626">依赖治理</text>
+    <text x="280" y="892">Bill of Materials，统一第三方版本平台</text>
+    <text x="630" y="892">platform(project(":bom")) 全模块版本对齐</text>
+
+    <rect x="20" y="904" width="940" height="32" fill="#F2F2F2"/>
+    <text x="30" y="924" font-weight="700" fill="#262626">ubenchmark</text>
+    <text x="160" y="924" fill="#262626">性能</text>
+    <text x="280" y="924">JMH 微基准</text>
+    <text x="630" y="924">把性能回归当一等公民管理</text>
+
+    <rect x="20" y="936" width="940" height="32" fill="#FAFAFA"/>
+    <text x="30" y="956" font-weight="700" fill="#262626">release</text>
+    <text x="160" y="956" fill="#262626">发布</text>
+    <text x="280" y="956">聚合源/二进制发布工件</text>
+    <text x="630" y="956">RAT/可复现 jar/签名集中在此</text>
+  </g>
+
+  <!-- legend -->
+  <g font-size="10">
+    <rect x="20" y="978" width="940" height="26" fill="#FFFFFF" stroke="#BFBFBF"/>
+    <rect x="30" y="983" width="14" height="14" fill="#DEEBF7"/><text x="50" y="995" fill="#595959">引擎/底座</text>
+    <rect x="150" y="983" width="14" height="14" fill="#E2EFDA" stroke="#548235"/><text x="170" y="995" fill="#595959">关系/SQL 类 Adapter</text>
+    <rect x="330" y="983" width="14" height="14" fill="#FFF2CC" stroke="#BF8F00"/><text x="350" y="995" fill="#595959">NoSQL/专用 Adapter</text>
+    <rect x="520" y="983" width="14" height="14" fill="#F2F2F2" stroke="#595959"/><text x="540" y="995" fill="#595959">构建/发布基础设施</text>
+    <text x="700" y="995" fill="#A6A6A6">图 20-3 — adapter 一律遵循"Schema+Table+Rules+Convention"四件套</text>
+  </g>
+</svg>

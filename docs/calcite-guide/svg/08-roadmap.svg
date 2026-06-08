@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <linearGradient id="weekBar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#5B9BD5"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1000" height="620" fill="#ffffff"/>
+  <text x="500" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">Calcite 二次开发者 6 周学习路线</text>
+  <text x="500" y="52" text-anchor="middle" font-size="12" fill="#595959">每周一个聚焦主题；末端目标：提交第一个 [CALCITE-NNNN] PR</text>
+
+  <!-- Timeline -->
+  <line x1="60" y1="100" x2="940" y2="100" stroke="#1F4E79" stroke-width="3"/>
+  <g font-size="12" font-weight="700" fill="#ffffff">
+    <circle cx="120" cy="100" r="22" fill="#1F4E79"/><text x="120" y="105" text-anchor="middle">W1</text>
+    <circle cx="270" cy="100" r="22" fill="#2E75B6"/><text x="270" y="105" text-anchor="middle">W2</text>
+    <circle cx="420" cy="100" r="22" fill="#5B9BD5"/><text x="420" y="105" text-anchor="middle">W3</text>
+    <circle cx="570" cy="100" r="22" fill="#ED7D31"/><text x="570" y="105" text-anchor="middle">W4</text>
+    <circle cx="720" cy="100" r="22" fill="#70AD47"/><text x="720" y="105" text-anchor="middle">W5</text>
+    <circle cx="870" cy="100" r="22" fill="#548235"/><text x="870" y="105" text-anchor="middle">W6</text>
+  </g>
+
+  <!-- Week labels (top) -->
+  <g font-size="12" fill="#262626">
+    <text x="120" y="148" text-anchor="middle" font-weight="700">入门 · 跑通</text>
+    <text x="270" y="148" text-anchor="middle" font-weight="700">核心抽象</text>
+    <text x="420" y="148" text-anchor="middle" font-weight="700">HepPlanner</text>
+    <text x="570" y="148" text-anchor="middle" font-weight="700">VolcanoPlanner</text>
+    <text x="720" y="148" text-anchor="middle" font-weight="700">Adapter 实战</text>
+    <text x="870" y="148" text-anchor="middle" font-weight="700">贡献 PR</text>
+  </g>
+
+  <!-- Swim lanes -->
+  <!-- Reading lane -->
+  <g>
+    <rect x="20" y="170" width="60" height="120" rx="6" fill="#FFF2CC" stroke="#BF8F00"/>
+    <text x="50" y="225" text-anchor="middle" font-size="13" font-weight="700" fill="#7F6000">阅读</text>
+    <text x="50" y="248" text-anchor="middle" font-size="11" fill="#7F6000">📖</text>
+
+    <rect x="90" y="170" width="120" height="120" rx="6" fill="#FFF8E7" stroke="#BF8F00" stroke-dasharray="3,2"/>
+    <text x="150" y="188" text-anchor="middle" font-size="10" font-weight="700" fill="#7F6000">site/_docs/</text>
+    <text x="150" y="204" text-anchor="middle" font-size="10" fill="#595959">tutorial.md</text>
+    <text x="150" y="220" text-anchor="middle" font-size="10" fill="#595959">model.md</text>
+    <text x="150" y="240" text-anchor="middle" font-size="10" fill="#595959">CLAUDE.md</text>
+    <text x="150" y="258" text-anchor="middle" font-size="10" fill="#595959">本指南第 1-3 章</text>
+
+    <rect x="220" y="170" width="120" height="120" rx="6" fill="#FFF8E7" stroke="#BF8F00" stroke-dasharray="3,2"/>
+    <text x="280" y="188" text-anchor="middle" font-size="10" font-weight="700" fill="#7F6000">site/_docs/</text>
+    <text x="280" y="204" text-anchor="middle" font-size="10" fill="#595959">algebra.md</text>
+    <text x="280" y="220" text-anchor="middle" font-size="10" fill="#595959">reference.md</text>
+    <text x="280" y="240" text-anchor="middle" font-size="10" fill="#595959">本指南第 4-5 章</text>
+
+    <rect x="350" y="170" width="120" height="120" rx="6" fill="#FFF8E7" stroke="#BF8F00" stroke-dasharray="3,2"/>
+    <text x="410" y="188" text-anchor="middle" font-size="10" font-weight="700" fill="#7F6000">HepPlanner 源码</text>
+    <text x="410" y="204" text-anchor="middle" font-size="10" fill="#595959">plan/hep/*</text>
+    <text x="410" y="220" text-anchor="middle" font-size="10" fill="#595959">本指南 6.1-6.2</text>
+
+    <rect x="480" y="170" width="120" height="120" rx="6" fill="#FFF8E7" stroke="#BF8F00" stroke-dasharray="3,2"/>
+    <text x="540" y="188" text-anchor="middle" font-size="10" font-weight="700" fill="#7F6000">Volcano 论文</text>
+    <text x="540" y="204" text-anchor="middle" font-size="10" fill="#595959">Cascades 论文</text>
+    <text x="540" y="220" text-anchor="middle" font-size="10" fill="#595959">VolcanoPlanner.java</text>
+    <text x="540" y="240" text-anchor="middle" font-size="10" fill="#595959">本指南 6.3-6.4</text>
+
+    <rect x="610" y="170" width="120" height="120" rx="6" fill="#FFF8E7" stroke="#BF8F00" stroke-dasharray="3,2"/>
+    <text x="670" y="188" text-anchor="middle" font-size="10" font-weight="700" fill="#7F6000">example/csv/ 全部</text>
+    <text x="670" y="204" text-anchor="middle" font-size="10" fill="#595959">site/_docs/adapter.md</text>
+    <text x="670" y="220" text-anchor="middle" font-size="10" fill="#595959">本指南第 8 章</text>
+
+    <rect x="740" y="170" width="220" height="120" rx="6" fill="#FFF8E7" stroke="#BF8F00" stroke-dasharray="3,2"/>
+    <text x="850" y="188" text-anchor="middle" font-size="10" font-weight="700" fill="#7F6000">site/_docs/howto.md</text>
+    <text x="850" y="204" text-anchor="middle" font-size="10" fill="#595959">CONTRIBUTING.md</text>
+    <text x="850" y="220" text-anchor="middle" font-size="10" fill="#595959">JIRA: issues.apache.org</text>
+    <text x="850" y="240" text-anchor="middle" font-size="10" fill="#595959">本指南第 9-10 章</text>
+  </g>
+
+  <!-- Hands-on lane -->
+  <g>
+    <rect x="20" y="298" width="60" height="120" rx="6" fill="#DEEBF7" stroke="#1F4E79"/>
+    <text x="50" y="353" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">动手</text>
+    <text x="50" y="376" text-anchor="middle" font-size="11" fill="#1F4E79">💻</text>
+
+    <rect x="90" y="298" width="120" height="120" rx="6" fill="#F4F9FE" stroke="#1F4E79" stroke-dasharray="3,2"/>
+    <text x="150" y="318" text-anchor="middle" font-size="10" fill="#1F4E79">./gradlew :example:csv:test</text>
+    <text x="150" y="336" text-anchor="middle" font-size="10" fill="#1F4E79">./sqlline</text>
+    <text x="150" y="354" text-anchor="middle" font-size="10" fill="#595959">写 5 条 SELECT</text>
+    <text x="150" y="372" text-anchor="middle" font-size="10" fill="#595959">改 model.json</text>
+
+    <rect x="220" y="298" width="120" height="120" rx="6" fill="#F4F9FE" stroke="#1F4E79" stroke-dasharray="3,2"/>
+    <text x="280" y="318" text-anchor="middle" font-size="10" fill="#1F4E79">RelBuilderExample</text>
+    <text x="280" y="336" text-anchor="middle" font-size="10" fill="#595959">构造 5 个 RelNode</text>
+    <text x="280" y="354" text-anchor="middle" font-size="10" fill="#595959">RelOptUtil.toString</text>
+    <text x="280" y="372" text-anchor="middle" font-size="10" fill="#595959">对比 SQL 计划</text>
+
+    <rect x="350" y="298" width="120" height="120" rx="6" fill="#F4F9FE" stroke="#1F4E79" stroke-dasharray="3,2"/>
+    <text x="410" y="318" text-anchor="middle" font-size="10" fill="#1F4E79">写一个 HepRule</text>
+    <text x="410" y="336" text-anchor="middle" font-size="10" fill="#595959">如：合并 Filter</text>
+    <text x="410" y="354" text-anchor="middle" font-size="10" fill="#595959">加单测</text>
+    <text x="410" y="372" text-anchor="middle" font-size="10" fill="#595959">看日志验证</text>
+
+    <rect x="480" y="298" width="120" height="120" rx="6" fill="#F4F9FE" stroke="#1F4E79" stroke-dasharray="3,2"/>
+    <text x="540" y="318" text-anchor="middle" font-size="10" fill="#1F4E79">VolcanoPlanner=TRACE</text>
+    <text x="540" y="336" text-anchor="middle" font-size="10" fill="#595959">阅读 Memo dump</text>
+    <text x="540" y="354" text-anchor="middle" font-size="10" fill="#595959">实现 ConverterRule</text>
+    <text x="540" y="372" text-anchor="middle" font-size="10" fill="#595959">下推 Project</text>
+
+    <rect x="610" y="298" width="120" height="120" rx="6" fill="#F4F9FE" stroke="#1F4E79" stroke-dasharray="3,2"/>
+    <text x="670" y="318" text-anchor="middle" font-size="10" fill="#1F4E79">写 MiniAdapter</text>
+    <text x="670" y="336" text-anchor="middle" font-size="10" fill="#595959">读 JSON / 本地内存</text>
+    <text x="670" y="354" text-anchor="middle" font-size="10" fill="#595959">定义 Convention</text>
+    <text x="670" y="372" text-anchor="middle" font-size="10" fill="#595959">写 ConverterRule</text>
+
+    <rect x="740" y="298" width="220" height="120" rx="6" fill="#F4F9FE" stroke="#1F4E79" stroke-dasharray="3,2"/>
+    <text x="850" y="318" text-anchor="middle" font-size="10" fill="#1F4E79">挑一个 newbie JIRA 单</text>
+    <text x="850" y="336" text-anchor="middle" font-size="10" fill="#595959">本地复现 + 写单测</text>
+    <text x="850" y="354" text-anchor="middle" font-size="10" fill="#595959">通过 ./gradlew check</text>
+    <text x="850" y="372" text-anchor="middle" font-size="10" fill="#595959">gh pr create + 走 review</text>
+  </g>
+
+  <!-- Self-check lane -->
+  <g>
+    <rect x="20" y="426" width="60" height="100" rx="6" fill="#E2EFDA" stroke="#548235"/>
+    <text x="50" y="471" text-anchor="middle" font-size="13" font-weight="700" fill="#385723">自测</text>
+    <text x="50" y="494" text-anchor="middle" font-size="11" fill="#385723">✅</text>
+
+    <rect x="90" y="426" width="120" height="100" rx="6" fill="#F2F8EE" stroke="#548235" stroke-dasharray="3,2"/>
+    <text x="150" y="446" text-anchor="middle" font-size="10" fill="#385723">能解释 jdbc:calcite:</text>
+    <text x="150" y="462" text-anchor="middle" font-size="10" fill="#385723">URL 走到哪个类？</text>
+    <text x="150" y="482" text-anchor="middle" font-size="10" fill="#385723">model.json 三要素</text>
+    <text x="150" y="498" text-anchor="middle" font-size="10" fill="#385723">是什么？</text>
+
+    <rect x="220" y="426" width="120" height="100" rx="6" fill="#F2F8EE" stroke="#548235" stroke-dasharray="3,2"/>
+    <text x="280" y="446" text-anchor="middle" font-size="10" fill="#385723">SqlNode/RelNode/RexNode</text>
+    <text x="280" y="462" text-anchor="middle" font-size="10" fill="#385723">分别在哪个阶段产生？</text>
+    <text x="280" y="482" text-anchor="middle" font-size="10" fill="#385723">Convention 与 Trait</text>
+    <text x="280" y="498" text-anchor="middle" font-size="10" fill="#385723">的关系？</text>
+
+    <rect x="350" y="426" width="120" height="100" rx="6" fill="#F2F8EE" stroke="#548235" stroke-dasharray="3,2"/>
+    <text x="410" y="446" text-anchor="middle" font-size="10" fill="#385723">Hep vs Volcano</text>
+    <text x="410" y="462" text-anchor="middle" font-size="10" fill="#385723">分别什么场景？</text>
+    <text x="410" y="482" text-anchor="middle" font-size="10" fill="#385723">RelOptRule 的</text>
+    <text x="410" y="498" text-anchor="middle" font-size="10" fill="#385723">operand 怎么写？</text>
+
+    <rect x="480" y="426" width="120" height="100" rx="6" fill="#F2F8EE" stroke="#548235" stroke-dasharray="3,2"/>
+    <text x="540" y="446" text-anchor="middle" font-size="10" fill="#385723">RelSet/RelSubset</text>
+    <text x="540" y="462" text-anchor="middle" font-size="10" fill="#385723">如何承载等价类？</text>
+    <text x="540" y="482" text-anchor="middle" font-size="10" fill="#385723">findBestExp 何时</text>
+    <text x="540" y="498" text-anchor="middle" font-size="10" fill="#385723">终止？</text>
+
+    <rect x="610" y="426" width="120" height="100" rx="6" fill="#F2F8EE" stroke="#548235" stroke-dasharray="3,2"/>
+    <text x="670" y="446" text-anchor="middle" font-size="10" fill="#385723">三种 Table 接口</text>
+    <text x="670" y="462" text-anchor="middle" font-size="10" fill="#385723">分别怎么选？</text>
+    <text x="670" y="482" text-anchor="middle" font-size="10" fill="#385723">下推怎么验证</text>
+    <text x="670" y="498" text-anchor="middle" font-size="10" fill="#385723">已经生效？</text>
+
+    <rect x="740" y="426" width="220" height="100" rx="6" fill="#F2F8EE" stroke="#548235" stroke-dasharray="3,2"/>
+    <text x="850" y="446" text-anchor="middle" font-size="10" fill="#385723">commit 信息符合 [CALCITE-NNNN] 规范？</text>
+    <text x="850" y="462" text-anchor="middle" font-size="10" fill="#385723">./gradlew autostyleCheck checkstyleAll 通过？</text>
+    <text x="850" y="482" text-anchor="middle" font-size="10" fill="#385723">.iq 测试都更新了？</text>
+    <text x="850" y="498" text-anchor="middle" font-size="10" fill="#385723">PR description 链接 JIRA？</text>
+  </g>
+
+  <!-- Final milestone -->
+  <g>
+    <rect x="730" y="540" width="240" height="60" rx="8" fill="#385723" stroke="#1F3015" stroke-width="2"/>
+    <text x="850" y="565" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">🎓 毕业里程碑</text>
+    <text x="850" y="585" text-anchor="middle" font-size="11" fill="#E2EFDA">合并第一个 [CALCITE-NNNN] PR</text>
+  </g>
+
+  <text x="380" y="580" font-size="11" fill="#595959">阶段性目标 → 每周末用「自测」栏的问题校验自己是否真正掌握</text>
+</svg>

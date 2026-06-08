@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 660" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="arrowO" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#C65911"/>
+    </marker>
+    <linearGradient id="bgMod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#BDD7EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="960" height="660" fill="#ffffff"/>
+  <text x="480" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">从 Expression 到 Java 源码：装配 + 优化流水线</text>
+  <text x="480" y="52" text-anchor="middle" font-size="12" fill="#595959">BlockBuilder 装配（CSE）→ toBlock 收尾优化（DCE/内联）→ OptimizeShuttle 窥孔化简 → unparse</text>
+
+  <!-- Stage 0: upstream -->
+  <rect x="40" y="86" width="180" height="74" rx="8" fill="#F2F2F2" stroke="#595959" stroke-width="1.5"/>
+  <text x="130" y="108" text-anchor="middle" font-size="12" font-weight="700" fill="#262626">RexNode（上游）</text>
+  <text x="130" y="127" text-anchor="middle" font-size="9.5" fill="#595959">RexToLixTranslator</text>
+  <text x="130" y="142" text-anchor="middle" font-size="9.5" fill="#595959">+ NullPolicy（→ 第16篇）</text>
+  <text x="130" y="156" text-anchor="middle" font-size="8.5" fill="#888888">产出 tree.Expression</text>
+
+  <!-- Stage 1: Expressions factory -->
+  <rect x="280" y="86" width="200" height="74" rx="8" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.6"/>
+  <text x="380" y="108" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">Expressions（工厂）</text>
+  <text x="380" y="127" text-anchor="middle" font-size="9.5" fill="#595959">200+ 静态工厂方法</text>
+  <text x="380" y="142" text-anchor="middle" font-size="9.5" fill="#595959">构造不可变 Expression 节点</text>
+  <text x="380" y="156" text-anchor="middle" font-size="8.5" fill="#888888">add/call/condition/declare…</text>
+
+  <!-- Stage 2: BlockBuilder append (CSE) -->
+  <rect x="540" y="86" width="380" height="74" rx="8" fill="url(#bgMod)" stroke="#1F4E79" stroke-width="2"/>
+  <text x="730" y="108" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">BlockBuilder.append() — 装配阶段</text>
+  <text x="730" y="127" text-anchor="middle" font-size="9.5" fill="#1F4E79">isSimpleExpression? 直接内联；否则查 expressionForReuse</text>
+  <text x="730" y="143" text-anchor="middle" font-size="9.5" font-weight="700" fill="#C65911">命中 → 复用变量（公共子表达式消除 CSE）</text>
+  <text x="730" y="157" text-anchor="middle" font-size="9" fill="#595959">未命中 → 声明 final 变量并登记进 reuse 表</text>
+
+  <!-- arrows row1 -->
+  <line x1="220" y1="123" x2="278" y2="123" stroke="#1F4E79" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="480" y1="123" x2="538" y2="123" stroke="#1F4E79" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- down to toBlock -->
+  <line x1="730" y1="160" x2="730" y2="196" stroke="#1F4E79" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- Stage 3: toBlock optimize loop -->
+  <rect x="300" y="200" width="620" height="150" rx="8" fill="#FBE5D6" stroke="#C65911" stroke-width="2"/>
+  <text x="610" y="222" text-anchor="middle" font-size="13" font-weight="700" fill="#833C0C">BlockBuilder.toBlock() — 收尾优化（最多循环 10 轮）</text>
+
+  <!-- inner: UseCounter -->
+  <rect x="320" y="238" width="170" height="96" rx="6" fill="#FFFFFF" stroke="#C65911" stroke-width="1.4"/>
+  <text x="405" y="258" text-anchor="middle" font-size="11" font-weight="700" fill="#833C0C">UseCounter</text>
+  <text x="405" y="277" text-anchor="middle" font-size="9" fill="#595959">遍历语句，统计每个</text>
+  <text x="405" y="291" text-anchor="middle" font-size="9" fill="#595959">ParameterExpression</text>
+  <text x="405" y="305" text-anchor="middle" font-size="9" fill="#595959">被使用的次数 count</text>
+  <text x="405" y="324" text-anchor="middle" font-size="8.5" fill="#888888">（Visitor 计数）</text>
+
+  <!-- inner: switch(count) -->
+  <rect x="510" y="238" width="180" height="96" rx="6" fill="#FFFFFF" stroke="#C65911" stroke-width="1.4"/>
+  <text x="600" y="257" text-anchor="middle" font-size="11" font-weight="700" fill="#833C0C">switch (count)</text>
+  <text x="522" y="276" font-size="9" fill="#1a1a1a">case 0 → 丢弃（死代码 DCE）</text>
+  <text x="522" y="292" font-size="9" fill="#1a1a1a">case 1 → 内联回使用点</text>
+  <text x="522" y="308" font-size="9" fill="#1a1a1a">默认 → 保留 + 化简</text>
+  <text x="522" y="326" font-size="8.5" fill="#888888">特判: 非final/costly/匿名类→不内联</text>
+
+  <!-- inner: OptimizeShuttle -->
+  <rect x="710" y="238" width="190" height="96" rx="6" fill="#ED7D31" stroke="#7F3F00" stroke-width="1.6"/>
+  <text x="805" y="257" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">OptimizeShuttle</text>
+  <text x="722" y="276" font-size="9" fill="#ffffff">常量折叠 true?y:z → y</text>
+  <text x="722" y="292" font-size="9" fill="#ffffff">三目化简 a?b:b → b</text>
+  <text x="722" y="308" font-size="9" fill="#ffffff">!(a&gt;=b) → a&lt;b</text>
+  <text x="722" y="326" font-size="9" fill="#FFF2CC">消冗余 null cast（保证 Janino 可编译）</text>
+
+  <!-- arrows inside -->
+  <line x1="490" y1="286" x2="508" y2="286" stroke="#C65911" stroke-width="1.4" marker-end="url(#arrowO)"/>
+  <line x1="690" y1="286" x2="708" y2="286" stroke="#C65911" stroke-width="1.4" marker-end="url(#arrowO)"/>
+
+  <!-- loop back arrow -->
+  <path d="M 805 334 C 805 372, 405 372, 405 336" fill="none" stroke="#7030A0" stroke-width="1.3" stroke-dasharray="6,3" marker-end="url(#arrowO)"/>
+  <text x="610" y="368" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7030A0">loop [本轮有改写 &amp;&amp; i&lt;10]</text>
+
+  <!-- down to BlockStatement -->
+  <line x1="610" y1="350" x2="610" y2="392" stroke="#1F4E79" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- Stage 4: BlockStatement -->
+  <rect x="400" y="396" width="420" height="58" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.8"/>
+  <text x="610" y="418" text-anchor="middle" font-size="12" font-weight="700" fill="#385723">BlockStatement（优化后的不可变语句树）</text>
+  <text x="610" y="436" text-anchor="middle" font-size="9.5" fill="#385723">已去重、去死代码、可被 Janino 编译的合法表达式</text>
+
+  <!-- down to ExpressionWriter -->
+  <line x1="610" y1="454" x2="610" y2="488" stroke="#1F4E79" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- Stage 5: ExpressionWriter unparse -->
+  <rect x="400" y="492" width="420" height="58" rx="8" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.6"/>
+  <text x="610" y="514" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a1a">ExpressionWriter.unparse()</text>
+  <text x="610" y="532" text-anchor="middle" font-size="9.5" fill="#595959">按 ExpressionType.lprec/rprec 自动加括号 → Java 源码字符串</text>
+
+  <!-- down to Janino -->
+  <line x1="610" y1="550" x2="610" y2="584" stroke="#1F4E79" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- Stage 6: Janino (next article) -->
+  <rect x="400" y="588" width="420" height="40" rx="8" fill="#F2F2F2" stroke="#595959" stroke-width="1.5"/>
+  <text x="610" y="613" text-anchor="middle" font-size="11" font-weight="700" fill="#262626">Janino 编译 → Bindable 字节码（→ 第 16 篇）</text>
+
+  <text x="480" y="648" text-anchor="middle" font-size="10" fill="#A6A6A6">图 15-2 — 蓝色为主数据流，橙色为优化子步骤，紫色虚线为 toBlock 的固定点循环；优化在此是正确性而非锦上添花</text>
+</svg>

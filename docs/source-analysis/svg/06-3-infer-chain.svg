@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 660" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="arrowO" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#C65911"/>
+    </marker>
+    <marker id="arrowP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7030A0"/>
+    </marker>
+  </defs>
+
+  <rect width="960" height="660" fill="#ffffff"/>
+  <text x="480" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">ReturnTypes 的两种组合器：cascade（andThen）与 chain（orElse）</text>
+  <text x="480" y="53" text-anchor="middle" font-size="12" fill="#595959">用「基础规则 + 变换 + 备选」三类积木拼出复杂类型推导，避免为每个算子写子类</text>
+
+  <!-- input -->
+  <rect x="40" y="80" width="200" height="48" rx="8" fill="#F2F2F2" stroke="#595959" stroke-width="1.3"/>
+  <text x="140" y="100" text-anchor="middle" font-size="11" font-weight="700" fill="#262626">SqlOperatorBinding</text>
+  <text x="140" y="116" text-anchor="middle" font-size="9" fill="#595959">opBinding（操作数类型上下文）</text>
+
+  <!-- ============ cascade row ============ -->
+  <rect x="40" y="150" width="880" height="170" rx="10" fill="none" stroke="#C65911" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <text x="56" y="170" font-size="13" font-weight="700" fill="#833C0C">A. cascade —— SqlTypeTransformCascade：一条基础规则 + 串联的变换链</text>
+  <text x="56" y="186" font-size="10" fill="#595959">例：ARG0.andThen(TO_NULLABLE).andThen(TO_VARYING)  →  ARG0_NULLABLE_VARYING</text>
+
+  <rect x="70" y="206" width="150" height="62" rx="8" fill="#ffffff" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="145" y="230" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">rule（基础规则）</text>
+  <text x="145" y="248" text-anchor="middle" font-size="9" fill="#595959">ARG0：取操作数#0 类型</text>
+  <text x="145" y="262" text-anchor="middle" font-size="9" fill="#595959">先算出初始 RelDataType</text>
+
+  <rect x="300" y="206" width="170" height="62" rx="8" fill="#FBE5D6" stroke="#C65911" stroke-width="1.5"/>
+  <text x="385" y="230" text-anchor="middle" font-size="11" font-weight="700" fill="#833C0C">transform #1</text>
+  <text x="385" y="248" text-anchor="middle" font-size="9" fill="#1a1a1a">TO_NULLABLE</text>
+  <text x="385" y="262" text-anchor="middle" font-size="9" fill="#595959">操作数可空则结果可空</text>
+
+  <rect x="540" y="206" width="170" height="62" rx="8" fill="#FBE5D6" stroke="#C65911" stroke-width="1.5"/>
+  <text x="625" y="230" text-anchor="middle" font-size="11" font-weight="700" fill="#833C0C">transform #2</text>
+  <text x="625" y="248" text-anchor="middle" font-size="9" fill="#1a1a1a">TO_VARYING</text>
+  <text x="625" y="262" text-anchor="middle" font-size="9" fill="#595959">CHAR→VARCHAR 变长</text>
+
+  <rect x="760" y="206" width="140" height="62" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="830" y="232" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">最终类型</text>
+  <text x="830" y="250" text-anchor="middle" font-size="9" fill="#385723">VARCHAR(n) 可空</text>
+
+  <line x1="220" y1="237" x2="299" y2="237" stroke="#C65911" stroke-width="1.5" marker-end="url(#arrowO)"/>
+  <line x1="470" y1="237" x2="539" y2="237" stroke="#C65911" stroke-width="1.5" marker-end="url(#arrowO)"/>
+  <line x1="710" y1="237" x2="759" y2="237" stroke="#C65911" stroke-width="1.5" marker-end="url(#arrowO)"/>
+  <text x="56" y="300" font-size="10" fill="#595959">关键：rule 返回 null 则整条 cascade 短路返回 null（变换不接受 null 类型）。</text>
+
+  <!-- ============ chain row ============ -->
+  <rect x="40" y="338" width="880" height="200" rx="10" fill="none" stroke="#7030A0" stroke-width="1.4" stroke-dasharray="6,3"/>
+  <text x="56" y="358" font-size="13" font-weight="700" fill="#7030A0">B. chain —— SqlReturnTypeInferenceChain：按序尝试多条规则，返回首个非 null 结果</text>
+  <text x="56" y="374" font-size="10" fill="#595959">例：PRODUCT_NULLABLE = DECIMAL_PRODUCT_NULLABLE.orElse(ARG0_INTERVAL_NULLABLE).orElse(LEAST_RESTRICTIVE)</text>
+
+  <rect x="70" y="396" width="200" height="58" rx="8" fill="#ffffff" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="170" y="418" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">rule #1</text>
+  <text x="170" y="436" text-anchor="middle" font-size="9" fill="#595959">DECIMAL_PRODUCT_NULLABLE</text>
+  <text x="170" y="448" text-anchor="middle" font-size="9" fill="#595959">两边都是 DECIMAL 才命中</text>
+
+  <rect x="380" y="396" width="200" height="58" rx="8" fill="#ffffff" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="480" y="418" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">rule #2</text>
+  <text x="480" y="436" text-anchor="middle" font-size="9" fill="#595959">ARG0_INTERVAL_NULLABLE</text>
+  <text x="480" y="448" text-anchor="middle" font-size="9" fill="#595959">interval × int 才命中</text>
+
+  <rect x="690" y="396" width="200" height="58" rx="8" fill="#ffffff" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="790" y="418" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">rule #3（兜底）</text>
+  <text x="790" y="436" text-anchor="middle" font-size="9" fill="#595959">LEAST_RESTRICTIVE</text>
+  <text x="790" y="448" text-anchor="middle" font-size="9" fill="#595959">取最不严格公共类型</text>
+
+  <!-- null fall-through arrows -->
+  <line x1="270" y1="425" x2="379" y2="425" stroke="#7030A0" stroke-width="1.5" marker-end="url(#arrowP)"/>
+  <text x="324" y="416" text-anchor="middle" font-size="9" fill="#7030A0">null↓</text>
+  <line x1="580" y1="425" x2="689" y2="425" stroke="#7030A0" stroke-width="1.5" marker-end="url(#arrowP)"/>
+  <text x="634" y="416" text-anchor="middle" font-size="9" fill="#7030A0">null↓</text>
+
+  <!-- hit arrows down -->
+  <line x1="170" y1="454" x2="170" y2="496" stroke="#548235" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="480" y1="454" x2="480" y2="496" stroke="#548235" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="790" y1="454" x2="790" y2="496" stroke="#548235" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="190" y="478" font-size="9" fill="#385723">命中→返回</text>
+  <text x="500" y="478" font-size="9" fill="#385723">命中→返回</text>
+  <text x="810" y="478" font-size="9" fill="#385723">命中→返回</text>
+
+  <rect x="330" y="498" width="300" height="34" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="480" y="520" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">首个非 null 结果即为返回类型</text>
+
+  <!-- input arrow to both rows -->
+  <line x1="140" y1="128" x2="140" y2="205" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="170" y1="320" x2="170" y2="395" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#arrow)"/>
+
+  <!-- footer note -->
+  <rect x="40" y="556" width="880" height="56" rx="8" fill="#F2F2F2" stroke="#BFBFBF"/>
+  <text x="56" y="576" font-size="10.5" fill="#262626">andThen(transform) → 返回 SqlTypeTransformCascade；orElse(rule) → 返回 SqlReturnTypeInferenceChain（均定义在 SqlReturnTypeInference 默认方法里）。</text>
+  <text x="56" y="595" font-size="10.5" fill="#262626">两者都实现 SqlReturnTypeInference 接口本身 → 可继续被 andThen/orElse 嵌套，形成任意深度的策略表达式（组合优于继承）。</text>
+
+  <text x="480" y="644" text-anchor="middle" font-size="10" fill="#A6A6A6">图 06-3 — 橙=cascade 串联变换（任一步 null 即短路）；紫=chain 顺序回退（null 才落到下一条）；绿=命中返回</text>
+</svg>

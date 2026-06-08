@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="down" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="up" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M10,0 L0,5 L10,10 z" fill="#548235"/>
+    </marker>
+    <marker id="ctrl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7030A0"/>
+    </marker>
+  </defs>
+
+  <rect width="960" height="700" fill="#ffffff"/>
+  <text x="480" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">RelShuttle 遍历改写链: accept → visit → visitChild → copy</text>
+  <text x="480" y="52" text-anchor="middle" font-size="12" fill="#595959">double-dispatch 下行 + 自底向上重建; 子节点不变则原节点不变 (引用相等短路)</text>
+
+  <!-- left: the tree -->
+  <text x="170" y="86" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">被遍历的 RelNode 树</text>
+
+  <rect x="100" y="100" width="140" height="40" rx="6" fill="#2E75B6" stroke="#1F4E79"/>
+  <text x="170" y="125" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">LogicalProject</text>
+
+  <rect x="100" y="180" width="140" height="40" rx="6" fill="#70AD47" stroke="#385723"/>
+  <text x="170" y="205" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">LogicalFilter</text>
+
+  <rect x="100" y="260" width="140" height="40" rx="6" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.4"/>
+  <text x="170" y="285" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">LogicalTableScan</text>
+
+  <line x1="170" y1="140" x2="170" y2="180" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#down)"/>
+  <line x1="170" y1="220" x2="170" y2="260" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#down)"/>
+
+  <!-- right: call sequence as steps -->
+  <text x="610" y="86" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">调用展开 (shuttle 为 MyShuttle)</text>
+
+  <g font-size="9.5" font-family="'SF Mono',Menlo,monospace">
+    <rect x="360" y="100" width="500" height="26" rx="4" fill="#DEEBF7" stroke="#1F4E79"/>
+    <text x="372" y="117" fill="#1F4E79">1  Project.accept(s) -&gt; s.visit(LogicalProject)   // 静态分派到精确重载</text>
+
+    <rect x="360" y="134" width="500" height="26" rx="4" fill="#DEEBF7" stroke="#1F4E79"/>
+    <text x="372" y="151" fill="#1F4E79">2  visit(Project): visitChild(project, 0, input)  // 下钻第 0 个输入</text>
+
+    <rect x="360" y="168" width="500" height="26" rx="4" fill="#DEEBF7" stroke="#1F4E79"/>
+    <text x="372" y="185" fill="#1F4E79">3    stack.push(project); Filter.accept(s) -&gt; s.visit(Filter)</text>
+
+    <rect x="360" y="202" width="500" height="26" rx="4" fill="#DEEBF7" stroke="#1F4E79"/>
+    <text x="372" y="219" fill="#1F4E79">4      visit(Filter): visitChild(filter, 0, input)</text>
+
+    <rect x="360" y="236" width="500" height="26" rx="4" fill="#DEEBF7" stroke="#1F4E79"/>
+    <text x="372" y="253" fill="#1F4E79">5        TableScan.accept(s) -&gt; s.visit(TableScan)</text>
+
+    <rect x="360" y="270" width="500" height="26" rx="4" fill="#E2EFDA" stroke="#548235"/>
+    <text x="372" y="287" fill="#385723">6        return scan  // 叶子: 默认不变, child2 == child</text>
+
+    <rect x="360" y="304" width="500" height="26" rx="4" fill="#E2EFDA" stroke="#548235"/>
+    <text x="372" y="321" fill="#385723">7      child2==child -&gt; 返回原 filter, 不 copy</text>
+
+    <rect x="360" y="338" width="500" height="26" rx="4" fill="#E2EFDA" stroke="#548235"/>
+    <text x="372" y="355" fill="#385723">8    child2==child -&gt; 返回原 project, 不 copy</text>
+
+    <rect x="360" y="372" width="500" height="26" rx="4" fill="#FBE5D6" stroke="#C65911"/>
+    <text x="372" y="389" fill="#833C0C">★ 若某层 visit 返回新子节点, visitChild 触发</text>
+    <rect x="360" y="402" width="500" height="26" rx="4" fill="#FBE5D6" stroke="#C65911"/>
+    <text x="372" y="419" fill="#833C0C">  parent.copy(traitSet, newInputs) 自底向上重建脊线</text>
+  </g>
+
+  <!-- arrows linking tree nodes to steps -->
+  <line x1="240" y1="115" x2="356" y2="113" stroke="#1F4E79" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="240" y1="195" x2="356" y2="181" stroke="#1F4E79" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="240" y1="280" x2="356" y2="283" stroke="#548235" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- down/up flow annotation on the tree -->
+  <path d="M86,110 C60,180 60,230 86,290" fill="none" stroke="#1F4E79" stroke-width="1.3" marker-end="url(#down)"/>
+  <text x="40" y="200" font-size="9.5" fill="#1F4E79" transform="rotate(-90 40 200)">下行: accept/visit 钻到叶子</text>
+
+  <path d="M254,290 C282,230 282,180 254,118" fill="none" stroke="#548235" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#up)"/>
+  <text x="300" y="205" font-size="9.5" fill="#385723" transform="rotate(-90 300 205)">上行: 不变则短路, 变则 copy</text>
+
+  <!-- bottom: three shuttle layers -->
+  <rect x="60" y="446" width="840" height="170" rx="8" fill="#F8F8F8" stroke="#BFBFBF" stroke-width="1"/>
+  <text x="76" y="468" font-size="13" font-weight="700" fill="#1F4E79">RelShuttle 家族: 一个接口, 三种使用强度</text>
+
+  <rect x="80" y="482" width="260" height="120" rx="6" fill="#ffffff" stroke="#548235" stroke-width="1.2"/>
+  <text x="96" y="502" font-size="11" font-weight="700" fill="#385723">RelShuttle (接口)</text>
+  <text x="96" y="520" font-size="9.5" fill="#262626">为每种 Logical 算子声明一个</text>
+  <text x="96" y="534" font-size="9.5" fill="#262626">visit 重载 + 兜底 visit(RelNode)</text>
+  <text x="96" y="552" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#548235">RelNode visit(LogicalJoin)</text>
+  <text x="96" y="570" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#548235">RelNode visit(RelNode other)</text>
+  <text x="96" y="590" font-size="9" fill="#595959">设计: 精确分派 + 默认兜底</text>
+
+  <rect x="350" y="482" width="260" height="120" rx="6" fill="#ffffff" stroke="#1F4E79" stroke-width="1.2"/>
+  <text x="366" y="502" font-size="11" font-weight="700" fill="#1F4E79">RelShuttleImpl (默认遍历)</text>
+  <text x="366" y="520" font-size="9.5" fill="#262626">实现 visitChild / visitChildren:</text>
+  <text x="366" y="534" font-size="9.5" fill="#262626">遍历输入, child 变才 copy 父节点</text>
+  <text x="366" y="552" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1F4E79">stack 维护父链 (Deque)</text>
+  <text x="366" y="570" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#1F4E79">child2!=child -&gt; copy(...)</text>
+  <text x="366" y="590" font-size="9" fill="#595959">只需覆盖关心的 visit 重载</text>
+
+  <rect x="620" y="482" width="260" height="120" rx="6" fill="#ffffff" stroke="#BF8F00" stroke-width="1.2"/>
+  <text x="636" y="502" font-size="11" font-weight="700" fill="#7F6000">RelHomogeneousShuttle</text>
+  <text x="636" y="520" font-size="9.5" fill="#262626">把所有具体 visit 统一委托给</text>
+  <text x="636" y="534" font-size="9.5" fill="#262626">visit(RelNode), 一处逻辑处理全部</text>
+  <text x="636" y="552" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#BF8F00">visit(LogicalJoin)</text>
+  <text x="636" y="566" font-size="9" font-family="'SF Mono',Menlo,monospace" fill="#BF8F00">  = visit((RelNode) join)</text>
+  <text x="636" y="590" font-size="9" fill="#595959">齐次处理: 不区分算子类型时用</text>
+
+  <text x="480" y="640" text-anchor="middle" font-size="10" fill="#A6A6A6">图 04-3 — 蓝色实线=下行调用, 绿色虚线=上行返回(不变即短路), 橙色=触发 copy 重建; 引用相等(==)是避免无谓拷贝的关键开关</text>
+</svg>

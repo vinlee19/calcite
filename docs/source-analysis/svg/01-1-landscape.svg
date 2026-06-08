@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 660" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7F3F00"/>
+    </marker>
+    <linearGradient id="bgCore" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#BDD7EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="900" height="660" fill="#ffffff"/>
+  <text x="450" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">Calcite 整体分层全景：前端公共化 · 后端专业化</text>
+  <text x="450" y="52" text-anchor="middle" font-size="12" fill="#595959">同一份 Core 编译/优化前端，服务于任意数量的 Adapter 后端 —— 无存储层</text>
+
+  <!-- Layer 1: Clients -->
+  <g>
+    <rect x="40" y="74" width="820" height="56" rx="8" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5"/>
+    <text x="58" y="95" font-size="13" font-weight="700" fill="#7F6000">① Clients / API 入口（多种用法，单一引擎）</text>
+    <rect x="180" y="98" width="170" height="26" rx="4" fill="#ffffff" stroke="#BF8F00"/>
+    <text x="265" y="115" text-anchor="middle" font-size="11" fill="#595959">JDBC Driver  jdbc:calcite:</text>
+    <rect x="360" y="98" width="170" height="26" rx="4" fill="#ffffff" stroke="#BF8F00"/>
+    <text x="445" y="115" text-anchor="middle" font-size="11" fill="#595959">Frameworks / Planner</text>
+    <rect x="540" y="98" width="170" height="26" rx="4" fill="#ffffff" stroke="#BF8F00"/>
+    <text x="625" y="115" text-anchor="middle" font-size="11" fill="#595959">RelBuilder（编程式）</text>
+  </g>
+
+  <!-- Layer 2: Core five stages -->
+  <g>
+    <rect x="40" y="152" width="600" height="172" rx="8" fill="url(#bgCore)" stroke="#1F4E79" stroke-width="2"/>
+    <text x="58" y="173" font-size="13" font-weight="700" fill="#1F4E79">② Core 五阶段前端  module: core/  （所有数据源共用）</text>
+
+    <rect x="58" y="190" width="96" height="58" rx="6" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="106" y="213" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">Parse</text>
+    <text x="106" y="231" text-anchor="middle" font-size="9" fill="#595959" font-family="'SF Mono',Menlo,monospace">SqlParser</text>
+    <text x="106" y="243" text-anchor="middle" font-size="9" fill="#595959">→ SqlNode</text>
+
+    <rect x="166" y="190" width="96" height="58" rx="6" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="214" y="213" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">Validate</text>
+    <text x="214" y="231" text-anchor="middle" font-size="9" fill="#595959" font-family="'SF Mono',Menlo,monospace">SqlValidator</text>
+    <text x="214" y="243" text-anchor="middle" font-size="9" fill="#595959">类型/作用域</text>
+
+    <rect x="274" y="190" width="96" height="58" rx="6" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="322" y="213" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">SqlToRel</text>
+    <text x="322" y="231" text-anchor="middle" font-size="9" fill="#595959" font-family="'SF Mono',Menlo,monospace">Converter</text>
+    <text x="322" y="243" text-anchor="middle" font-size="9" fill="#595959">→ RelNode</text>
+
+    <rect x="382" y="190" width="110" height="58" rx="6" fill="#ED7D31" stroke="#7F3F00"/>
+    <text x="437" y="213" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">Optimize</text>
+    <text x="437" y="231" text-anchor="middle" font-size="9" fill="#FFF2CC">Volcano / Hep</text>
+    <text x="437" y="243" text-anchor="middle" font-size="9" fill="#FFF2CC">CBO 重心</text>
+
+    <rect x="504" y="190" width="118" height="58" rx="6" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="563" y="213" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">Implement</text>
+    <text x="563" y="231" text-anchor="middle" font-size="9" fill="#595959">物理 RelNode</text>
+    <text x="563" y="243" text-anchor="middle" font-size="9" fill="#595959">/ pushdown</text>
+
+    <line x1="154" y1="219" x2="166" y2="219" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <line x1="262" y1="219" x2="274" y2="219" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <line x1="370" y1="219" x2="382" y2="219" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <line x1="492" y1="219" x2="504" y2="219" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <text x="58" y="276" font-size="11" font-weight="700" fill="#1F4E79">共享基础设施（IR / 优化器内核）</text>
+    <rect x="58" y="284" width="120" height="30" rx="4" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="118" y="303" text-anchor="middle" font-size="10" fill="#595959">RelNode / RexNode</text>
+    <rect x="186" y="284" width="120" height="30" rx="4" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="246" y="303" text-anchor="middle" font-size="10" fill="#595959">RelTraitSet / Convention</text>
+    <rect x="314" y="284" width="140" height="30" rx="4" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="384" y="303" text-anchor="middle" font-size="10" fill="#595959">RelMetadataQuery / Cost</text>
+    <rect x="462" y="284" width="160" height="30" rx="4" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="542" y="303" text-anchor="middle" font-size="10" fill="#595959">RelOptRule / CoreRules</text>
+  </g>
+
+  <!-- Schema / Catalog (right) -->
+  <g>
+    <rect x="660" y="152" width="200" height="172" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="2"/>
+    <text x="678" y="173" font-size="13" font-weight="700" fill="#385723">③ Schema SPI / Catalog</text>
+    <rect x="678" y="188" width="164" height="26" rx="4" fill="#ffffff" stroke="#548235"/>
+    <text x="760" y="205" text-anchor="middle" font-size="10" fill="#595959">Schema · SchemaPlus</text>
+    <rect x="678" y="220" width="164" height="26" rx="4" fill="#ffffff" stroke="#548235"/>
+    <text x="760" y="237" text-anchor="middle" font-size="10" fill="#595959">Table · ScannableTable</text>
+    <rect x="678" y="252" width="164" height="26" rx="4" fill="#ffffff" stroke="#548235"/>
+    <text x="760" y="269" text-anchor="middle" font-size="10" fill="#595959">TranslatableTable</text>
+    <rect x="678" y="284" width="164" height="30" rx="4" fill="#ffffff" stroke="#548235"/>
+    <text x="760" y="303" text-anchor="middle" font-size="10" fill="#595959">能力分层 → 第 17 篇</text>
+  </g>
+
+  <!-- linq4j substrate -->
+  <g>
+    <rect x="40" y="344" width="820" height="44" rx="8" fill="#F2F2F2" stroke="#595959" stroke-width="1.5"/>
+    <text x="58" y="364" font-size="13" font-weight="700" fill="#262626">④ linq4j 底座  module: linq4j/  —— Enumerable/Enumerator + Expression Tree（编译到 Java 的公共运行时与 IR 第四层）</text>
+    <text x="58" y="380" font-size="10" fill="#595959">enumerable convention 的 codegen 与 Janino 即时编译均建立在此之上；adapter 之间共享这套执行原语</text>
+  </g>
+
+  <!-- Layer 5: Adapters -->
+  <g>
+    <rect x="40" y="408" width="820" height="138" rx="8" fill="#FBE5D6" stroke="#C65911" stroke-width="2"/>
+    <text x="58" y="429" font-size="13" font-weight="700" fill="#833C0C">⑤ Adapters（各自独立 module，外围专业化）= Schema + Table + Convention + Rules</text>
+
+    <g font-size="10" fill="#ffffff">
+      <rect x="58"  y="444" width="86" height="32" rx="6" fill="#ED7D31"/><text x="101" y="464" text-anchor="middle">enumerable*</text>
+      <rect x="152" y="444" width="86" height="32" rx="6" fill="#5B9BD5"/><text x="195" y="464" text-anchor="middle">jdbc*</text>
+      <rect x="246" y="444" width="86" height="32" rx="6" fill="#70AD47"/><text x="289" y="464" text-anchor="middle">mongodb</text>
+      <rect x="340" y="444" width="100" height="32" rx="6" fill="#A5A5A5"/><text x="390" y="464" text-anchor="middle">elasticsearch</text>
+      <rect x="448" y="444" width="86" height="32" rx="6" fill="#FFC000"/><text x="491" y="464" text-anchor="middle">druid</text>
+      <rect x="542" y="444" width="86" height="32" rx="6" fill="#7030A0"/><text x="585" y="464" text-anchor="middle">cassandra</text>
+      <rect x="636" y="444" width="86" height="32" rx="6" fill="#264478"/><text x="679" y="464" text-anchor="middle">kafka</text>
+      <rect x="730" y="444" width="86" height="32" rx="6" fill="#9E480E"/><text x="773" y="464" text-anchor="middle">arrow</text>
+
+      <rect x="58"  y="482" width="86" height="32" rx="6" fill="#636363"/><text x="101" y="502" text-anchor="middle">file</text>
+      <rect x="152" y="482" width="86" height="32" rx="6" fill="#997300"/><text x="195" y="502" text-anchor="middle">spark</text>
+      <rect x="246" y="482" width="86" height="32" rx="6" fill="#43682B"/><text x="289" y="502" text-anchor="middle">splunk</text>
+      <rect x="340" y="482" width="100" height="32" rx="6" fill="#255E91"/><text x="390" y="502" text-anchor="middle">redis / geode</text>
+      <rect x="448" y="482" width="86" height="32" rx="6" fill="#1F3864"/><text x="491" y="502" text-anchor="middle">innodb</text>
+      <rect x="542" y="482" width="86" height="32" rx="6" fill="#525252"/><text x="585" y="502" text-anchor="middle">pig/piglet</text>
+      <rect x="636" y="482" width="180" height="32" rx="6" fill="#7F6000"/><text x="726" y="502" text-anchor="middle">example/csv（教学三态）</text>
+    </g>
+    <text x="450" y="534" text-anchor="middle" font-size="10" fill="#7F3F00">* enumerable 与 jdbc 内置于 core；其余各为 settings.gradle.kts 中的独立 module —— 后端可单独迭代而不动前端</text>
+  </g>
+
+  <!-- External systems -->
+  <g>
+    <rect x="40" y="560" width="820" height="44" rx="8" fill="#F2F2F2" stroke="#595959" stroke-width="1.5"/>
+    <text x="58" y="580" font-size="12" font-weight="700" fill="#262626">外部数据源 / 执行引擎</text>
+    <text x="58" y="596" font-size="10" fill="#595959">MySQL · PostgreSQL · Oracle | MongoDB · Cassandra · ES | Kafka · Druid · Splunk | 本地文件 / Parquet / Arrow —— 数据与执行均在此</text>
+  </g>
+
+  <!-- inter-layer arrows -->
+  <line x1="450" y1="130" x2="450" y2="152" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="640" y1="240" x2="660" y2="240" stroke="#548235" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="450" y1="324" x2="450" y2="344" stroke="#595959" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="450" y1="388" x2="450" y2="408" stroke="#C65911" stroke-width="1.5" marker-end="url(#arrowOrange)"/>
+  <line x1="450" y1="546" x2="450" y2="560" stroke="#595959" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <text x="450" y="634" text-anchor="middle" font-size="10" fill="#A6A6A6">图 01-1 — 顶部多入口共用同一前端；橙色高亮为 CBO 优化重心；底部数据源不归 Calcite 持有，故称"无存储"</text>
+</svg>

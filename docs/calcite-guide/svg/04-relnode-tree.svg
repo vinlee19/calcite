@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="tArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="600" fill="#ffffff"/>
+  <text x="450" y="30" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">一条 SQL 对应的 RelNode 树</text>
+  <text x="450" y="50" text-anchor="middle" font-size="12" fill="#595959">SqlToRelConverter 把已校验的 SqlNode 翻译为逻辑算子树 (Convention.NONE)</text>
+
+  <!-- SQL block at top -->
+  <rect x="80" y="68" width="740" height="64" rx="8" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5"/>
+  <text x="96" y="88" font-size="11" font-weight="700" fill="#7F6000">示例 SQL</text>
+  <text x="96" y="108" font-family="Menlo, monospace" font-size="12" fill="#262626">SELECT d.name, COUNT(*) AS cnt</text>
+  <text x="96" y="124" font-family="Menlo, monospace" font-size="12" fill="#262626">FROM emp e JOIN dept d ON e.deptno = d.deptno  WHERE e.sal &gt; 1000  GROUP BY d.name;</text>
+
+  <!-- LogicalAggregate (root) -->
+  <rect x="320" y="160" width="260" height="58" rx="8" fill="#1F4E79"/>
+  <text x="450" y="183" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">LogicalAggregate</text>
+  <text x="450" y="201" text-anchor="middle" font-size="11" fill="#DEEBF7">group=[{0}]  aggs=[COUNT()]</text>
+  <text x="595" y="190" font-size="10" fill="#595959">← GROUP BY d.name</text>
+
+  <!-- LogicalProject -->
+  <rect x="320" y="248" width="260" height="58" rx="8" fill="#2E75B6"/>
+  <text x="450" y="271" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">LogicalProject</text>
+  <text x="450" y="289" text-anchor="middle" font-size="11" fill="#DEEBF7">name=[$11]</text>
+  <text x="595" y="278" font-size="10" fill="#595959">← 选出 d.name 列</text>
+
+  <!-- LogicalJoin -->
+  <rect x="320" y="336" width="260" height="58" rx="8" fill="#5B9BD5"/>
+  <text x="450" y="359" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">LogicalJoin</text>
+  <text x="450" y="377" text-anchor="middle" font-size="11" fill="#DEEBF7">condition=[=($7, $9)]  joinType=[inner]</text>
+  <text x="595" y="366" font-size="10" fill="#595959">← ON e.deptno = d.deptno</text>
+
+  <!-- Left child: LogicalFilter -->
+  <rect x="80" y="430" width="220" height="58" rx="8" fill="#70AD47"/>
+  <text x="190" y="453" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">LogicalFilter</text>
+  <text x="190" y="471" text-anchor="middle" font-size="11" fill="#E2EFDA">condition=[&gt;($5, 1000)]</text>
+
+  <!-- Left grandchild: LogicalTableScan(emp) -->
+  <rect x="80" y="512" width="220" height="46" rx="8" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="190" y="532" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">LogicalTableScan(emp)</text>
+  <text x="190" y="548" text-anchor="middle" font-size="10" fill="#595959">14 cols: empno, ename, sal, deptno, ...</text>
+
+  <!-- Right child: LogicalTableScan(dept) -->
+  <rect x="600" y="430" width="220" height="46" rx="8" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="710" y="450" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">LogicalTableScan(dept)</text>
+  <text x="710" y="466" text-anchor="middle" font-size="10" fill="#595959">3 cols: deptno, name, loc</text>
+
+  <!-- Arrows from parent to child (parent reads child input) -->
+  <line x1="450" y1="218" x2="450" y2="247" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#tArr)"/>
+  <line x1="450" y1="306" x2="450" y2="335" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#tArr)"/>
+
+  <!-- Join branches -->
+  <line x1="380" y1="394" x2="190" y2="429" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#tArr)"/>
+  <line x1="520" y1="394" x2="710" y2="429" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#tArr)"/>
+  <line x1="190" y1="488" x2="190" y2="511" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#tArr)"/>
+
+  <!-- Side panel: legend -->
+  <g>
+    <rect x="50" y="568" width="800" height="24" rx="4" fill="#F2F2F2" stroke="#BFBFBF"/>
+    <text x="60" y="585" font-size="11" fill="#595959">数据自底向上流：TableScan → Filter → Join → Project → Aggregate；$N 表示输入字段下标 — 用 EXPLAIN PLAN 或 RelOptUtil.toString() 可验证</text>
+  </g>
+
+  <text x="450" y="40" font-size="0" fill="none">.</text>
+</svg>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 660" font-family="-apple-system, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="arrowEnf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7F3F00"/>
+    </marker>
+  </defs>
+
+  <rect width="940" height="660" fill="#ffffff"/>
+  <text x="470" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">Convention 转换图：NONE 星形中枢 + ConverterRule 边</text>
+  <text x="470" y="52" text-anchor="middle" font-size="12" fill="#595959">ConventionTraitDef 把每条 ConverterRule(inTrait→outTrait) 注册成有向图的一条弧，转换 = 求最短路</text>
+
+  <!-- central NONE node -->
+  <circle cx="470" cy="320" r="62" fill="#FFF2CC" stroke="#BF8F00" stroke-width="2.5"/>
+  <text x="470" y="312" text-anchor="middle" font-size="16" font-weight="700" fill="#7F6000">NONE</text>
+  <text x="470" y="330" text-anchor="middle" font-size="9" fill="#7F6000">虚拟约定</text>
+  <text x="470" y="344" text-anchor="middle" font-size="8.5" fill="#7F6000">cost = ∞</text>
+
+  <!-- spokes (physical conventions) -->
+  <!-- ENUMERABLE top -->
+  <rect x="395" y="92" width="150" height="56" rx="10" fill="#ED7D31" stroke="#7F3F00" stroke-width="2"/>
+  <text x="470" y="116" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">ENUMERABLE</text>
+  <text x="470" y="133" text-anchor="middle" font-size="8.5" fill="#FFF2CC">in-process Janino 执行</text>
+
+  <!-- JDBC left -->
+  <rect x="70" y="180" width="150" height="56" rx="10" fill="#DEEBF7" stroke="#1F4E79" stroke-width="2"/>
+  <text x="145" y="204" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">JDBC(mysql)</text>
+  <text x="145" y="221" text-anchor="middle" font-size="8.5" fill="#1F4E79">下推为 SQL 方言</text>
+
+  <!-- JDBC2 left-bottom -->
+  <rect x="70" y="404" width="150" height="56" rx="10" fill="#DEEBF7" stroke="#1F4E79" stroke-width="2"/>
+  <text x="145" y="428" text-anchor="middle" font-size="13" font-weight="700" fill="#1F4E79">JDBC(pg)</text>
+  <text x="145" y="445" text-anchor="middle" font-size="8.5" fill="#1F4E79">另一数据源</text>
+
+  <!-- MONGO right-top -->
+  <rect x="720" y="180" width="150" height="56" rx="10" fill="#E2EFDA" stroke="#548235" stroke-width="2"/>
+  <text x="795" y="204" text-anchor="middle" font-size="13" font-weight="700" fill="#385723">MONGO</text>
+  <text x="795" y="221" text-anchor="middle" font-size="8.5" fill="#385723">BSON 聚合管道</text>
+
+  <!-- DRUID right-bottom -->
+  <rect x="720" y="404" width="150" height="56" rx="10" fill="#E2EFDA" stroke="#548235" stroke-width="2"/>
+  <text x="795" y="428" text-anchor="middle" font-size="13" font-weight="700" fill="#385723">DRUID</text>
+  <text x="795" y="445" text-anchor="middle" font-size="8.5" fill="#385723">时序聚合</text>
+
+  <!-- BINDABLE bottom -->
+  <rect x="395" y="494" width="150" height="56" rx="10" fill="#F2F2F2" stroke="#595959" stroke-width="2"/>
+  <text x="470" y="518" text-anchor="middle" font-size="13" font-weight="700" fill="#262626">BINDABLE</text>
+  <text x="470" y="535" text-anchor="middle" font-size="8.5" fill="#595959">解释器后备</text>
+
+  <!-- edges: ConverterRule arcs from NONE to each, and cross arcs -->
+  <!-- NONE -> ENUMERABLE -->
+  <line x1="470" y1="258" x2="470" y2="150" stroke="#1F4E79" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="486" y="208" font-size="9" fill="#1F4E79">EnumerableConverterRule</text>
+
+  <!-- NONE -> JDBC(mysql) -->
+  <line x1="412" y1="288" x2="208" y2="232" stroke="#1F4E79" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="230" y="262" font-size="9" fill="#1F4E79">JdbcConverterRule</text>
+
+  <!-- NONE -> JDBC(pg) -->
+  <line x1="412" y1="352" x2="208" y2="408" stroke="#1F4E79" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="230" y="390" font-size="9" fill="#1F4E79">JdbcConverterRule</text>
+
+  <!-- NONE -> MONGO -->
+  <line x1="528" y1="288" x2="732" y2="232" stroke="#1F4E79" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="590" y="262" font-size="9" fill="#385723">MongoToEnumerable…</text>
+
+  <!-- NONE -> DRUID -->
+  <line x1="528" y1="352" x2="732" y2="408" stroke="#1F4E79" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="600" y="390" font-size="9" fill="#385723">DruidRules.…</text>
+
+  <!-- JDBC(mysql) -> ENUMERABLE (cross, leaving federation) -->
+  <line x1="220" y1="196" x2="392" y2="124" stroke="#7F3F00" stroke-width="1.6" stroke-dasharray="6,3" marker-end="url(#arrowEnf)"/>
+  <text x="250" y="150" font-size="9" fill="#7F3F00">JdbcToEnumerableConverterRule</text>
+
+  <!-- MONGO -> ENUMERABLE (cross) -->
+  <line x1="720" y1="196" x2="548" y2="124" stroke="#7F3F00" stroke-width="1.6" stroke-dasharray="6,3" marker-end="url(#arrowEnf)"/>
+  <text x="560" y="150" font-size="9" fill="#7F3F00">MongoToEnumerableConverterRule</text>
+
+  <!-- ENUMERABLE -> BINDABLE -->
+  <line x1="470" y1="382" x2="470" y2="492" stroke="#1F4E79" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="486" y="440" font-size="9" fill="#595959">EnumerableInterpretable</text>
+
+  <!-- annotation boxes -->
+  <rect x="30" y="500" width="330" height="120" rx="8" fill="#FBE5D6" stroke="#C65911" stroke-width="1.5"/>
+  <text x="46" y="520" font-size="11" font-weight="700" fill="#833C0C">联邦本质：图就是"谁能转成谁"的邻接表</text>
+  <text x="46" y="540" font-size="9.5" fill="#595959">· registerConverterRule(): 仅 isGuaranteed() 的边入图</text>
+  <text x="46" y="556" font-size="9.5" fill="#595959">· addVertex(in) / addVertex(out) / addEdge(in,out)</text>
+  <text x="46" y="572" font-size="9.5" fill="#595959">· mapArcToConverterRule: 弧 → 实际 ConverterRule</text>
+  <text x="46" y="588" font-size="9.5" fill="#595959">· convert(): getPaths(from,to) 取最短路径逐弧改写</text>
+  <text x="46" y="606" font-size="9.5" fill="#833C0C">每个 adapter 把自己挂到 NONE 上，core 不认识任何具体数据源</text>
+
+  <rect x="600" y="500" width="310" height="120" rx="8" fill="#F2F2F2" stroke="#595959" stroke-width="1.5"/>
+  <text x="616" y="520" font-size="11" font-weight="700" fill="#262626">坑（pitfalls）</text>
+  <text x="616" y="540" font-size="9.5" fill="#595959">· NONE 自身 cost=∞，必须被某条边转换走</text>
+  <text x="616" y="556" font-size="9.5" fill="#595959">· 两数据源间无直接弧 → 只能绕 ENUMERABLE 中转</text>
+  <text x="616" y="572" font-size="9.5" fill="#595959">  （跨库 Join 的代价根源：数据被拉回进程）</text>
+  <text x="616" y="588" font-size="9.5" fill="#595959">· 转换图按 planner 实例隔离（weakKeys 缓存）</text>
+  <text x="616" y="604" font-size="9.5" fill="#595959">· AbstractConverter 兜底 enforcer 成本也是 ∞</text>
+
+  <text x="470" y="648" text-anchor="middle" font-size="10" fill="#A6A6A6">图 14-2 — 蓝实线=进入某 Convention 的 ConverterRule；橙虚线=回到 ENUMERABLE 的出向转换；NONE 是所有逻辑算子的起点</text>
+</svg>

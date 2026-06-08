@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="pop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#548235"/>
+    </marker>
+  </defs>
+
+  <rect width="960" height="720" fill="#ffffff"/>
+  <text x="480" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">RelBuilder 的 Frame 栈状态演变</text>
+  <text x="480" y="52" text-anchor="middle" font-size="12" fill="#595959">Builder 模式 + ArrayDeque&lt;Frame&gt; 栈：每个 fluent 调用 pop 输入、构造算子、push 新 Frame</text>
+
+  <!-- The code -->
+  <rect x="30" y="70" width="900" height="62" rx="8" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5"/>
+  <text x="44" y="90" font-size="11" font-weight="700" fill="#7F6000">示例链式调用（等价于 SELECT deptno, COUNT(*) FROM emp WHERE sal &gt; 1000 GROUP BY deptno）</text>
+  <text x="44" y="110" font-family="'SF Mono',Menlo,monospace" font-size="11" fill="#262626">builder.scan("emp").filter(gt($("sal"),literal(1000))).aggregate(groupKey("deptno"),count()).build();</text>
+  <text x="44" y="126" font-size="9.5" fill="#7F6000">每一步返回 this（RelBuilder），形成 fluent pipeline；最后 build() 弹出栈顶并返回 RelNode 树根。</text>
+
+  <!-- Stack snapshots: 5 columns -->
+  <!-- helper: a Frame box is white with blue border; stack grows upward -->
+
+  <!-- Step 0: scan -->
+  <g>
+    <rect x="40" y="160" width="160" height="26" rx="5" fill="#DEEBF7" stroke="#1F4E79"/>
+    <text x="120" y="178" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">① scan("emp")</text>
+    <text x="120" y="200" text-anchor="middle" font-size="9.5" fill="#595959">push 一个 Frame</text>
+    <!-- stack: one frame -->
+    <rect x="55" y="300" width="130" height="40" rx="4" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.4"/>
+    <text x="120" y="318" text-anchor="middle" font-size="10" font-weight="700" fill="#1F4E79">TableScan(emp)</text>
+    <text x="120" y="332" text-anchor="middle" font-size="8.5" fill="#595959">fields: emp.* alias</text>
+    <line x1="48" y1="296" x2="48" y2="344" stroke="#888"/>
+    <line x1="48" y1="344" x2="192" y2="344" stroke="#888"/>
+    <line x1="192" y1="296" x2="192" y2="344" stroke="#888"/>
+    <text x="120" y="360" text-anchor="middle" font-size="9" fill="#888">stack size = 1</text>
+  </g>
+
+  <!-- Step 1: filter -->
+  <g>
+    <rect x="220" y="160" width="160" height="26" rx="5" fill="#DEEBF7" stroke="#1F4E79"/>
+    <text x="300" y="178" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">② filter(sal&gt;1000)</text>
+    <text x="300" y="200" text-anchor="middle" font-size="9.5" fill="#595959">pop → build Filter → push</text>
+    <rect x="235" y="300" width="130" height="40" rx="4" fill="#70AD47" stroke="#385723" stroke-width="1.4"/>
+    <text x="300" y="318" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">Filter[&gt;($5,1000)]</text>
+    <text x="300" y="332" text-anchor="middle" font-size="8.5" fill="#E2EFDA">input = 旧栈顶</text>
+    <line x1="228" y1="296" x2="228" y2="344" stroke="#888"/>
+    <line x1="228" y1="344" x2="372" y2="344" stroke="#888"/>
+    <line x1="372" y1="296" x2="372" y2="344" stroke="#888"/>
+    <text x="300" y="360" text-anchor="middle" font-size="9" fill="#888">stack size = 1</text>
+  </g>
+
+  <!-- Step 2: aggregate -->
+  <g>
+    <rect x="400" y="160" width="160" height="26" rx="5" fill="#DEEBF7" stroke="#1F4E79"/>
+    <text x="480" y="178" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">③ aggregate(...)</text>
+    <text x="480" y="200" text-anchor="middle" font-size="9.5" fill="#595959">pop → build Aggregate → push</text>
+    <rect x="415" y="300" width="130" height="40" rx="4" fill="#1F4E79" stroke="#0F2C4A" stroke-width="1.4"/>
+    <text x="480" y="318" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">Aggregate</text>
+    <text x="480" y="332" text-anchor="middle" font-size="8.5" fill="#DEEBF7">group={0} COUNT()</text>
+    <line x1="408" y1="296" x2="408" y2="344" stroke="#888"/>
+    <line x1="408" y1="344" x2="552" y2="344" stroke="#888"/>
+    <line x1="552" y1="296" x2="552" y2="344" stroke="#888"/>
+    <text x="480" y="360" text-anchor="middle" font-size="9" fill="#888">stack size = 1</text>
+  </g>
+
+  <!-- Step 3: build -->
+  <g>
+    <rect x="580" y="160" width="160" height="26" rx="5" fill="#E2EFDA" stroke="#548235"/>
+    <text x="660" y="178" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">④ build()</text>
+    <text x="660" y="200" text-anchor="middle" font-size="9.5" fill="#595959">pop 栈顶 → 返回 RelNode</text>
+    <rect x="595" y="300" width="130" height="40" rx="4" fill="#ffffff" stroke="#BFBFBF" stroke-dasharray="4,3"/>
+    <text x="660" y="323" text-anchor="middle" font-size="10" fill="#888">（空栈）</text>
+    <line x1="588" y1="296" x2="588" y2="344" stroke="#888"/>
+    <line x1="588" y1="344" x2="732" y2="344" stroke="#888"/>
+    <line x1="732" y1="296" x2="732" y2="344" stroke="#888"/>
+    <text x="660" y="360" text-anchor="middle" font-size="9" fill="#888">stack size = 0</text>
+  </g>
+
+  <!-- Returned tree -->
+  <g>
+    <rect x="760" y="160" width="170" height="26" rx="5" fill="#ED7D31" stroke="#7F3F00"/>
+    <text x="845" y="178" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">返回的 RelNode 树</text>
+    <rect x="775" y="246" width="140" height="24" rx="4" fill="#1F4E79"/><text x="845" y="262" text-anchor="middle" font-size="9.5" fill="#ffffff">LogicalAggregate</text>
+    <rect x="775" y="282" width="140" height="24" rx="4" fill="#70AD47"/><text x="845" y="298" text-anchor="middle" font-size="9.5" fill="#ffffff">LogicalFilter</text>
+    <rect x="775" y="318" width="140" height="24" rx="4" fill="#FFFFFF" stroke="#1F4E79"/><text x="845" y="334" text-anchor="middle" font-size="9.5" fill="#1F4E79">LogicalTableScan</text>
+    <line x1="845" y1="270" x2="845" y2="281" stroke="#1F4E79" stroke-width="1.3" marker-end="url(#arrow)"/>
+    <line x1="845" y1="306" x2="845" y2="317" stroke="#1F4E79" stroke-width="1.3" marker-end="url(#arrow)"/>
+  </g>
+
+  <!-- transition arrows between snapshots -->
+  <line x1="200" y1="320" x2="234" y2="320" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="380" y1="320" x2="414" y2="320" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="560" y1="320" x2="594" y2="320" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="732" y1="320" x2="774" y2="300" stroke="#548235" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#pop)"/>
+  <text x="752" y="290" font-size="9" fill="#385723">pop</text>
+
+  <!-- Key mechanism box -->
+  <rect x="30" y="384" width="900" height="150" rx="8" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5"/>
+  <text x="44" y="406" font-size="13" font-weight="700" fill="#7F6000">Frame 栈：Builder 模式承载"隐式输入"的关键设计</text>
+  <g font-size="10.5" fill="#1a1a1a">
+    <text x="44" y="428" font-family="'SF Mono',Menlo,monospace" font-size="9.5" fill="#385723">private final Deque&lt;Frame&gt; stack = new ArrayDeque&lt;&gt;();   // RelBuilder 字段</text>
+    <text x="44" y="446" font-family="'SF Mono',Menlo,monospace" font-size="9.5" fill="#385723">public RelBuilder push(RelNode n){ stack.push(new Frame(n)); return this; }</text>
+    <text x="44" y="464" font-family="'SF Mono',Menlo,monospace" font-size="9.5" fill="#385723">public RelNode build(){ return stack.pop().rel; }</text>
+    <text x="44" y="486">· 一元算子（filter/project）pop 一个 Frame 当输入；二元算子（join/union）pop 两个。调用方无需手传 input。</text>
+    <text x="44" y="503">· Frame 不只存 rel，还存 fields（别名 → RelDataTypeField 的 PairList），让 field("e","sal") 这类按名取列成为可能。</text>
+    <text x="44" y="520">· Builder 内含 RexSimplify：filter() 顺手化简谓词，always-false → empty()、always-true → 原样返回（见源码 filter 实现）。</text>
+  </g>
+
+  <!-- Three-question takeaways -->
+  <rect x="30" y="546" width="900" height="138" rx="8" fill="#F2F2F2" stroke="#595959"/>
+  <text x="44" y="568" font-size="13" font-weight="700" fill="#262626">三问视角</text>
+  <g font-size="10.5" fill="#1a1a1a">
+    <text x="44" y="590" font-weight="700" fill="#1F4E79">好在哪</text>
+    <text x="120" y="590">把"构造 RelNode 树"的繁琐（索引对齐、Project 去重、类型推导）收敛进一个对象，调用方写得像 SQL。</text>
+    <text x="44" y="612" font-weight="700" fill="#1F4E79">为什么这么设计</text>
+    <text x="160" y="612">优化器规则需要反复构造算子；用栈隐藏 input 传递，配合可替换 RelFactories.Struct 让规则与节点族解耦。</text>
+    <text x="44" y="634" font-weight="700" fill="#1F4E79">可借鉴</text>
+    <text x="120" y="634">"Builder + 内部栈"适合表达树形/管道结构；fluent 链 + 返回 this 是 DSL 的低成本实现。</text>
+    <text x="44" y="656" font-weight="700" fill="#C65911">坑</text>
+    <text x="120" y="656">RelBuilder 非线程安全（源码 javadoc 明示），有可变栈状态；误用 build() 次数与 push/pop 不匹配会栈空抛错。</text>
+    <text x="44" y="676" font-size="9.5" fill="#595959">RelBuilder 是本系列其他篇构造 RelNode 的公共工具，详见 04-relnode.md / 12-rules.md。</text>
+  </g>
+
+  <text x="480" y="710" text-anchor="middle" font-size="10" fill="#A6A6A6">图 19-3 — 蓝色实线为 fluent 状态推进，绿色虚线为 build() 出栈；栈顶始终是"当前节点"</text>
+</svg>

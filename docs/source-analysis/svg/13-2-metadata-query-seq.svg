@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 880" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="seqArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="seqArrBack" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M10,0 L0,5 L10,10 z" fill="#548235"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="880" fill="#ffffff"/>
+  <text x="500" y="30" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">mq.getRowCount(rel)：门面 → Handler → Janino 编译 / 缓存</text>
+  <text x="500" y="50" text-anchor="middle" font-size="12" fill="#595959">首次失配触发 revise()，懒生成并编译 dispatch 类；命中后走 map 缓存与 NullSentinel 防环</text>
+
+  <!-- Actors -->
+  <g font-size="10.5" font-weight="700" fill="#ffffff">
+    <rect x="20"  y="70" width="120" height="32" rx="6" fill="#595959"/><text x="80"  y="91" text-anchor="middle">RelOptRuleCall</text>
+    <rect x="160" y="70" width="120" height="32" rx="6" fill="#ED7D31"/><text x="220" y="91" text-anchor="middle">RelMetadataQuery</text>
+    <rect x="300" y="70" width="150" height="32" rx="6" fill="#1F4E79"/><text x="375" y="91" text-anchor="middle">rowCountHandler (代理)</text>
+    <rect x="470" y="70" width="170" height="32" rx="6" fill="#1F4E79"/><text x="555" y="91" text-anchor="middle">JaninoRelMetadataProvider</text>
+    <rect x="660" y="70" width="150" height="32" rx="6" fill="#548235"/><text x="735" y="91" text-anchor="middle">HANDLERS LoadingCache</text>
+    <rect x="830" y="70" width="150" height="32" rx="6" fill="#1F4E79"/><text x="905" y="91" text-anchor="middle">GeneratedMetadata_*</text>
+  </g>
+
+  <!-- Lifelines -->
+  <g stroke="#BFBFBF" stroke-dasharray="3,4" stroke-width="1">
+    <line x1="80"  y1="102" x2="80"  y2="840"/>
+    <line x1="220" y1="102" x2="220" y2="840"/>
+    <line x1="375" y1="102" x2="375" y2="840"/>
+    <line x1="555" y1="102" x2="555" y2="840"/>
+    <line x1="735" y1="102" x2="735" y2="840"/>
+    <line x1="905" y1="102" x2="905" y2="840"/>
+  </g>
+
+  <!-- Activation bars -->
+  <rect x="216" y="125" width="8" height="690" fill="#FCE4D6"/>
+  <rect x="371" y="150" width="8" height="120" fill="#DEEBF7"/>
+  <rect x="551" y="200" width="8" height="380" fill="#DEEBF7"/>
+  <rect x="901" y="620" width="8" height="170" fill="#DEEBF7"/>
+
+  <g font-size="10.5" fill="#1F4E79">
+    <!-- 1 -->
+    <line x1="80" y1="130" x2="216" y2="130" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#seqArr)"/>
+    <text x="92" y="124" fill="#262626">1. mq.getRowCount(rel)   // 规则中估算行数</text>
+
+    <!-- 2 first call: handler is the NoHandler placeholder -->
+    <line x1="224" y1="160" x2="371" y2="160" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#seqArr)"/>
+    <text x="232" y="154" fill="#262626">2. rowCountHandler.getRowCount(rel, this)</text>
+
+    <line x1="371" y1="186" x2="224" y2="186" stroke="#9E480E" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#seqArrBack)"/>
+    <text x="232" y="180" fill="#9E480E">3. throw NoHandler(rel.getClass())   // 占位代理抛异常</text>
+
+    <!-- 4 revise -->
+    <line x1="224" y1="216" x2="551" y2="216" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#seqArr)"/>
+    <text x="232" y="210" fill="#262626">4. catch NoHandler &#8594; rowCountHandler = revise(RowCount.Handler.class)</text>
+
+    <!-- 5 cache get -->
+    <line x1="555" y1="246" x2="731" y2="246" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#seqArr)"/>
+    <text x="563" y="240" fill="#262626">5. HANDLERS.get( Key(handlerClass, provider) )</text>
+
+    <!-- loop frame for cache miss -->
+    <rect x="475" y="262" width="500" height="262" fill="none" stroke="#7030A0" stroke-width="1.2" stroke-dasharray="6,3" rx="6"/>
+    <text x="483" y="278" font-size="10" font-weight="700" fill="#7030A0">alt  [缓存未命中：仅首次按 (handlerClass, provider) 触发]</text>
+
+    <!-- 6 provider.handlers -->
+    <line x1="735" y1="300" x2="559" y2="300" stroke="#548235" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#seqArrBack)"/>
+    <text x="563" y="294" fill="#385723">6. CacheLoader &#8594; provider.handlers(RowCount.Handler.class)</text>
+
+    <!-- 7 generate code -->
+    <line x1="555" y1="330" x2="555" y2="330"/>
+    <rect x="430" y="316" width="250" height="30" rx="4" fill="#FFF2CC" stroke="#BF8F00"/>
+    <text x="437" y="335" font-size="9.5" fill="#7F6000">7. generateHandler(): 拼出 dispatch + cache 源码</text>
+
+    <!-- 8 compile -->
+    <rect x="430" y="354" width="250" height="30" rx="4" fill="#FFF2CC" stroke="#BF8F00"/>
+    <text x="437" y="373" font-size="9.5" fill="#7F6000">8. Janino compiler.cook(src) &#8594; newInstance</text>
+
+    <!-- 9 instantiate generated -->
+    <line x1="555" y1="404" x2="901" y2="404" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#seqArr)"/>
+    <text x="563" y="398" fill="#262626">9. new GeneratedMetadata_RowCountHandler(providers…)</text>
+
+    <line x1="901" y1="430" x2="559" y2="430" stroke="#548235" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#seqArrBack)"/>
+    <text x="563" y="424" fill="#385723">10. &#8592; 编译好的 Handler 实例</text>
+
+    <!-- 11 put cache -->
+    <line x1="555" y1="460" x2="731" y2="460" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#seqArr)"/>
+    <text x="563" y="454" fill="#262626">11. HANDLERS 写入；后续命中直接复用（全局缓存）</text>
+    <text x="483" y="500" font-size="9" fill="#7030A0">  注：缓存以 provider 为 key；同一 provider 只编译一次</text>
+
+    <!-- 12 revise return -->
+    <line x1="551" y1="554" x2="224" y2="554" stroke="#548235" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#seqArrBack)"/>
+    <text x="232" y="548" fill="#385723">12. &#8592; 真正的 rowCountHandler（替换占位代理）</text>
+
+    <!-- 13 loop retry -->
+    <line x1="224" y1="584" x2="371" y2="584" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#seqArr)"/>
+    <text x="232" y="578" fill="#262626">13. for(;;) 重试 rowCountHandler.getRowCount(rel, this)</text>
+
+    <!-- generated dispatch entered: cache check -->
+    <rect x="200" y="600" width="780" height="170" fill="none" stroke="#7030A0" stroke-width="1.2" stroke-dasharray="6,3" rx="6"/>
+    <text x="208" y="616" font-size="10" font-weight="700" fill="#7030A0">生成类内部：缓存 + 防环（每次调用都走这段）</text>
+
+    <line x1="224" y1="638" x2="901" y2="638" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#seqArr)"/>
+    <text x="232" y="632" fill="#262626">14. getRowCount(r, mq): Object v = mq.map.get(r, key)</text>
+
+    <rect x="250" y="650" width="640" height="46" rx="4" fill="#F2F2F2" stroke="#595959"/>
+    <text x="260" y="668" font-size="9.5" fill="#262626">15a. v == ACTIVE &#8594; throw CyclicMetadataException   |   15b. v == INSTANCE &#8594; return null</text>
+    <text x="260" y="684" font-size="9.5" fill="#262626">15c. v != null &#8594; return (Double) v   // 命中缓存，零计算</text>
+
+    <line x1="224" y1="716" x2="901" y2="716" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#seqArr)"/>
+    <text x="232" y="710" fill="#262626">16. miss: map.put(r,key,ACTIVE); x = getRowCount_(r,mq); 按 RelNode 类型分派 RelMd*</text>
+
+    <line x1="901" y1="752" x2="224" y2="752" stroke="#548235" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#seqArrBack)"/>
+    <text x="232" y="746" fill="#385723">17. map.put(r,key,mask(x)); return x   // 写回缓存（null 存为 INSTANCE）</text>
+
+    <!-- 18 final return -->
+    <line x1="216" y1="800" x2="80" y2="800" stroke="#548235" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#seqArrBack)"/>
+    <text x="92" y="794" fill="#385723">18. &#8592; estimated row count (Double)</text>
+  </g>
+
+  <text x="500" y="862" text-anchor="middle" font-size="10" fill="#A6A6A6">图 13-2 — 蓝实线为正向调用，绿虚线为返回，紫虚线框为条件/缓存区，橙红虚线为 NoHandler 异常；步骤 5-11 仅首次发生</text>
+</svg>

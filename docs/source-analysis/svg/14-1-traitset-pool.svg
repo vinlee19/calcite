@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 700" font-family="-apple-system, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="inh" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="13" markerHeight="13" orient="auto">
+      <path d="M1,1 L11,6 L1,11 z" fill="#ffffff" stroke="#595959" stroke-width="1"/>
+    </marker>
+    <marker id="ref" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#888888"/>
+    </marker>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7F3F00"/>
+    </marker>
+    <linearGradient id="bgPool" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#BDD7EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="920" height="700" fill="#ffffff"/>
+  <text x="460" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">RelTraitSet 内存池 + RelTrait 多态体系</text>
+  <text x="460" y="52" text-anchor="middle" font-size="12" fill="#595959">每个 cluster 一个 Cache；canonize 把同值 trait/traitSet 收敛成唯一实例，使 == 即可比较</text>
+
+  <!-- ===== Left: the interning pool ===== -->
+  <rect x="30" y="74" width="430" height="296" rx="10" fill="url(#bgPool)" stroke="#1F4E79" stroke-width="2"/>
+  <text x="48" y="98" font-size="13" font-weight="700" fill="#1F4E79">① 内存池：RelTraitSet.Cache  (每 cluster 一份)</text>
+  <text x="48" y="116" font-size="10" fill="#1F4E79">Map&lt;RelTraitSet, RelTraitSet&gt; map  ·  getOrAdd = putIfAbsent</text>
+
+  <!-- pool slots -->
+  <g font-size="10">
+    <rect x="48" y="130" width="180" height="40" rx="5" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="138" y="148" text-anchor="middle" font-weight="700" fill="#1a1a1a">#A1B2  实例 P1</text>
+    <text x="138" y="163" text-anchor="middle" fill="#595959">[NONE]</text>
+
+    <rect x="248" y="130" width="190" height="40" rx="5" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="343" y="148" text-anchor="middle" font-weight="700" fill="#1a1a1a">#C3D4  实例 P2</text>
+    <text x="343" y="163" text-anchor="middle" fill="#595959">[ENUMERABLE, [0 asc], any]</text>
+
+    <rect x="48" y="180" width="180" height="40" rx="5" fill="#ffffff" stroke="#1F4E79"/>
+    <text x="138" y="198" text-anchor="middle" font-weight="700" fill="#1a1a1a">#E5F6  实例 P3</text>
+    <text x="138" y="213" text-anchor="middle" fill="#595959">[ENUMERABLE, [], hash[1]]</text>
+
+    <rect x="248" y="180" width="190" height="40" rx="5" fill="#ED7D31" stroke="#7F3F00"/>
+    <text x="343" y="198" text-anchor="middle" font-weight="700" fill="#ffffff">canonize() 命中</text>
+    <text x="343" y="213" text-anchor="middle" fill="#FFF2CC">复用 P2 → 返回同一引用</text>
+  </g>
+
+  <!-- replace returns new pooled instance -->
+  <text x="48" y="244" font-size="11" font-weight="700" fill="#1F4E79">replace / plus / apply → 克隆数组 → getOrAdd</text>
+  <rect x="48" y="252" width="390" height="100" rx="6" fill="#F2F2F2" stroke="#595959"/>
+  <text x="60" y="272" font-family="'SF Mono',Menlo,monospace" font-size="9.5" fill="#262626">RelTrait[] newTraits = traits.clone();</text>
+  <text x="60" y="288" font-family="'SF Mono',Menlo,monospace" font-size="9.5" fill="#262626">newTraits[i] = canonize(trait);</text>
+  <text x="60" y="304" font-family="'SF Mono',Menlo,monospace" font-size="9.5" fill="#7F3F00">return cache.getOrAdd(</text>
+  <text x="60" y="320" font-family="'SF Mono',Menlo,monospace" font-size="9.5" fill="#7F3F00">    new RelTraitSet(cache, newTraits));</text>
+  <text x="60" y="340" font-size="9.5" fill="#595959">不可变：原 traitSet 不变，返回池内规范实例（命中则复用）</text>
+
+  <!-- ===== Right: RelTrait polymorphism ===== -->
+  <text x="490" y="98" font-size="13" font-weight="700" fill="#385723">② RelTrait 多态：单值 / 多值 / 组合</text>
+
+  <!-- RelTrait interface -->
+  <rect x="600" y="112" width="270" height="62" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="735" y="130" text-anchor="middle" font-size="11" fill="#385723">&#171;interface&#187;</text>
+  <text x="735" y="146" text-anchor="middle" font-size="12" font-weight="700" fill="#385723">RelTrait</text>
+  <text x="735" y="163" text-anchor="middle" font-size="8.5" font-family="'SF Mono',Menlo,monospace" fill="#385723">satisfies() · getTraitDef() · apply()</text>
+
+  <!-- Convention (interface, single value, equivalence) -->
+  <rect x="490" y="210" width="190" height="78" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="585" y="228" text-anchor="middle" font-size="10" fill="#385723">&#171;interface&#187;</text>
+  <text x="585" y="244" text-anchor="middle" font-size="12" font-weight="700" fill="#385723">Convention</text>
+  <text x="585" y="260" text-anchor="middle" font-size="8.5" font-family="'SF Mono',Menlo,monospace" fill="#385723">NONE · getInterface()</text>
+  <text x="585" y="274" text-anchor="middle" font-size="8.5" font-family="'SF Mono',Menlo,monospace" fill="#385723">enforce() · 单值/等价</text>
+
+  <!-- RelMultipleTrait (interface, multi value) -->
+  <rect x="700" y="210" width="190" height="78" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.5"/>
+  <text x="795" y="228" text-anchor="middle" font-size="10" fill="#385723">&#171;interface&#187;</text>
+  <text x="795" y="244" text-anchor="middle" font-size="11.5" font-weight="700" fill="#385723">RelMultipleTrait</text>
+  <text x="795" y="260" text-anchor="middle" font-size="8.5" font-family="'SF Mono',Menlo,monospace" fill="#385723">Comparable · isTop()</text>
+  <text x="795" y="274" text-anchor="middle" font-size="8.5" font-family="'SF Mono',Menlo,monospace" fill="#385723">同槽可多值</text>
+
+  <!-- RelCollation / RelDistribution -->
+  <rect x="640" y="324" width="120" height="58" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.2"/>
+  <text x="700" y="342" text-anchor="middle" font-size="10" fill="#385723">&#171;interface&#187;</text>
+  <text x="700" y="358" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">RelCollation</text>
+  <text x="700" y="373" text-anchor="middle" font-size="8" fill="#385723">[x asc, y] 前缀偏序</text>
+
+  <rect x="772" y="324" width="120" height="58" rx="8" fill="#E2EFDA" stroke="#548235" stroke-width="1.2"/>
+  <text x="832" y="342" text-anchor="middle" font-size="10" fill="#385723">&#171;interface&#187;</text>
+  <text x="832" y="358" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">RelDistribution</text>
+  <text x="832" y="373" text-anchor="middle" font-size="8" fill="#385723">HASH/RANGE/...</text>
+
+  <!-- RelCompositeTrait (concrete, holds list) -->
+  <rect x="490" y="324" width="130" height="58" rx="8" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="555" y="343" text-anchor="middle" font-size="11" font-weight="700" fill="#1a1a1a">RelCompositeTrait</text>
+  <text x="555" y="358" text-anchor="middle" font-size="8" fill="#595959">T[] traits (同 def)</text>
+  <text x="555" y="371" text-anchor="middle" font-size="8" fill="#595959">satisfies = 任一满足</text>
+
+  <!-- inheritance arrows -->
+  <line x1="585" y1="210" x2="690" y2="174" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="795" y1="210" x2="760" y2="174" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="700" y1="324" x2="780" y2="289" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="832" y1="324" x2="808" y2="289" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <line x1="555" y1="324" x2="600" y2="174" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <!-- composite holds multiple traits -->
+  <line x1="620" y1="350" x2="640" y2="350" stroke="#888888" stroke-width="1.1" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="497" y="396" font-size="8.5" fill="#888888">组合 trait 持有多个 RelMultipleTrait（同槽并存）</text>
+
+  <!-- traitSet holds traits[] -->
+  <line x1="248" y1="200" x2="460" y2="143" stroke="#888888" stroke-width="1.1" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="295" y="178" font-size="8.5" fill="#888888">traits[] 元素均为 canonize 后的 RelTrait</text>
+
+  <!-- ===== Bottom: RelTraitDef weak interner ===== -->
+  <rect x="30" y="408" width="860" height="170" rx="10" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.5"/>
+  <text x="48" y="432" font-size="13" font-weight="700" fill="#7F6000">③ RelTraitDef：每类 trait 的 WeakInterner（第二级内存池）</text>
+
+  <rect x="48" y="446" width="250" height="116" rx="6" fill="#ffffff" stroke="#BF8F00"/>
+  <text x="60" y="466" font-size="11" font-weight="700" fill="#7F6000">RelTraitDef&lt;T&gt;</text>
+  <text x="60" y="484" font-family="'SF Mono',Menlo,monospace" font-size="9" fill="#262626">Interner&lt;T&gt; interner =</text>
+  <text x="60" y="498" font-family="'SF Mono',Menlo,monospace" font-size="9" fill="#262626">  Interners.newWeakInterner();</text>
+  <text x="60" y="516" font-family="'SF Mono',Menlo,monospace" font-size="9" fill="#7F3F00">canonize(t){ return interner</text>
+  <text x="60" y="530" font-family="'SF Mono',Menlo,monospace" font-size="9" fill="#7F3F00">              .intern(t); }</text>
+  <text x="60" y="550" font-size="9" fill="#595959">弱引用 → trait 不再被引用即可 GC</text>
+
+  <g font-size="9.5">
+    <rect x="320" y="446" width="170" height="52" rx="5" fill="#ffffff" stroke="#BF8F00"/>
+    <text x="405" y="466" text-anchor="middle" font-weight="700" fill="#1a1a1a">ConventionTraitDef</text>
+    <text x="405" y="482" text-anchor="middle" fill="#595959">getDefault()=NONE · 持转换图</text>
+
+    <rect x="510" y="446" width="170" height="52" rx="5" fill="#ffffff" stroke="#BF8F00"/>
+    <text x="595" y="466" text-anchor="middle" font-weight="700" fill="#1a1a1a">RelCollationTraitDef</text>
+    <text x="595" y="482" text-anchor="middle" fill="#595959">getDefault()=EMPTY [] </text>
+
+    <rect x="700" y="446" width="172" height="52" rx="5" fill="#ffffff" stroke="#BF8F00"/>
+    <text x="786" y="466" text-anchor="middle" font-weight="700" fill="#1a1a1a">RelDistributionTraitDef</text>
+    <text x="786" y="482" text-anchor="middle" fill="#595959">getDefault()=ANY</text>
+  </g>
+
+  <text x="320" y="522" font-size="10" fill="#7F6000" font-weight="700">两级 interning 的工程意义：</text>
+  <text x="320" y="540" font-size="9.5" fill="#595959">· RelTraitDef.interner 收敛单个 trait（弱键，可 GC）</text>
+  <text x="320" y="556" font-size="9.5" fill="#595959">· RelTraitSet.Cache 收敛 trait 的有序组合（强键，随 cluster 生命周期）</text>
+
+  <!-- legend -->
+  <rect x="30" y="596" width="860" height="78" rx="8" fill="#F8F8F8" stroke="#BFBFBF"/>
+  <text x="44" y="616" font-size="11" font-weight="700" fill="#595959">图例</text>
+  <rect x="44" y="626" width="22" height="14" fill="#E2EFDA" stroke="#548235"/>
+  <text x="72" y="637" font-size="10" fill="#385723">interface</text>
+  <rect x="150" y="626" width="22" height="14" fill="#FFF2CC" stroke="#BF8F00"/>
+  <text x="178" y="637" font-size="10" fill="#7F6000">abstract / 容器</text>
+  <rect x="290" y="626" width="22" height="14" fill="#FFFFFF" stroke="#1F4E79"/>
+  <text x="318" y="637" font-size="10" fill="#1a1a1a">具体类</text>
+  <rect x="390" y="626" width="22" height="14" fill="#ED7D31" stroke="#7F3F00"/>
+  <text x="418" y="637" font-size="10" fill="#7F3F00">热点路径</text>
+  <line x1="500" y1="633" x2="540" y2="633" stroke="#595959" stroke-width="1.2" marker-end="url(#inh)"/>
+  <text x="548" y="637" font-size="10" fill="#595959">继承/实现(空心)</text>
+  <line x1="680" y1="633" x2="720" y2="633" stroke="#888888" stroke-width="1.1" stroke-dasharray="4,3" marker-end="url(#ref)"/>
+  <text x="728" y="637" font-size="10" fill="#888888">持有/引用(虚线)</text>
+  <text x="44" y="662" font-size="9.5" fill="#595959">canonize 不变式：t1.equals(t2)  ⇔  t1 == t2，因此整个优化器内 trait 与 traitSet 比较退化为指针比较</text>
+
+  <text x="460" y="692" text-anchor="middle" font-size="10" fill="#A6A6A6">图 14-1 — RelTraitSet（组合级池）与 RelTraitDef.interner（单值级池）两级 Flyweight，配合 RelTrait 多态承载物理属性</text>
+</svg>

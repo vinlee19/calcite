@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 660" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="arrowHot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7F3F00"/>
+    </marker>
+  </defs>
+
+  <rect width="960" height="660" fill="#ffffff"/>
+  <text x="480" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">联邦查询的 Convention 转换：从 NONE 到各 adapter 再汇聚到 ENUMERABLE</text>
+  <text x="480" y="54" text-anchor="middle" font-size="12" fill="#595959">Table 通过 toRel 进入算子网络；ConverterRule 在 Convention 之间架桥；ENUMERABLE 是联邦的"通用底座"</text>
+
+  <!-- Stage 1: SqlToRel produces logical (Convention.NONE) -->
+  <rect x="40" y="86" width="200" height="86" rx="8" fill="#DEEBF7" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="140" y="108" text-anchor="middle" font-size="12" font-weight="700" fill="#1F4E79">① 逻辑算子树</text>
+  <text x="140" y="126" text-anchor="middle" font-size="10.5" fill="#1F4E79">Convention.NONE</text>
+  <text x="140" y="144" text-anchor="middle" font-size="9.5" fill="#595959">LogicalJoin / Filter /</text>
+  <text x="140" y="158" text-anchor="middle" font-size="9.5" fill="#595959">Project / TableScan</text>
+
+  <!-- toRel annotation -->
+  <text x="140" y="194" text-anchor="middle" font-size="9.5" fill="#888">RelOptTableImpl.toRel():</text>
+  <text x="140" y="208" text-anchor="middle" font-size="9" fill="#888" font-family="'SF Mono',Menlo,monospace">TranslatableTable.toRel()</text>
+  <text x="140" y="221" text-anchor="middle" font-size="9" fill="#888">否则 → LogicalTableScan</text>
+
+  <!-- arrow to optimizer -->
+  <line x1="240" y1="129" x2="300" y2="129" stroke="#1F4E79" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- Stage 2: planner with ConverterRules -->
+  <rect x="300" y="80" width="360" height="300" rx="8" fill="#F2F2F2" stroke="#595959" stroke-width="1.5"/>
+  <text x="480" y="102" text-anchor="middle" font-size="12" font-weight="700" fill="#262626">② VolcanoPlanner：ConverterRule 搭桥（Convention 网络）</text>
+
+  <!-- NONE hub -->
+  <circle cx="480" cy="170" r="34" fill="#DEEBF7" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="480" y="167" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">NONE</text>
+  <text x="480" y="182" text-anchor="middle" font-size="8.5" fill="#1F4E79">虚拟约定</text>
+
+  <!-- adapter conventions around -->
+  <rect x="320" y="250" width="92" height="48" rx="6" fill="#5B9BD5" stroke="#1F4E79"/>
+  <text x="366" y="270" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">JDBC</text>
+  <text x="366" y="285" text-anchor="middle" font-size="8.5" fill="#DEEBF7">JdbcConvention</text>
+
+  <rect x="434" y="250" width="92" height="48" rx="6" fill="#70AD47" stroke="#385723"/>
+  <text x="480" y="270" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">MONGO</text>
+  <text x="480" y="285" text-anchor="middle" font-size="8.5" fill="#E2EFDA">MongoConvention</text>
+
+  <rect x="548" y="250" width="92" height="48" rx="6" fill="#A5A5A5" stroke="#595959"/>
+  <text x="594" y="270" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">ES / Druid</text>
+  <text x="594" y="285" text-anchor="middle" font-size="8.5" fill="#F2F2F2">…Convention</text>
+
+  <!-- NONE -> each adapter via ConverterRule -->
+  <line x1="455" y1="192" x2="378" y2="248" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="480" y1="204" x2="480" y2="248" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="505" y1="192" x2="582" y2="248" stroke="#1F4E79" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="338" y="228" font-size="8.5" fill="#1F4E79">ConverterRule</text>
+
+  <!-- each adapter -> ENUMERABLE -->
+  <rect x="360" y="324" width="240" height="42" rx="6" fill="#ED7D31" stroke="#7F3F00" stroke-width="1.5"/>
+  <text x="480" y="342" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">EnumerableConvention</text>
+  <text x="480" y="357" text-anchor="middle" font-size="8.5" fill="#FFF2CC">联邦通用底座（in-process via linq4j+Janino）</text>
+
+  <line x1="366" y1="298" x2="430" y2="322" stroke="#7F3F00" stroke-width="1.4" marker-end="url(#arrowHot)"/>
+  <line x1="480" y1="298" x2="480" y2="322" stroke="#7F3F00" stroke-width="1.4" marker-end="url(#arrowHot)"/>
+  <line x1="594" y1="298" x2="530" y2="322" stroke="#7F3F00" stroke-width="1.4" marker-end="url(#arrowHot)"/>
+
+  <!-- arrow to physical plan -->
+  <line x1="660" y1="230" x2="720" y2="230" stroke="#1F4E79" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- Stage 3: chosen physical plan -->
+  <rect x="720" y="120" width="200" height="220" rx="8" fill="#ffffff" stroke="#7F3F00" stroke-width="1.5"/>
+  <text x="820" y="142" text-anchor="middle" font-size="12" font-weight="700" fill="#7F3F00">③ 最优物理计划</text>
+  <text x="820" y="160" text-anchor="middle" font-size="9.5" fill="#595959">（按代价择优后）</text>
+
+  <rect x="740" y="174" width="160" height="30" rx="5" fill="#ED7D31"/>
+  <text x="820" y="193" text-anchor="middle" font-size="9.5" font-weight="700" fill="#ffffff">EnumerableHashJoin</text>
+
+  <rect x="740" y="214" width="76" height="50" rx="5" fill="#5B9BD5"/>
+  <text x="778" y="233" text-anchor="middle" font-size="9" font-weight="700" fill="#ffffff">JdbcToEnum</text>
+  <text x="778" y="246" text-anchor="middle" font-size="8" fill="#DEEBF7">Converter</text>
+  <text x="778" y="258" text-anchor="middle" font-size="8" fill="#DEEBF7">(MySQL 下推)</text>
+
+  <rect x="824" y="214" width="76" height="50" rx="5" fill="#70AD47"/>
+  <text x="862" y="233" text-anchor="middle" font-size="9" font-weight="700" fill="#ffffff">MongoToEnum</text>
+  <text x="862" y="246" text-anchor="middle" font-size="8" fill="#E2EFDA">Converter</text>
+  <text x="862" y="258" text-anchor="middle" font-size="8" fill="#E2EFDA">(Mongo 下推)</text>
+
+  <line x1="778" y1="204" x2="790" y2="213" stroke="#7F3F00" stroke-width="1.2" marker-end="url(#arrowHot)"/>
+  <line x1="862" y1="204" x2="850" y2="213" stroke="#7F3F00" stroke-width="1.2" marker-end="url(#arrowHot)"/>
+
+  <text x="820" y="288" text-anchor="middle" font-size="9" fill="#595959">JOIN 在引擎内做，</text>
+  <text x="820" y="302" text-anchor="middle" font-size="9" fill="#595959">两侧子树各下推到</text>
+  <text x="820" y="316" text-anchor="middle" font-size="9" fill="#595959">MySQL / MongoDB 执行</text>
+
+  <!-- key insight box -->
+  <rect x="40" y="412" width="880" height="180" rx="8" fill="#FFF2CC" stroke="#BF8F00" stroke-width="1.2"/>
+  <text x="60" y="436" font-size="13" font-weight="700" fill="#7F6000">设计意图（数据工程视角）</text>
+  <text x="60" y="460" font-size="11" fill="#7F6000">• Convention.NONE 是星形枢纽：每个 adapter 只需注册 NONE → 自身 Convention 的 ConverterRule，N 个数据源 O(N) 条边而非 O(N²)。</text>
+  <text x="60" y="482" font-size="11" fill="#7F6000">• EnumerableConvention 是"公共货币"：任何 adapter 都能转成它，于是跨源 JOIN/聚合可在引擎内进行——这正是联邦查询的实现支点。</text>
+  <text x="60" y="504" font-size="11" fill="#7F6000">• TranslatableTable.toRel() 是 Table 接入这张网络的唯一入口；标记接口（Scannable/Filterable…）则走另一条"无需自定义 RelNode"的捷径。</text>
+  <text x="60" y="526" font-size="11" fill="#7F6000">• 是否把 Filter/Project 下推、还是让 Enumerable 兜底，由代价模型在 Memo 中决定，而非接口强制——能力是"声明"，使用是"协商"。</text>
+  <text x="60" y="556" font-size="10.5" fill="#A6740A">坑：自定义 Convention 若未实现 hashCode/equals 或忘记注册 enforce 转换，TraitSet 内存池会失效、规划可能找不到可行计划（详见第 14 篇）。</text>
+  <text x="60" y="576" font-size="10.5" fill="#A6740A">坑：AbstractConverter 以无穷成本占位，过度依赖规则顺序可能掩盖真实转换代价（详见第 11 / 14 篇）。</text>
+
+  <text x="480" y="628" text-anchor="middle" font-size="10" fill="#A6A6A6">图 17-3 — 蓝色实线为 NONE→adapter 转换边，橙色为 →Enumerable 汇聚边；Convention 网络细节见第 14 篇，adapter 下推矩阵见第 18 篇</text>
+</svg>

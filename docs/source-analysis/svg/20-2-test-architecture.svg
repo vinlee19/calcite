@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 680" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="arrowBack" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M10,0 L0,5 L10,10 z" fill="#548235"/>
+    </marker>
+    <marker id="ref" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#888"/>
+    </marker>
+    <linearGradient id="bgMod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DEEBF7"/>
+      <stop offset="100%" stop-color="#BDD7EE"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="960" height="680" fill="#ffffff"/>
+  <text x="480" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">testkit 测试体系：Fixture / Quidem / DiffRepository / Matchers 数据流</text>
+  <text x="480" y="56" text-anchor="middle" font-size="12" fill="#595959">不可变 Fixture 描述输入 → 跑出 actual → 与 golden file 对比 → 失败写 *_actual.xml 供 diff</text>
+
+  <!-- Layer 1: Fixtures factory -->
+  <rect x="40" y="78" width="880" height="96" rx="10" fill="url(#bgMod)" stroke="#1F4E79" stroke-width="2"/>
+  <text x="60" y="100" font-size="13" font-weight="700" fill="#1F4E79">① Fixtures 工厂（testkit/Fixtures.java）— 每种测试一个入口，返回 final 字段 + with* 不可变对象</text>
+  <g font-size="10.5">
+    <rect x="60"  y="114" width="128" height="46" rx="6" fill="#FFFFFF" stroke="#1F4E79"/><text x="124" y="135" text-anchor="middle" font-weight="700" fill="#1F4E79">forParser()</text><text x="124" y="151" text-anchor="middle" fill="#595959">SqlParserFixture</text>
+    <rect x="198" y="114" width="128" height="46" rx="6" fill="#FFFFFF" stroke="#1F4E79"/><text x="262" y="135" text-anchor="middle" font-weight="700" fill="#1F4E79">forValidator()</text><text x="262" y="151" text-anchor="middle" fill="#595959">SqlValidatorFixture</text>
+    <rect x="336" y="114" width="128" height="46" rx="6" fill="#FFFFFF" stroke="#1F4E79"/><text x="400" y="135" text-anchor="middle" font-weight="700" fill="#1F4E79">forSqlToRel()</text><text x="400" y="151" text-anchor="middle" fill="#595959">SqlToRelFixture</text>
+    <rect x="474" y="114" width="128" height="46" rx="6" fill="#ED7D31" stroke="#7F3F00"/><text x="538" y="135" text-anchor="middle" font-weight="700" fill="#FFFFFF">forRules()</text><text x="538" y="151" text-anchor="middle" fill="#FFF2CC">RelOptFixture</text>
+    <rect x="612" y="114" width="138" height="46" rx="6" fill="#FFFFFF" stroke="#1F4E79"/><text x="681" y="135" text-anchor="middle" font-weight="700" fill="#1F4E79">forOperators()</text><text x="681" y="151" text-anchor="middle" fill="#595959">SqlOperatorFixture</text>
+    <rect x="760" y="114" width="140" height="46" rx="6" fill="#FFFFFF" stroke="#1F4E79"/><text x="830" y="135" text-anchor="middle" font-weight="700" fill="#1F4E79">forMetadata()</text><text x="830" y="151" text-anchor="middle" fill="#595959">RelMetadataFixture</text>
+  </g>
+
+  <!-- Layer 2: two pathways -->
+  <text x="40" y="206" font-size="13" font-weight="700" fill="#1F4E79">② 两条断言路径</text>
+
+  <!-- Path A: programmatic via fixture+matchers -->
+  <rect x="40" y="220" width="430" height="220" rx="10" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="60" y="242" font-size="12" font-weight="700" fill="#1F4E79">A · 程序化断言（Java 测试 + Matchers）</text>
+
+  <rect x="60" y="256" width="160" height="50" rx="6" fill="#E2EFDA" stroke="#548235"/>
+  <text x="140" y="277" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">Fixture.sql(...).with*()</text>
+  <text x="140" y="294" text-anchor="middle" font-size="9.5" fill="#595959">不可变：每个 with 返回新副本</text>
+
+  <rect x="290" y="256" width="160" height="50" rx="6" fill="#FFFFFF" stroke="#1F4E79"/>
+  <text x="370" y="277" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">run / check()</text>
+  <text x="370" y="294" text-anchor="middle" font-size="9.5" fill="#595959">驱动真实 5 阶段管线</text>
+
+  <rect x="60" y="334" width="390" height="42" rx="6" fill="#FFF2CC" stroke="#BF8F00"/>
+  <text x="255" y="352" text-anchor="middle" font-size="11" font-weight="700" fill="#7F6000">Matchers（org.hamcrest 自定义匹配器）</text>
+  <text x="255" y="368" text-anchor="middle" font-size="9.5" fill="#595959">relIsValid() · hasTree() · returnsUnordered() · isLinux()</text>
+
+  <rect x="60" y="388" width="390" height="40" rx="6" fill="#F2F2F2" stroke="#595959"/>
+  <text x="255" y="406" text-anchor="middle" font-size="10" fill="#595959">THREAD_ACTUAL（ThreadLocal）：把 ResultSet 物化结果在匹配器间传递</text>
+  <text x="255" y="421" text-anchor="middle" font-size="10" fill="#888">坑：匹配器有副作用，必须 remove() 防泄漏</text>
+
+  <line x1="220" y1="281" x2="290" y2="281" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="370" y1="306" x2="300" y2="333" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Path B: golden file via Quidem + DiffRepository -->
+  <rect x="490" y="220" width="430" height="220" rx="10" fill="#FFFFFF" stroke="#1F4E79" stroke-width="1.5"/>
+  <text x="510" y="242" font-size="12" font-weight="700" fill="#1F4E79">B · golden-file 断言（数据驱动）</text>
+
+  <rect x="510" y="256" width="180" height="50" rx="6" fill="#E2EFDA" stroke="#548235"/>
+  <text x="600" y="277" text-anchor="middle" font-size="11" font-weight="700" fill="#385723">QuidemTest（.iq 脚本）</text>
+  <text x="600" y="294" text-anchor="middle" font-size="9.5" fill="#595959">@ParameterizedTest + @MethodSource</text>
+
+  <rect x="720" y="256" width="180" height="50" rx="6" fill="#FFFFFF" stroke="#1F4E79"/>
+  <text x="810" y="277" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">DiffRepository</text>
+  <text x="810" y="294" text-anchor="middle" font-size="9.5" fill="#595959">XML golden file (MyTest.xml)</text>
+
+  <rect x="510" y="334" width="390" height="42" rx="6" fill="#FFF2CC" stroke="#BF8F00"/>
+  <text x="705" y="352" text-anchor="middle" font-size="11" font-weight="700" fill="#7F6000">assertEquals(tag, "${expected}", actual)</text>
+  <text x="705" y="368" text-anchor="middle" font-size="9.5" fill="#595959">行尾归一化 \n 后逐字符比对</text>
+
+  <rect x="510" y="388" width="390" height="40" rx="6" fill="#FBE5D6" stroke="#C65911"/>
+  <text x="705" y="406" text-anchor="middle" font-size="10" fill="#833C0C">失败 → amend() 写 build/diffrepo/.../MyTest_actual.xml</text>
+  <text x="705" y="421" text-anchor="middle" font-size="10" fill="#7F3F00">人工核对后 cp 覆盖 / -Dquidem.write=true 自动更新</text>
+
+  <line x1="690" y1="281" x2="720" y2="281" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="810" y1="306" x2="740" y2="333" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="705" y1="376" x2="705" y2="386" stroke="#548235" stroke-width="1.4" stroke-dasharray="5,3" marker-end="url(#arrowBack)"/>
+
+  <!-- Layer 3: Hook injection -->
+  <rect x="40" y="458" width="880" height="92" rx="10" fill="#F2F2F2" stroke="#595959" stroke-width="1.5"/>
+  <text x="60" y="480" font-size="13" font-weight="700" fill="#262626">③ Hook 观察点（runtime/Hook.java）— Fixture 用 before/after BiFunction 把 Hook 注入管线</text>
+  <g font-size="10">
+    <rect x="60"  y="494" width="150" height="44" rx="6" fill="#FFFFFF" stroke="#595959"/><text x="135" y="513" text-anchor="middle" font-weight="700" fill="#262626">Hook.PARSE_TREE</text><text x="135" y="529" text-anchor="middle" fill="#595959">观察 SqlNode</text>
+    <rect x="220" y="494" width="150" height="44" rx="6" fill="#FFFFFF" stroke="#595959"/><text x="295" y="513" text-anchor="middle" font-weight="700" fill="#262626">Hook.CONVERTED</text><text x="295" y="529" text-anchor="middle" fill="#595959">观察 RelNode</text>
+    <rect x="380" y="494" width="150" height="44" rx="6" fill="#FFFFFF" stroke="#595959"/><text x="455" y="513" text-anchor="middle" font-weight="700" fill="#262626">Hook.PROGRAM</text><text x="455" y="529" text-anchor="middle" fill="#595959">替换优化 Program</text>
+    <rect x="540" y="494" width="150" height="44" rx="6" fill="#FFFFFF" stroke="#595959"/><text x="615" y="513" text-anchor="middle" font-weight="700" fill="#262626">Hook.JAVA_PLAN</text><text x="615" y="529" text-anchor="middle" fill="#595959">截获 Janino 源码</text>
+    <rect x="700" y="494" width="200" height="44" rx="6" fill="#E2EFDA" stroke="#548235"/><text x="800" y="513" text-anchor="middle" font-weight="700" fill="#385723">addThread + TryThreadLocal</text><text x="800" y="529" text-anchor="middle" fill="#595959">线程隔离，自动恢复，并行安全</text>
+  </g>
+
+  <!-- legend -->
+  <g>
+    <rect x="40" y="568" width="880" height="74" rx="8" fill="#FFFFFF" stroke="#BFBFBF"/>
+    <text x="56" y="588" font-size="11" font-weight="700" fill="#595959">图例：</text>
+    <line x1="110" y1="584" x2="150" y2="584" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="158" y="588" font-size="10" fill="#595959">正向数据流</text>
+    <line x1="240" y1="584" x2="280" y2="584" stroke="#548235" stroke-width="1.4" stroke-dasharray="5,3" marker-end="url(#arrowBack)"/>
+    <text x="288" y="588" font-size="10" fill="#385723">失败回写</text>
+    <rect x="360" y="578" width="16" height="12" fill="#ED7D31"/><text x="382" y="588" font-size="10" fill="#595959">优化器相关 Fixture</text>
+    <rect x="520" y="578" width="16" height="12" fill="#E2EFDA" stroke="#548235"/><text x="542" y="588" font-size="10" fill="#595959">不可变/线程安全设施</text>
+    <text x="56" y="612" font-size="10" fill="#595959">设计内核：Fixture 不可变 → 测试间零共享态、可安全并行；golden file 把"预期"沉到 XML，断言与数据解耦。</text>
+    <text x="56" y="630" font-size="10" fill="#888">坑：golden file 易被 -Dquidem.write 误覆盖；必须人工 review diff 后再提交，否则会"测试通过但语义错误"。</text>
+  </g>
+
+  <text x="480" y="664" text-anchor="middle" font-size="10" fill="#A6A6A6">图 20-2 — 左路程序化 + Matchers，右路数据驱动 + golden file，底层共用 Hook 观察点</text>
+</svg>

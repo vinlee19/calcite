@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="aArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="aArrO" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#C65911"/>
+    </marker>
+  </defs>
+
+  <rect width="960" height="600" fill="#ffffff"/>
+  <text x="480" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">Adapter 插件机制 — 四类扩展点</text>
+  <text x="480" y="52" text-anchor="middle" font-size="12" fill="#595959">写一个 Adapter = 提供 Schema/Table + 自定义 Convention + 自定义物理算子 + ConverterRule</text>
+
+  <!-- Center: Calcite Core -->
+  <circle cx="480" cy="310" r="92" fill="#1F4E79" stroke="#0F2C44" stroke-width="2"/>
+  <text x="480" y="295" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">Calcite Core</text>
+  <text x="480" y="316" text-anchor="middle" font-size="11" fill="#DEEBF7">Validator</text>
+  <text x="480" y="332" text-anchor="middle" font-size="11" fill="#DEEBF7">VolcanoPlanner</text>
+  <text x="480" y="348" text-anchor="middle" font-size="11" fill="#DEEBF7">EnumerableImpl</text>
+
+  <!-- Top-Left: Schema Layer -->
+  <rect x="40" y="100" width="280" height="160" rx="10" fill="#E2EFDA" stroke="#548235" stroke-width="2"/>
+  <text x="180" y="125" text-anchor="middle" font-size="14" font-weight="700" fill="#385723">① Schema 层 (元数据)</text>
+  <rect x="60" y="140" width="240" height="28" rx="4" fill="#ffffff" stroke="#548235"/>
+  <text x="180" y="158" text-anchor="middle" font-size="11" fill="#595959">XxxSchemaFactory implements SchemaFactory</text>
+  <rect x="60" y="174" width="240" height="28" rx="4" fill="#ffffff" stroke="#548235"/>
+  <text x="180" y="192" text-anchor="middle" font-size="11" fill="#595959">XxxSchema extends AbstractSchema</text>
+  <rect x="60" y="208" width="240" height="42" rx="4" fill="#ffffff" stroke="#548235"/>
+  <text x="180" y="225" text-anchor="middle" font-size="11" fill="#595959">XxxTable implements ScannableTable</text>
+  <text x="180" y="241" text-anchor="middle" font-size="11" fill="#595959">/ FilterableTable / TranslatableTable</text>
+  <text x="180" y="266" text-anchor="middle" font-size="10" font-style="italic" fill="#385723">model.json 中通过 'factory' 字段挂入</text>
+
+  <!-- Top-Right: Convention -->
+  <rect x="640" y="100" width="280" height="160" rx="10" fill="#FBE5D6" stroke="#C65911" stroke-width="2"/>
+  <text x="780" y="125" text-anchor="middle" font-size="14" font-weight="700" fill="#833C0C">② Convention (calling)</text>
+  <rect x="660" y="140" width="240" height="28" rx="4" fill="#ffffff" stroke="#C65911"/>
+  <text x="780" y="158" text-anchor="middle" font-size="11" fill="#595959">class XxxConvention extends Convention.Impl</text>
+  <rect x="660" y="174" width="240" height="28" rx="4" fill="#ffffff" stroke="#C65911"/>
+  <text x="780" y="192" text-anchor="middle" font-size="11" fill="#595959">INSTANCE = new XxxConvention("XXX")</text>
+  <rect x="660" y="208" width="240" height="42" rx="4" fill="#ffffff" stroke="#C65911"/>
+  <text x="780" y="225" text-anchor="middle" font-size="11" fill="#595959">interface XxxRel extends RelNode</text>
+  <text x="780" y="241" text-anchor="middle" font-size="11" fill="#595959">{ Implementor implement(...) }</text>
+  <text x="780" y="266" text-anchor="middle" font-size="10" font-style="italic" fill="#833C0C">声明物理算子的执行协议</text>
+
+  <!-- Bottom-Left: Physical RelNode -->
+  <rect x="40" y="360" width="280" height="160" rx="10" fill="#DEEBF7" stroke="#1F4E79" stroke-width="2"/>
+  <text x="180" y="385" text-anchor="middle" font-size="14" font-weight="700" fill="#1F4E79">③ 物理算子 (PhysicalRel)</text>
+  <rect x="60" y="400" width="240" height="28" rx="4" fill="#ffffff" stroke="#1F4E79"/>
+  <text x="180" y="418" text-anchor="middle" font-size="11" fill="#595959">XxxTableScan extends TableScan</text>
+  <rect x="60" y="434" width="240" height="28" rx="4" fill="#ffffff" stroke="#1F4E79"/>
+  <text x="180" y="452" text-anchor="middle" font-size="11" fill="#595959">XxxFilter / XxxProject / XxxSort ...</text>
+  <rect x="60" y="468" width="240" height="42" rx="4" fill="#ffffff" stroke="#1F4E79"/>
+  <text x="180" y="485" text-anchor="middle" font-size="11" fill="#595959">implement(implementor)</text>
+  <text x="180" y="501" text-anchor="middle" font-size="11" fill="#595959">→ 生成下推查询字符串 / DSL</text>
+
+  <!-- Bottom-Right: Rules -->
+  <rect x="640" y="360" width="280" height="160" rx="10" fill="#FFF2CC" stroke="#BF8F00" stroke-width="2"/>
+  <text x="780" y="385" text-anchor="middle" font-size="14" font-weight="700" fill="#7F6000">④ 规则集 (Rules)</text>
+  <rect x="660" y="400" width="240" height="28" rx="4" fill="#ffffff" stroke="#BF8F00"/>
+  <text x="780" y="418" text-anchor="middle" font-size="11" fill="#595959">XxxToEnumerableConverterRule</text>
+  <rect x="660" y="434" width="240" height="28" rx="4" fill="#ffffff" stroke="#BF8F00"/>
+  <text x="780" y="452" text-anchor="middle" font-size="11" fill="#595959">XxxFilterRule extends ConverterRule</text>
+  <rect x="660" y="468" width="240" height="42" rx="4" fill="#ffffff" stroke="#BF8F00"/>
+  <text x="780" y="485" text-anchor="middle" font-size="11" fill="#595959">XxxProjectTableScanRule</text>
+  <text x="780" y="501" text-anchor="middle" font-size="11" fill="#595959">把 LogicalXxx → XxxConvention</text>
+
+  <!-- Connecting arrows: each sector to core -->
+  <line x1="320" y1="180" x2="395" y2="270" stroke="#548235" stroke-width="1.5" marker-end="url(#aArr)"/>
+  <text x="338" y="218" font-size="10" font-weight="700" fill="#385723">注册</text>
+  <text x="338" y="232" font-size="10" fill="#385723">schema.add(name, table)</text>
+
+  <line x1="640" y1="180" x2="565" y2="270" stroke="#C65911" stroke-width="1.5" marker-end="url(#aArrO)"/>
+  <text x="592" y="218" font-size="10" font-weight="700" fill="#833C0C">声明</text>
+  <text x="592" y="232" font-size="10" fill="#833C0C">trait</text>
+
+  <line x1="320" y1="440" x2="395" y2="350" stroke="#1F4E79" stroke-width="1.5" marker-end="url(#aArr)"/>
+  <text x="338" y="398" font-size="10" font-weight="700" fill="#1F4E79">实例化</text>
+  <text x="338" y="412" font-size="10" fill="#1F4E79">implementor.visitChild</text>
+
+  <line x1="640" y1="440" x2="565" y2="350" stroke="#BF8F00" stroke-width="1.5" marker-end="url(#aArr)"/>
+  <text x="585" y="398" font-size="10" font-weight="700" fill="#7F6000">addRule()</text>
+  <text x="585" y="412" font-size="10" fill="#7F6000">注册到 planner</text>
+
+  <!-- Bottom band: example -->
+  <rect x="40" y="544" width="880" height="40" rx="6" fill="#F2F2F2" stroke="#BFBFBF"/>
+  <text x="56" y="562" font-size="11" font-weight="700" fill="#262626">案例：example/csv/</text>
+  <text x="56" y="578" font-size="11" fill="#595959">CsvSchemaFactory · CsvSchema · CsvTable · CsvTableScan · CsvProjectTableScanRule  —  对照查看可掌握全部四块</text>
+
+  <!-- top decorative arrows from core to environment external systems (hint) -->
+  <text x="480" y="430" text-anchor="middle" font-size="11" fill="#DEEBF7">↑ 解析 ↑</text>
+  <text x="480" y="394" text-anchor="middle" font-size="11" fill="#DEEBF7">↓ 优化 ↓</text>
+</svg>
