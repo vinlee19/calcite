@@ -438,6 +438,11 @@ allprojects {
         apply(plugin = "com.github.autostyle")
         configure<com.github.autostyle.gradle.AutostyleExtension> {
             kotlinGradle {
+                // Non-source working dirs (Claude Code agent worktrees under .claude/,
+                // generated media under harness-engineering-video/) live in the tree but
+                // are not Calcite source. Autostyle does not honor .gitignore, so exclude
+                // them explicitly here and in the web/markdown formats below.
+                filter.exclude(".claude/**", "harness-engineering-video/**")
                 license()
                 ktlint()
             }
@@ -458,6 +463,7 @@ allprojects {
                 filter {
                     include("**/*.md", "**/*.html")
                     exclude("**/test/**/*.html")
+                    exclude(".claude/**", "harness-engineering-video/**")
                 }
                 trimTrailingWhitespace()
                 endWithNewline()
@@ -468,6 +474,7 @@ allprojects {
                 // See https://github.com/diffplug/spotless/issues/468
                 format("markdown") {
                     filter.include("**/*.md")
+                    filter.exclude(".claude/**", "harness-engineering-video/**")
                     // Flot is known to have trailing whitespace, so the files
                     // are kept in their original format (e.g. to simplify diff on library upgrade)
                     endWithNewline()

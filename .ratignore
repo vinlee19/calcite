@@ -3,6 +3,17 @@
 **/.gitignore
 **/.gitattributes
 .github/**
+.claude/**
+harness-engineering-video/**
+# Personal Calcite study notes (CJK articles + hand-authored SVG diagrams) and the
+# agent instruction files. In-tree but not Calcite source. RAT's binary heuristic
+# skips the CJK-heavy articles but flags the ASCII-heavy files (SVGs, code-heavy
+# articles, AGENTS.md/CLAUDE.md) as text and demands a license header, so exclude
+# the doc trees wholesale to keep the result stable across edits.
+docs/source-analysis/**
+docs/calcite-guide/**
+AGENTS.md
+CLAUDE.md
 .ratignore
 **/META-INF/services/java.sql.Driver
 **/src/test/resources/**/*.csv

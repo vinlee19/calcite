@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F4E79"/>
+    </marker>
+    <marker id="stage" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7F3F00"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="620" fill="#ffffff"/>
+  <text x="500" y="30" text-anchor="middle" font-size="20" font-weight="700" fill="#1F4E79">开窗关键一步：RexOver（行级）→ Window.Group（关系级）</text>
+  <text x="500" y="50" text-anchor="middle" font-size="12" fill="#595959">ProjectToWindowRule 用 WindowedAggRelSplitter 把同窗口规格的多个 RexOver 归并进一个 Group，Project 里改引字段</text>
+
+  <!-- before -->
+  <rect x="40" y="70" width="410" height="490" rx="8" fill="#ffffff" stroke="#1F4E79" stroke-width="1.4"/>
+  <text x="56" y="92" font-size="13" font-weight="700" fill="#1F4E79">变换前：Project 内嵌 3 个 RexOver</text>
+  <text x="56" y="109" font-size="9.4" fill="#595959">行表达式里直接挂窗口聚合，优化器无法对"分区/排序"建模</text>
+
+  <rect x="62" y="122" width="366" height="40" rx="6" fill="#FFFFFF" stroke="#1F4E79"/>
+  <text x="245" y="141" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1F4E79">LogicalProject</text>
+  <text x="245" y="155" text-anchor="middle" font-size="8.4" fill="#595959">exprs 含 3 个 RexOver</text>
+
+  <rect x="62" y="174" width="366" height="46" rx="6" fill="#ED7D31" stroke="#7F3F00"/>
+  <text x="245" y="193" text-anchor="middle" font-size="9.6" font-weight="700" fill="#ffffff">RexOver: SUM(sal) OVER w1</text>
+  <text x="245" y="209" text-anchor="middle" font-size="8.2" fill="#FFF2CC">w1 = PARTITION BY deptno ORDER BY hiredate</text>
+
+  <rect x="62" y="228" width="366" height="46" rx="6" fill="#ED7D31" stroke="#7F3F00"/>
+  <text x="245" y="247" text-anchor="middle" font-size="9.6" font-weight="700" fill="#ffffff">RexOver: AVG(sal) OVER w1</text>
+  <text x="245" y="263" text-anchor="middle" font-size="8.2" fill="#FFF2CC">与上一个同窗口 w1</text>
+
+  <rect x="62" y="282" width="366" height="46" rx="6" fill="#ED7D31" stroke="#7F3F00"/>
+  <text x="245" y="301" text-anchor="middle" font-size="9.6" font-weight="700" fill="#ffffff">RexOver: rank() OVER w2</text>
+  <text x="245" y="317" text-anchor="middle" font-size="8.2" fill="#FFF2CC">w2 = PARTITION BY job ORDER BY sal</text>
+
+  <line x1="245" y1="328" x2="245" y2="346" stroke="#1F4E79" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <rect x="62" y="346" width="366" height="40" rx="6" fill="#FFFFFF" stroke="#1F4E79"/>
+  <text x="245" y="370" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1F4E79">LogicalTableScan(emp)</text>
+
+  <text x="56" y="416" font-size="9.6" fill="#595959">RexOver 是 RexCall 子类（RexOver.java），</text>
+  <text x="56" y="430" font-size="9.6" fill="#595959">持有 RexWindow + distinct + ignoreNulls。</text>
+  <text x="56" y="452" font-size="9.6" fill="#888">问题：分区/排序/帧是行表达式的"内部细节"，</text>
+  <text x="56" y="466" font-size="9.6" fill="#888">无法被排序消除、TopN 下推等规则识别利用。</text>
+  <text x="56" y="494" font-size="8.8" font-family="'SF Mono',Menlo,monospace" fill="#888">rex/RexOver · rex/RexWindow</text>
+  <text x="56" y="508" font-size="8.8" font-family="'SF Mono',Menlo,monospace" fill="#888">rex/RexWindowBound · RexFieldCollation</text>
+
+  <!-- transform arrow -->
+  <line x1="450" y1="300" x2="548" y2="300" stroke="#7F3F00" stroke-width="2.2" marker-end="url(#stage)"/>
+  <text x="499" y="288" text-anchor="middle" font-size="9.6" font-weight="700" fill="#7F3F00">ProjectToWindow</text>
+  <text x="499" y="316" text-anchor="middle" font-size="8.4" fill="#833C0C">Rule（:93/132）</text>
+
+  <!-- after -->
+  <rect x="556" y="70" width="404" height="490" rx="8" fill="#ffffff" stroke="#1F4E79" stroke-width="1.4"/>
+  <text x="572" y="92" font-size="13" font-weight="700" fill="#1F4E79">变换后：LogicalWindow + 改写的 Project</text>
+  <text x="572" y="109" font-size="9.4" fill="#595959">同 w1 的两个聚合归一个 Group；w2 单独一个 Group</text>
+
+  <rect x="576" y="122" width="364" height="44" rx="6" fill="#FFFFFF" stroke="#1F4E79"/>
+  <text x="758" y="140" text-anchor="middle" font-size="10.3" font-weight="700" fill="#1F4E79">LogicalProject（已改写）</text>
+  <text x="758" y="156" text-anchor="middle" font-size="8.2" fill="#595959">RexOver → RexInputRef 指向 window 输出列</text>
+
+  <line x1="758" y1="166" x2="758" y2="182" stroke="#1F4E79" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <rect x="576" y="182" width="364" height="150" rx="6" fill="#1F4E79"/>
+  <text x="758" y="202" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">LogicalWindow</text>
+
+  <rect x="592" y="212" width="332" height="56" rx="5" fill="#FFF2CC" stroke="#BF8F00"/>
+  <text x="758" y="229" text-anchor="middle" font-size="9.6" font-weight="700" fill="#7F6000">Window.Group #1（窗口 w1）</text>
+  <text x="758" y="244" text-anchor="middle" font-size="8" fill="#7F6000">keys={deptno} orderKeys=[hiredate] frame=ROWS…</text>
+  <text x="758" y="257" text-anchor="middle" font-size="8" fill="#7F6000">aggCalls=[ RexWinAggCall SUM, RexWinAggCall AVG ]</text>
+
+  <rect x="592" y="274" width="332" height="50" rx="5" fill="#FFF2CC" stroke="#BF8F00"/>
+  <text x="758" y="291" text-anchor="middle" font-size="9.6" font-weight="700" fill="#7F6000">Window.Group #2（窗口 w2）</text>
+  <text x="758" y="306" text-anchor="middle" font-size="8" fill="#7F6000">keys={job} orderKeys=[sal]</text>
+  <text x="758" y="318" text-anchor="middle" font-size="8" fill="#7F6000">aggCalls=[ RexWinAggCall rank ]</text>
+
+  <line x1="758" y1="332" x2="758" y2="348" stroke="#1F4E79" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <rect x="576" y="348" width="364" height="38" rx="6" fill="#FFFFFF" stroke="#1F4E79"/>
+  <text x="758" y="372" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1F4E79">LogicalTableScan(emp)</text>
+
+  <text x="572" y="416" font-size="10.5" font-weight="700" fill="#385723">收益（优化器视角）</text>
+  <text x="572" y="434" font-size="9.4" fill="#595959">• 分区/排序成为关系级属性 → 可与上游</text>
+  <text x="572" y="448" font-size="9.4" fill="#595959">  Sort 合并、共享排序、估算代价。</text>
+  <text x="572" y="466" font-size="9.4" fill="#595959">• 同窗口聚合合一组 → 一次扫描算多个。</text>
+  <text x="572" y="484" font-size="9.4" fill="#888">坑：跨 Group 仍需多趟分区/排序；窗口算子</text>
+  <text x="572" y="498" font-size="9.4" fill="#888">本身较重，能下推到源（如 RANK）才更划算。</text>
+  <text x="572" y="520" font-size="8.8" font-family="'SF Mono',Menlo,monospace" fill="#888">rel/core/Window.Group / RexWinAggCall(:251/410)</text>
+  <text x="572" y="534" font-size="8.8" font-family="'SF Mono',Menlo,monospace" fill="#888">rel/logical/LogicalWindow</text>
+
+  <text x="500" y="600" text-anchor="middle" font-size="10" fill="#A6A6A6">图 21-6 — 橙=行级 RexOver；黄=关系级 Window.Group；棕箭头为关键提升，按窗口规格归并并把 Project 改成字段引用</text>
+</svg>

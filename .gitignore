@@ -58,3 +58,9 @@ local.properties
 
 # jenv
 .java-version
+
+# Claude Code working dir (agent worktrees, settings)
+.claude/
+
+# Local generated media (not Calcite source)
+harness-engineering-video/

@@ -171,3 +171,18 @@
   - `svg/20-2-test-architecture.svg`【Arch】测试体系（Fixtures/Quidem/DiffRepository/Matchers 数据流）。
   - `svg/20-3-module-tour-matrix.svg`【Matrix】全模块巡礼（≥20 模块 × 定位/能力）。
 - 内容：全模块逐个短评——core/linq4j/testkit/babel/server/plus/ubenchmark + adapters(arrow/cassandra/druid/elasticsearch/file/geode/innodb/kafka/mongodb/pig/piglet/redis/spark/splunk) + buildSrc/bom，每个给"定位 + 亮点 + 可借鉴点"。
+
+## 21 · 21-feature-pipeline.md — 三道硬菜的全链路：子查询 / CTE / 开窗函数（综合篇）☆
+- 目标：唯一一篇"按特性纵切"的综合篇——把子查询、CTE、开窗函数各自走一遍五阶段全链路，并列出三者的关键一步（都在 sql2rel 阶段）。
+- 定位：综合篇（番外），串联前 20 篇；每阶段通用机制只一句话 + 链接主讲篇，只展开各特性专属装置。
+- 锚点：`sql2rel/SqlToRelConverter`（replaceSubQueries/substituteSubQuery/convertExists、convertWith/convertIdentifier 内联、createUnion 递归检测、convertOver/HistogramShuttle）、`rex/{RexSubQuery,RexOver,RexWindow}`、`rel/rules/{SubQueryRemoveRule,ProjectToWindowRule}`、`sql2rel/RelDecorrelator`、`sql/{SqlWith,SqlWithItem,SqlWindow,SqlOverOperator}`、`rel/core/{RepeatUnion,TableSpool,Window}`、`tools/RelBuilder`（repeatUnion/transientScan）、`schema/impl/ListTransientTable`、`adapter/enumerable/{EnumerableWindow,EnumerableRepeatUnion,EnumerableTableSpool}`。
+- SVG：
+  - `svg/21-1-subquery-pipeline.svg`【Flow】子查询五阶段全链路。
+  - `svg/21-2-subquery-keystep.svg`【Flow】关键一步 + 相关/非相关分叉（RexSubQuery）。
+  - `svg/21-3-cte-pipeline.svg`【Flow】CTE 五阶段全链路（被引用两次 → 内联两份）。
+  - `svg/21-4-cte-keystep.svg`【Flow】关键一步：内联展开 vs 递归 RepeatUnion。
+  - `svg/21-5-window-pipeline.svg`【Flow】开窗五阶段全链路。
+  - `svg/21-6-window-keystep.svg`【Flow/Class】关键一步：RexOver → Window.Group。
+  - `svg/21-7-window-exec.svg`【Flow/Seq】EnumerableWindow 执行：分桶→排序→滑帧累加。
+  - `svg/21-8-fullpath-overview.svg`【Arch】总览：三特性 × 五阶段泳道，高亮各自关键一步（压轴图）。
+- 边界：去关联机制本体→08；Scope/Namespace→07；规则机制→12；codegen/执行→16；四层 IR→02。本篇只讲三特性各自专属的 IR 节点与转换/消解一步。

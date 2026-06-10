@@ -35,6 +35,9 @@
 | 设计模式总览（Builder/Factory/Strategy/Registry/Template/Visitor/Flyweight/Immutables） | 19 | 各机制细节在其主讲篇，19 只做"模式视角"归纳 + 指针 |
 | RelBuilder | 19 | 其他篇用到即链接 |
 | 构建/静态检查（werror/Checker/ErrorProne/forbiddenapis/RAT）、测试体系、util 精品、Hook、全模块巡礼 | 20 | 09 讲 Parser 构建是 build 子集，链接 20 看全局 |
+| 子查询特性全链路 / `RexSubQuery` / `SubQueryRemoveRule`（特性视角） | 21 | 08 仍主讲去关联机制本体；12 主讲规则机制；21 只讲"特性如何流过五阶段" |
+| CTE 特性全链路 / `SqlWith` / 内联展开 vs `RepeatUnion` / `Spool`+`TransientTable` | 21 | 07 讲 WithScope 作用域本体；21 讲 convertWith/内联与递归改写 |
+| 开窗特性全链路 / `RexOver` / `Window.Group` / `ProjectToWindowRule` / `EnumerableWindow` | 21 | 07 讲窗口校验本体；12 主讲规则机制；16 主讲 codegen；21 串特性全链路 |
 
 ## 每篇"不讲什么"速查（转引目标见上表）
 
@@ -58,3 +61,4 @@
 - 18：不讲 SPI 接口定义（→17）。
 - 19：不讲每个模式的机制细节（链接到主讲篇）。
 - 20：不讲 Parser 模板语法细节（→09）。
+- 21：不讲去关联机制本体（→08）、不讲 Scope/Namespace 本体（→07）、不讲规则匹配机制（→12）、不讲 codegen/执行引擎本体（→16）、不讲四层 IR 为何分层（→02）；只讲三特性各自专属的 IR 节点与"转换/消解"那一步如何流过五阶段。
